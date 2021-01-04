@@ -10,10 +10,12 @@ class AccountList extends React.Component {
     }
 
     render() {
+        const listItems = this.state.accounts.map(account =>
+            <li key={account.id}>{account.name}</li>
+        );
+
         return (
-            this.state.accounts.map(account =>
-                <li key={account.id}>{account.name}</li>
-            )
+            <ol>{listItems}</ol>
         );
     }
 }
