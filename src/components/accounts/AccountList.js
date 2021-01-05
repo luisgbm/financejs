@@ -18,12 +18,13 @@ class AccountList extends React.Component {
                 <ul>
                 {
                     this.state.accounts.map(account =>
-                        <li key={account.id}>{account.name} <Link to={`/edit-account/${account.id}`}>Edit</Link></li>
+                        <li key={account.id}>{account.name} <Link to={`/accounts/edit/${account.id}`}>Edit</Link></li>
                     )
                 }
                 </ul>
+                <Link to='/accounts/new'>New Account</Link>
+                <br />
                 <Link to='/'>Home</Link>
-                <Link to='/new-account'>New Account</Link>
             </div>
         );
     }

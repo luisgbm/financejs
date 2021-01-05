@@ -42,12 +42,14 @@ class EditAccount extends React.Component {
             <div>
                 <h1>Edit Account</h1>
                 <form onSubmit={this.onSubmit}>
-                    <label htmlFor="name">Name:</label>
-                    <input id="name" type="text" value={this.state.name} onChange={this.onChange} />
+                    <label>
+                        Name:
+                        <input type="text" value={this.state.name} onChange={this.onChange} />
+                    </label>
                     <input type="submit" value="Submit" />
                     <input type="button" value="Delete" onClick={this.onDelete} />
                 </form>
-                <Link to="/">Back</Link>
+                <Link to="/accounts">Back</Link>
             </div>
         );
     }
