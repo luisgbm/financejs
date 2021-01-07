@@ -1,7 +1,7 @@
 import React from 'react';
 import finance from '../../api/finance';
 
-import { Link } from 'react-router-dom'
+import {Link} from 'react-router-dom'
 
 class AccountList extends React.Component {
     state = { accounts: [] };
@@ -19,7 +19,9 @@ class AccountList extends React.Component {
                 {
                     this.state.accounts.map(account =>
                         <li key={account.id}>
-                            <Link to={`/transactions/account/${account.id}`}>{account.name}</Link> <Link to={`/accounts/edit/${account.id}`}>Edit</Link>
+                            <Link
+                                to={`/transactions/account/${account.id}`}>{account.name}</Link> (Balance: {account.balance}) <Link
+                            to={`/accounts/edit/${account.id}`}>Edit</Link>
                         </li>
                     )
                 }
