@@ -1,7 +1,7 @@
 import React from 'react';
 import finance from '../../api/finance';
 
-import { Link } from 'react-router-dom'
+import {Link} from 'react-router-dom'
 
 class TransactionList extends React.Component {
     constructor(props) {
@@ -24,13 +24,13 @@ class TransactionList extends React.Component {
                     this.state.transactions.map(transaction =>
                         <li key={transaction.id}>
                             <b>Value:</b> {transaction.value}
-                            <br />
+                            <br/>
                             <b>Description:</b> {transaction.description}
-                            <br />
-                            <b>Category:</b> {transaction.category}
-                            <br />
+                            <br/>
+                            <b>Category:</b> {transaction.category_name} ({transaction.category_type})
+                            <br/>
                             <b>Date:</b> {transaction.date}
-                            <br />
+                            <br/>
                             <Link to={`/transactions/${transaction.id}`}>Edit</Link>
                         </li>
                     )
