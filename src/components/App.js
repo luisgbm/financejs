@@ -1,5 +1,4 @@
 import React from 'react';
-import AccountList from "./accounts/AccountList";
 import NewAccount from "./accounts/NewAccount";
 import EditAccount from "./accounts/EditAccount";
 import Home from "./home/Home";
@@ -19,7 +18,6 @@ class App extends React.Component {
                 <Switch>
                     <Route exact path="/accounts/new" component={NewAccount} />
                     <Route exact path="/accounts/edit/:id" component={EditAccount} />
-                    <Route exact path="/accounts" component={AccountList} />
                     <Route exact path="/categories/new" component={NewCategory} />
                     <Route exact path="/categories/edit/:id" component={EditCategory} />
                     <Route exact path="/categories" component={CategoryList} />

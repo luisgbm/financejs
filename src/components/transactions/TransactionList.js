@@ -42,8 +42,8 @@ class TransactionList extends React.Component {
                 }
                 </ul>
                 <Link to={`/transactions/account/${this.state.accountId}/new`}>New Transaction</Link>
-                <br />
-                <Link to='/accounts'>Back</Link>
+                <br/>
+                <Link to='/'>Back</Link>
             </div>
         );
     }

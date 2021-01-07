@@ -7,14 +7,13 @@ class AccountList extends React.Component {
     state = { accounts: [] };
 
     async componentDidMount() {
-        const response = await finance.get('/accounts');
-        this.setState({ accounts: response.data} );
+        const accounts = await finance.get('/accounts');
+        this.setState({accounts: accounts.data});
     }
 
     render() {
         return (
             <div>
-                <h1>Accounts</h1>
                 <ul>
                 {
                     this.state.accounts.map(account =>
@@ -27,8 +26,6 @@ class AccountList extends React.Component {
                 }
                 </ul>
                 <Link to='/accounts/new'>New Account</Link>
-                <br />
-                <Link to='/'>Home</Link>
             </div>
         );
     }

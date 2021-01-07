@@ -34,13 +34,13 @@ class AccountForm extends React.Component {
             });
         }
 
-        this.props.history.push('/accounts');
+        this.props.history.push('/');
     }
 
     async onDelete() {
         await finance.delete(`/accounts/${this.state.id}`);
 
-        this.props.history.push('/accounts');
+        this.props.history.push('/');
     }
 
     onChange(event) {
@@ -61,7 +61,7 @@ class AccountForm extends React.Component {
                         this.state.editMode ? <input type="button" value="Delete" onClick={this.onDelete}/> : ''
                     }
                 </form>
-                <Link to="/accounts">Back</Link>
+                <Link to="/">Back</Link>
             </div>
         );
     }
