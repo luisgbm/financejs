@@ -3,7 +3,7 @@ import React from 'react';
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import AppBar from "@material-ui/core/AppBar";
-import CategoryFormV2 from "./CategoryFormV2";
+import CategoryForm from "./CategoryForm";
 import {Container, IconButton} from "@material-ui/core";
 import {Done} from "@material-ui/icons";
 import finance from "../../api/finance";
@@ -41,7 +41,7 @@ function NewCategory(props) {
                 </Toolbar>
             </AppBar>
             <Container maxWidth='sm' style={{paddingTop: '16px'}}>
-                <CategoryFormV2
+                <CategoryForm
                     categoryName={categoryName}
                     categoryType={categoryType}
                     onChange={onChange}
