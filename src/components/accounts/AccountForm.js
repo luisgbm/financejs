@@ -1,8 +1,6 @@
 import React from 'react';
 import finance from '../../api/finance';
 
-import {Link} from "react-router-dom";
-
 class AccountForm extends React.Component {
     constructor(props) {
         super(props);
@@ -61,7 +59,6 @@ class AccountForm extends React.Component {
                         this.state.editMode ? <input type="button" value="Delete" onClick={this.onDelete}/> : ''
                     }
                 </form>
-                <Link to="/">Back</Link>
             </React.Fragment>
         );
     }

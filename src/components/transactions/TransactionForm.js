@@ -1,7 +1,6 @@
 import React from 'react';
 import finance from '../../api/finance';
 
-import {Link} from "react-router-dom";
 import moment from 'moment';
 
 class TransactionForm extends React.Component {
@@ -169,7 +168,6 @@ class TransactionForm extends React.Component {
                         this.state.editMode ? <input type="button" value="Delete" onClick={this.onDelete}/> : ''
                     }
                 </form>
-                <Link to={`/transactions/account/${this.state.accountId}`}>Back</Link>
             </React.Fragment>
         );
     }

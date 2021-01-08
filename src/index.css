@@ -9,11 +9,15 @@ body {
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+  monospace;
 }
 
 .bottomNav {
   width: 100%;
   position: fixed;
   bottom: 0;
+}
+
+.appBarTitle {
+  flex-grow: 1;
 }

@@ -5,6 +5,8 @@ import {Link} from 'react-router-dom'
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import AppBar from "@material-ui/core/AppBar";
+import {Add} from "@material-ui/icons";
+import {IconButton} from "@material-ui/core";
 
 class CategoryList extends React.Component {
     state = {categories: []};
@@ -19,7 +21,10 @@ class CategoryList extends React.Component {
             <React.Fragment>
                 <AppBar position="static">
                     <Toolbar>
-                        <Typography variant="h6">Categories</Typography>
+                        <Typography variant="h6" className="appBarTitle">Categories</Typography>
+                        <IconButton color="inherit" component={Link} to={'/categories/new'}>
+                            <Add/>
+                        </IconButton>
                     </Toolbar>
                 </AppBar>
                 <ul>
@@ -30,7 +35,6 @@ class CategoryList extends React.Component {
                         )
                     }
                 </ul>
-                <Link to='/categories/new'>New Category</Link>
             </React.Fragment>
         );
     }

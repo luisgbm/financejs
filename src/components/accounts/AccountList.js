@@ -5,6 +5,8 @@ import {Link} from 'react-router-dom'
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
+import {IconButton} from "@material-ui/core";
+import {Add} from "@material-ui/icons";
 
 class AccountList extends React.Component {
     state = {accounts: []};
@@ -19,7 +21,10 @@ class AccountList extends React.Component {
             <React.Fragment>
                 <AppBar position="static">
                     <Toolbar>
-                        <Typography variant="h6">Finance</Typography>
+                        <Typography variant="h6" className="appBarTitle">Accounts</Typography>
+                        <IconButton color="inherit" component={Link} to={'/accounts/new'}>
+                            <Add/>
+                        </IconButton>
                     </Toolbar>
                 </AppBar>
                 <ul>
@@ -33,7 +38,6 @@ class AccountList extends React.Component {
                         )
                     }
                 </ul>
-                <Link to='/accounts/new'>New Account</Link>
             </React.Fragment>
         );
     }

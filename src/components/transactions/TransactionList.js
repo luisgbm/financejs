@@ -5,6 +5,8 @@ import {Link} from 'react-router-dom'
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import AppBar from "@material-ui/core/AppBar";
+import {Add} from "@material-ui/icons";
+import {IconButton} from "@material-ui/core";
 
 class TransactionList extends React.Component {
     constructor(props) {
@@ -27,7 +29,11 @@ class TransactionList extends React.Component {
             <React.Fragment>
                 <AppBar position="sticky">
                     <Toolbar>
-                        <Typography variant="h6">{this.state.accountName}</Typography>
+                        <Typography variant="h6" className="appBarTitle">{this.state.accountName}</Typography>
+                        <IconButton color="inherit" component={Link}
+                                    to={`/transactions/account/${this.state.accountId}/new`}>
+                            <Add/>
+                        </IconButton>
                     </Toolbar>
                 </AppBar>
                 <p>Balance: {this.state.accountBalance}</p>
@@ -48,9 +54,6 @@ class TransactionList extends React.Component {
                         )
                     }
                 </ul>
-                <Link to={`/transactions/account/${this.state.accountId}/new`}>New Transaction</Link>
-                <br/>
-                <Link to='/'>Back</Link>
             </React.Fragment>
         );
     }
