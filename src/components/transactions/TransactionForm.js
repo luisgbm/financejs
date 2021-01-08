@@ -112,7 +112,7 @@ class TransactionForm extends React.Component {
 
     render() {
         return (
-            <div>
+            <React.Fragment>
                 <form onSubmit={this.onSubmit}>
                     <label>
                         Value:
@@ -170,7 +170,7 @@ class TransactionForm extends React.Component {
                     }
                 </form>
                 <Link to={`/transactions/account/${this.state.accountId}`}>Back</Link>
-            </div>
+            </React.Fragment>
         );
     }
 }

@@ -55,7 +55,7 @@ class CategoryForm extends React.Component {
 
     render() {
         return (
-            <div>
+            <React.Fragment>
                 <form onSubmit={this.onSubmit}>
                     <label>
                         Name:
@@ -77,7 +77,7 @@ class CategoryForm extends React.Component {
                     }
                 </form>
                 <Link to="/categories">Back</Link>
-            </div>
+            </React.Fragment>
         );
     }
 }

@@ -1,16 +1,23 @@
 import React from 'react';
 
 import AccountForm from "./AccountForm";
+import Toolbar from "@material-ui/core/Toolbar";
+import Typography from "@material-ui/core/Typography";
+import AppBar from "@material-ui/core/AppBar";
 
 function NewAccount(props) {
     return (
-        <div>
-            <h1>New Account</h1>
+        <React.Fragment>
+            <AppBar position="static">
+                <Toolbar>
+                    <Typography variant="h6">New Account</Typography>
+                </Toolbar>
+            </AppBar>
             <AccountForm
                 editMode={false}
                 history={props.history}
             />
-        </div>
+        </React.Fragment>
     );
 }
 

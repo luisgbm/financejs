@@ -2,6 +2,9 @@ import React from 'react';
 import finance from '../../api/finance';
 
 import {Link} from 'react-router-dom'
+import Toolbar from "@material-ui/core/Toolbar";
+import Typography from "@material-ui/core/Typography";
+import AppBar from "@material-ui/core/AppBar";
 
 class TransactionList extends React.Component {
     constructor(props) {
@@ -21,8 +24,12 @@ class TransactionList extends React.Component {
 
     render() {
         return (
-            <div>
-                <h1>Transactions - {this.state.accountName}</h1>
+            <React.Fragment>
+                <AppBar position="sticky">
+                    <Toolbar>
+                        <Typography variant="h6">{this.state.accountName}</Typography>
+                    </Toolbar>
+                </AppBar>
                 <p>Balance: {this.state.accountBalance}</p>
                 <ul>
                     {
@@ -34,17 +41,17 @@ class TransactionList extends React.Component {
                                 <br/>
                                 <b>Category:</b> {transaction.category_name} ({transaction.category_type})
                                 <br/>
-                            <b>Date:</b> {transaction.date}
-                            <br/>
-                            <Link to={`/transactions/${transaction.id}`}>Edit</Link>
-                        </li>
-                    )
-                }
+                                <b>Date:</b> {transaction.date}
+                                <br/>
+                                <Link to={`/transactions/${transaction.id}`}>Edit</Link>
+                            </li>
+                        )
+                    }
                 </ul>
                 <Link to={`/transactions/account/${this.state.accountId}/new`}>New Transaction</Link>
                 <br/>
                 <Link to='/'>Back</Link>
-            </div>
+            </React.Fragment>
         );
     }
 }

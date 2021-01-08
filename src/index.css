@@ -11,3 +11,9 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.bottomNav {
+  width: 100%;
+  position: fixed;
+  bottom: 0;
+}

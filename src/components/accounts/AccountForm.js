@@ -49,7 +49,7 @@ class AccountForm extends React.Component {
 
     render() {
         return (
-            <div>
+            <React.Fragment>
                 <form onSubmit={this.onSubmit}>
                     <label>
                         Name:
@@ -62,7 +62,7 @@ class AccountForm extends React.Component {
                     }
                 </form>
                 <Link to="/">Back</Link>
-            </div>
+            </React.Fragment>
         );
     }
 }
