@@ -81,7 +81,7 @@ function TransactionForm(props) {
                         label='Date/Time'
                         inputVariant='outlined'
                         value={props.date}
-                        format='DD/MM/yyyy HH:mm:ss'
+                        format='DD/MM/yyyy HH:mm'
                         onChange={date => props.onChange('date', date)}
                     />
                 </FormControl>
