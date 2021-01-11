@@ -8,10 +8,12 @@ import {Container, IconButton} from '@material-ui/core';
 import {Done} from '@material-ui/icons';
 import finance from '../../api/finance';
 import CategoryTypes from './CategoryTypes';
+import LoadingModal from "../LoadingModal";
 
 function NewCategory(props) {
     const [categoryName, setCategoryName] = React.useState('');
     const [categoryType, setCategoryType] = React.useState(props.match.params.type === 'expense' ? CategoryTypes.EXPENSE : CategoryTypes.INCOME);
+    const [showLoadingModal, setShowLoadingModal] = React.useState(false);
 
     const onChange = (fieldName, fieldValue) => {
         if (fieldName === 'categoryName') {
@@ -22,16 +24,23 @@ function NewCategory(props) {
     };
 
     const onNewCategory = async () => {
+        setShowLoadingModal(true);
+
         await finance.post('/categories', {
             name: categoryName,
             categorytype: categoryType
         });
 
-        props.history.push('/categories');
+        setShowLoadingModal(false);
+
+        props.history.push(`/categories/${categoryType.toLowerCase()}`);
     };
 
     return (
         <React.Fragment>
+            <LoadingModal
+                show={showLoadingModal}
+            />
             <AppBar position='static'>
                 <Toolbar>
                     <Typography variant='h6' className='appBarTitle'>New Category</Typography>

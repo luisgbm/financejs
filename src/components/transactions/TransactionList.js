@@ -10,6 +10,7 @@ import {Card, CardHeader, Chip, IconButton} from '@material-ui/core';
 import CreateIcon from "@material-ui/icons/Create";
 import {withStyles} from "@material-ui/core/styles";
 import moment from 'moment';
+import LoadingModal from "../LoadingModal";
 
 const styles = theme => ({
     card: {
@@ -26,7 +27,13 @@ const styles = theme => ({
 class TransactionList extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {accountId: props.match.params.accountId, accountName: '', transactions: [], accountBalance: 0};
+        this.state = {
+            accountId: props.match.params.accountId,
+            accountName: 'Loading...',
+            transactions: [],
+            accountBalance: 0,
+            showLoadingModal: true
+        };
     }
 
     async componentDidMount() {
@@ -35,7 +42,8 @@ class TransactionList extends React.Component {
         this.setState({
             transactions: transactions.data,
             accountName: account.data.name,
-            accountBalance: account.data.balance
+            accountBalance: account.data.balance,
+            showLoadingModal: false
         });
     }
 
@@ -44,6 +52,9 @@ class TransactionList extends React.Component {
 
         return (
             <React.Fragment>
+                <LoadingModal
+                    show={this.state.showLoadingModal}
+                />
                 <AppBar position='sticky'>
                     <Toolbar>
                         <Typography variant='h6' className='appBarTitle'>{this.state.accountName} <Chip
@@ -75,7 +86,7 @@ class TransactionList extends React.Component {
                                         <br/>
                                         <b>Category:</b> {transaction.category_name} ({transaction.category_type})
                                         <br/>
-                                        <b>Date:</b> {moment(transaction.date).format('DD/MM/YYYY hh:mm')}
+                                        <b>Date:</b> {moment(transaction.date).format('DD/MM/YYYY HH:mm')}
                                     </React.Fragment>
                                 }
                             />

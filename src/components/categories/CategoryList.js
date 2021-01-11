@@ -11,6 +11,7 @@ import ThumbUpIcon from '@material-ui/icons/ThumbUp';
 import ThumbDownIcon from '@material-ui/icons/ThumbDown';
 import {Card, CardHeader, IconButton, Tab, Tabs} from '@material-ui/core';
 import CreateIcon from '@material-ui/icons/Create';
+import LoadingModal from "../LoadingModal";
 
 const styles = theme => ({
     card: {
@@ -24,7 +25,8 @@ class CategoryList extends React.Component {
 
         this.state = {
             categories: [],
-            currentTab: 0
+            currentTab: props.match.params.type === 'expense' ? 0 : 1,
+            showLoadingModal: true
         };
 
         this.onChangeTab = this.onChangeTab.bind(this);
@@ -34,7 +36,8 @@ class CategoryList extends React.Component {
         const response = await finance.get('/categories');
 
         this.setState({
-            categories: response.data
+            categories: response.data,
+            showLoadingModal: false
         });
     }
 
@@ -49,6 +52,9 @@ class CategoryList extends React.Component {
 
         return (
             <React.Fragment>
+                <LoadingModal
+                    show={this.state.showLoadingModal}
+                />
                 <AppBar position='static'>
                     <Toolbar>
                         <Typography variant='h6' className='appBarTitle'>Categories</Typography>

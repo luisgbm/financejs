@@ -9,6 +9,7 @@ import finance from '../../api/finance';
 import CategoryTypes from '../categories/CategoryTypes';
 import DoneIcon from '@material-ui/icons/Done';
 import moment from 'moment';
+import LoadingModal from "../LoadingModal";
 
 class NewTransaction extends React.Component {
     constructor(props) {
@@ -23,7 +24,8 @@ class NewTransaction extends React.Component {
             categories: [],
             categoryId: '',
             categoryName: '',
-            date: moment().format('YYYY-MM-DDThh:mm:ss')
+            date: moment().format('YYYY-MM-DDThh:mm:ss'),
+            showLoadingModal: true
         };
 
         this.onChange = this.onChange.bind(this);
@@ -40,6 +42,8 @@ class NewTransaction extends React.Component {
     }
 
     async onNewTransaction() {
+        this.setState({showLoadingModal: true});
+
         await finance.post(`/transactions/account/${this.state.accountId}`, {
             value: parseInt(this.state.value),
             description: this.state.description,
@@ -47,12 +51,16 @@ class NewTransaction extends React.Component {
             category: parseInt(this.state.categoryId)
         });
 
+        this.setState({showLoadingModal: false});
+
         this.props.history.push(`/transactions/account/${this.state.accountId}`);
     }
 
     async updateCategoriesAndSelectFirst(categoryType) {
+        this.setState({showLoadingModal: true});
+
         const categories = await finance.get(`/categories/${categoryType.toLowerCase()}`);
-        this.setState({categories: categories.data});
+        this.setState({categories: categories.data, showLoadingModal: false});
 
         if (categories.data && categories.data.length) {
             this.setState({
@@ -64,16 +72,22 @@ class NewTransaction extends React.Component {
 
     async componentDidMount() {
         const accounts = await finance.get('/accounts');
+
         this.setState({
             accounts: accounts.data,
-            accountId: this.props.match.params.accountId
+            accountId: this.props.match.params.accountId,
+            showLoadingModal: false
         });
+
         await this.updateCategoriesAndSelectFirst(this.state.categoryType);
     }
 
     render() {
         return (
             <React.Fragment>
+                <LoadingModal
+                    show={this.state.showLoadingModal}
+                />
                 <AppBar position='static'>
                     <Toolbar>
                         <Typography variant='h6' className='appBarTitle'>New Transaction</Typography>

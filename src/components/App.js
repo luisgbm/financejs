@@ -35,7 +35,8 @@ function App() {
                         <Route exact path='/accounts/edit/:id' component={EditAccount}/>
                         <Route exact path='/categories/new/:type' component={NewCategory}/>
                         <Route exact path='/categories/edit/:id' component={EditCategory}/>
-                        <Route exact path='/categories' component={CategoryList}/>
+                        <Route exact path='/categories/' component={CategoryList}/>
+                        <Route exact path='/categories/:type' component={CategoryList}/>
                         <Route exact path='/transactions/account/:accountId' component={TransactionList}/>
                         <Route exact path='/transactions/account/:accountId/new' component={NewTransaction}/>
                         <Route exact path='/transactions/:transactionId' component={EditTransaction}/>

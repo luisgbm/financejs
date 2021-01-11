@@ -9,6 +9,7 @@ import Typography from '@material-ui/core/Typography';
 import {Card, CardHeader, IconButton} from '@material-ui/core';
 import {Add} from '@material-ui/icons';
 import CreateIcon from "@material-ui/icons/Create";
+import LoadingModal from "../LoadingModal";
 
 const styles = theme => ({
     card: {
@@ -27,13 +28,14 @@ class AccountList extends React.Component {
         super(props);
 
         this.state = {
-            accounts: []
+            accounts: [],
+            showLoadingModal: true
         };
     }
 
     async componentDidMount() {
         const accounts = await finance.get('/accounts');
-        this.setState({accounts: accounts.data});
+        this.setState({accounts: accounts.data, showLoadingModal: false});
     }
 
     render() {
@@ -41,6 +43,9 @@ class AccountList extends React.Component {
 
         return (
             <React.Fragment>
+                <LoadingModal
+                    show={this.state.showLoadingModal}
+                />
                 <AppBar position='static'>
                     <Toolbar>
                         <Typography variant='h6' className='appBarTitle'>Accounts</Typography>

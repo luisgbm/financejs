@@ -2,9 +2,10 @@ import React from 'react';
 import DoneIcon from '@material-ui/icons/Done';
 import {AppBar, Container, IconButton, TextField, Toolbar, Typography} from '@material-ui/core';
 import finance from '../../api/finance';
+import LoadingModal from "../LoadingModal";
 
 class NewAccount extends React.Component {
-    state = {accountName: ''};
+    state = {accountName: '', showLoadingModal: false};
 
     constructor(props) {
         super(props);
@@ -13,9 +14,13 @@ class NewAccount extends React.Component {
     }
 
     async onNewAccount() {
+        this.setState({showLoadingModal: true});
+
         await finance.post('/accounts', {
             name: this.state.accountName
         });
+
+        this.setState({showLoadingModal: false});
 
         this.props.history.push('/');
     }
@@ -23,6 +28,9 @@ class NewAccount extends React.Component {
     render() {
         return (
             <React.Fragment>
+                <LoadingModal
+                    show={this.state.showLoadingModal}
+                />
                 <AppBar position='static'>
                     <Toolbar>
                         <Typography variant='h6' className='appBarTitle'>New Account</Typography>

@@ -10,6 +10,7 @@ import CategoryTypes from '../categories/CategoryTypes';
 import moment from 'moment';
 import finance from '../../api/finance';
 import DeleteIcon from '@material-ui/icons/Delete';
+import LoadingModal from "../LoadingModal";
 
 class EditTransaction extends React.Component {
     constructor(props) {
@@ -26,7 +27,8 @@ class EditTransaction extends React.Component {
             categories: [],
             categoryId: '',
             categoryName: '',
-            date: moment().format('YYYY-MM-DDThh:mm:ss')
+            date: moment().format('YYYY-MM-DDThh:mm:ss'),
+            showLoadingModal: true
         };
 
         this.onEditTransaction = this.onEditTransaction.bind(this);
@@ -36,14 +38,21 @@ class EditTransaction extends React.Component {
     }
 
     async onDeleteTransaction() {
+        this.setState({showLoadingModal: true});
+
         await finance.delete(`/transactions/${this.state.transactionId}`);
+
+        this.setState({showLoadingModal: false});
 
         this.props.history.push(`/transactions/account/${this.state.accountId}`);
     }
 
     async updateCategoriesAndSelectFirst(categoryType) {
+        this.setState({showLoadingModal: true});
+
         const categories = await finance.get(`/categories/${categoryType.toLowerCase()}`);
-        this.setState({categories: categories.data});
+
+        this.setState({categories: categories.data, showLoadingModal: false});
 
         if (categories.data && categories.data.length) {
             this.setState({
@@ -72,11 +81,14 @@ class EditTransaction extends React.Component {
 
         this.setState({
             categories: categories.data,
-            accounts: accounts.data
+            accounts: accounts.data,
+            showLoadingModal: false
         });
     }
 
     async onEditTransaction() {
+        this.setState({showLoadingModal: true});
+
         await finance.patch(`/transactions/${this.state.transactionId}`, {
             value: parseInt(this.state.value),
             description: this.state.description,
@@ -84,6 +96,8 @@ class EditTransaction extends React.Component {
             account: parseInt(this.state.accountId),
             category: parseInt(this.state.categoryId)
         });
+
+        this.setState({showLoadingModal: false});
 
         this.props.history.push(`/transactions/account/${this.state.accountId}`);
     }
@@ -99,6 +113,9 @@ class EditTransaction extends React.Component {
     render() {
         return (
             <React.Fragment>
+                <LoadingModal
+                    show={this.state.showLoadingModal}
+                />
                 <AppBar position='static'>
                     <Toolbar>
                         <Typography variant='h6' className='appBarTitle'>Edit Transaction</Typography>

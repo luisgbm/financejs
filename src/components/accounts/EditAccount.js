@@ -3,6 +3,7 @@ import SaveIcon from '@material-ui/icons/Save';
 import DeleteIcon from '@material-ui/icons/Delete';
 import {AppBar, Button, Container, IconButton, TextField, Toolbar, Typography} from '@material-ui/core';
 import finance from '../../api/finance';
+import LoadingModal from "../LoadingModal";
 
 class EditAccount extends React.Component {
     constructor(props) {
@@ -13,32 +14,44 @@ class EditAccount extends React.Component {
 
         this.state = {
             accountId: props.match.params.id,
-            accountName: ''
+            accountName: '',
+            showLoadingModal: true
         };
     }
 
     async componentDidMount() {
         const account = await finance.get(`/accounts/${this.state.accountId}`);
-        this.setState({accountName: account.data.name});
+        this.setState({accountName: account.data.name, showLoadingModal: false});
     }
 
     async onEditAccount() {
+        this.setState({showLoadingModal: true});
+
         await finance.patch(`/accounts/${this.state.accountId}`, {
             name: this.state.accountName
         });
+
+        this.setState({showLoadingModal: false});
 
         this.props.history.push('/');
     }
 
     async onDeleteAccount() {
+        this.setState({showLoadingModal: true});
+
         await finance.delete(`/accounts/${this.state.accountId}`);
+
+        this.setState({showLoadingModal: false});
 
         this.props.history.push('/');
     }
 
     render() {
         return (
-            <div>
+            <React.Fragment>
+                <LoadingModal
+                    show={this.state.showLoadingModal}
+                />
                 <AppBar position='static'>
                     <Toolbar>
                         <Typography variant='h6' className='appBarTitle'>Edit Account</Typography>
@@ -66,7 +79,7 @@ class EditAccount extends React.Component {
                         Delete
                     </Button>
                 </Container>
-            </div>
+            </React.Fragment>
         );
     }
 }
