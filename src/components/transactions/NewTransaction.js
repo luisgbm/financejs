@@ -24,7 +24,7 @@ class NewTransaction extends React.Component {
             categories: [],
             categoryId: '',
             categoryName: '',
-            date: moment().format('YYYY-MM-DDThh:mm:ss'),
+            date: moment(),
             showLoadingModal: true
         };
 
@@ -47,7 +47,7 @@ class NewTransaction extends React.Component {
         await finance.post(`/transactions/account/${this.state.accountId}`, {
             value: parseInt(this.state.value),
             description: this.state.description,
-            date: this.state.date,
+            date: this.state.date.format('yyyy-MM-DDTHH:mm:ss'),
             category: parseInt(this.state.categoryId)
         });
 

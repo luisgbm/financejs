@@ -27,7 +27,9 @@ class EditTransaction extends React.Component {
             categories: [],
             categoryId: '',
             categoryName: '',
-            date: moment().format('YYYY-MM-DDThh:mm:ss'),
+            date: moment(),
+            dateOnly: '',
+            timeOnly: '',
             showLoadingModal: true
         };
 
@@ -92,7 +94,7 @@ class EditTransaction extends React.Component {
         await finance.patch(`/transactions/${this.state.transactionId}`, {
             value: parseInt(this.state.value),
             description: this.state.description,
-            date: this.state.date,
+            date: this.state.date.format('YYYY-MM-DDTHH:mm:ss'),
             account: parseInt(this.state.accountId),
             category: parseInt(this.state.categoryId)
         });

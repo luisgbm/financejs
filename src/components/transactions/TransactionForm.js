@@ -1,6 +1,8 @@
 import React from 'react';
 import {FormControl, InputLabel, makeStyles, MenuItem, Select, TextField} from '@material-ui/core';
 import CategoryTypes from '../categories/CategoryTypes';
+import {DateTimePicker, MuiPickersUtilsProvider} from '@material-ui/pickers';
+import MomentUtils from '@date-io/moment';
 
 const useStyles = makeStyles(theme => ({
     textField: {
@@ -73,18 +75,17 @@ function TransactionForm(props) {
                     }
                 </Select>
             </FormControl>
-            <TextField
-                variant='outlined'
-                label='Date/Time'
-                type='datetime-local'
-                step='1'
-                value={props.date}
-                onChange={event => props.onChange('date', event.target.value)}
-                className={classes.textField}
-                InputLabelProps={{
-                    shrink: true
-                }}
-            />
+            <MuiPickersUtilsProvider utils={MomentUtils}>
+                <FormControl className={classes.formControl}>
+                    <DateTimePicker
+                        label='Date/Time'
+                        inputVariant='outlined'
+                        value={props.date}
+                        format='DD/MM/yyyy HH:mm:ss'
+                        onChange={date => props.onChange('date', date)}
+                    />
+                </FormControl>
+            </MuiPickersUtilsProvider>
         </React.Fragment>
     );
 }
