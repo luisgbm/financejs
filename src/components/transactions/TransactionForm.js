@@ -77,6 +77,7 @@ function TransactionForm(props) {
                 variant='outlined'
                 label="Date/Time"
                 type="datetime-local"
+                step="1"
                 value={props.date}
                 onChange={event => props.onChange('date', event.target.value)}
                 className={classes.textField}
