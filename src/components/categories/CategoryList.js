@@ -15,18 +15,7 @@ import CreateIcon from '@material-ui/icons/Create';
 const styles = theme => ({
     card: {
         margin: theme.spacing(2)
-    },
-    bullet: {
-        display: 'inline-block',
-        margin: '0 2px',
-        transform: 'scale(0.8)',
-    },
-    title: {
-        fontSize: 14,
-    },
-    pos: {
-        marginBottom: 12,
-    },
+    }
 });
 
 class CategoryList extends React.Component {

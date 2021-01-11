@@ -21,3 +21,8 @@ code {
 .appBarTitle {
   flex-grow: 1;
 }
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
