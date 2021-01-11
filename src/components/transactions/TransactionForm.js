@@ -1,6 +1,6 @@
 import React from 'react';
-import {FormControl, InputLabel, makeStyles, MenuItem, Select, TextField} from "@material-ui/core";
-import CategoryTypes from "../categories/CategoryTypes";
+import {FormControl, InputLabel, makeStyles, MenuItem, Select, TextField} from '@material-ui/core';
+import CategoryTypes from '../categories/CategoryTypes';
 
 const useStyles = makeStyles(theme => ({
     textField: {
@@ -64,7 +64,7 @@ function TransactionForm(props) {
                 <Select
                     value={props.categoryId}
                     onChange={event => props.onChange('categoryId', event.target.value)}
-                    label='Type'
+                    label='Category'
                 >
                     {
                         props.categories.map(category =>
@@ -75,14 +75,14 @@ function TransactionForm(props) {
             </FormControl>
             <TextField
                 variant='outlined'
-                label="Date/Time"
-                type="datetime-local"
-                step="1"
+                label='Date/Time'
+                type='datetime-local'
+                step='1'
                 value={props.date}
                 onChange={event => props.onChange('date', event.target.value)}
                 className={classes.textField}
                 InputLabelProps={{
-                    shrink: true,
+                    shrink: true
                 }}
             />
         </React.Fragment>

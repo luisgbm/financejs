@@ -1,14 +1,14 @@
 import React from 'react';
 
-import Toolbar from "@material-ui/core/Toolbar";
-import Typography from "@material-ui/core/Typography";
-import AppBar from "@material-ui/core/AppBar";
-import {Container, IconButton} from "@material-ui/core";
-import TransactionForm from "./TransactionForm";
-import finance from "../../api/finance";
-import CategoryTypes from "../categories/CategoryTypes";
-import DoneIcon from "@material-ui/icons/Done";
-import moment from "moment";
+import Toolbar from '@material-ui/core/Toolbar';
+import Typography from '@material-ui/core/Typography';
+import AppBar from '@material-ui/core/AppBar';
+import {Container, IconButton} from '@material-ui/core';
+import TransactionForm from './TransactionForm';
+import finance from '../../api/finance';
+import CategoryTypes from '../categories/CategoryTypes';
+import DoneIcon from '@material-ui/icons/Done';
+import moment from 'moment';
 
 class NewTransaction extends React.Component {
     constructor(props) {
@@ -23,7 +23,7 @@ class NewTransaction extends React.Component {
             categories: [],
             categoryId: '',
             categoryName: '',
-            date: moment().format("YYYY-MM-DDThh:mm:ss")
+            date: moment().format('YYYY-MM-DDThh:mm:ss')
         };
 
         this.onChange = this.onChange.bind(this);
@@ -74,10 +74,10 @@ class NewTransaction extends React.Component {
     render() {
         return (
             <React.Fragment>
-                <AppBar position="static">
+                <AppBar position='static'>
                     <Toolbar>
-                        <Typography variant="h6" className="appBarTitle">New Transaction</Typography>
-                        <IconButton color="inherit" onClick={this.onNewTransaction}>
+                        <Typography variant='h6' className='appBarTitle'>New Transaction</Typography>
+                        <IconButton color='inherit' onClick={this.onNewTransaction}>
                             <DoneIcon/>
                         </IconButton>
                     </Toolbar>

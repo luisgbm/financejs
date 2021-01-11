@@ -1,15 +1,15 @@
 import React from 'react';
 
-import TransactionForm from "./TransactionForm";
-import Toolbar from "@material-ui/core/Toolbar";
-import Typography from "@material-ui/core/Typography";
-import AppBar from "@material-ui/core/AppBar";
-import SaveIcon from "@material-ui/icons/Save";
-import {Button, Container, IconButton} from "@material-ui/core";
-import CategoryTypes from "../categories/CategoryTypes";
-import moment from "moment";
-import finance from "../../api/finance";
-import DeleteIcon from "@material-ui/icons/Delete";
+import TransactionForm from './TransactionForm';
+import Toolbar from '@material-ui/core/Toolbar';
+import Typography from '@material-ui/core/Typography';
+import AppBar from '@material-ui/core/AppBar';
+import SaveIcon from '@material-ui/icons/Save';
+import {Button, Container, IconButton} from '@material-ui/core';
+import CategoryTypes from '../categories/CategoryTypes';
+import moment from 'moment';
+import finance from '../../api/finance';
+import DeleteIcon from '@material-ui/icons/Delete';
 
 class EditTransaction extends React.Component {
     constructor(props) {
@@ -26,7 +26,7 @@ class EditTransaction extends React.Component {
             categories: [],
             categoryId: '',
             categoryName: '',
-            date: moment().format("YYYY-MM-DDThh:mm:ss")
+            date: moment().format('YYYY-MM-DDThh:mm:ss')
         };
 
         this.onEditTransaction = this.onEditTransaction.bind(this);
@@ -99,10 +99,10 @@ class EditTransaction extends React.Component {
     render() {
         return (
             <React.Fragment>
-                <AppBar position="static">
+                <AppBar position='static'>
                     <Toolbar>
-                        <Typography variant="h6" className="appBarTitle">Edit Transaction</Typography>
-                        <IconButton color="inherit" onClick={this.onEditTransaction}>
+                        <Typography variant='h6' className='appBarTitle'>Edit Transaction</Typography>
+                        <IconButton color='inherit' onClick={this.onEditTransaction}>
                             <SaveIcon/>
                         </IconButton>
                     </Toolbar>
@@ -120,10 +120,10 @@ class EditTransaction extends React.Component {
                         onChange={this.onChange}
                     />
                     <Button
-                        variant="contained"
-                        color="secondary"
+                        variant='contained'
+                        color='secondary'
                         startIcon={<DeleteIcon/>}
-                        size="large"
+                        size='large'
                         style={{width: '100%'}}
                         onClick={this.onDeleteTransaction}
                     >

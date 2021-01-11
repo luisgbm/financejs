@@ -1,13 +1,13 @@
 import React, {useEffect} from 'react';
 
-import CategoryForm from "./CategoryForm";
-import Toolbar from "@material-ui/core/Toolbar";
-import Typography from "@material-ui/core/Typography";
-import AppBar from "@material-ui/core/AppBar";
-import SaveIcon from "@material-ui/icons/Save";
-import {Button, Container, IconButton} from "@material-ui/core";
-import finance from "../../api/finance";
-import DeleteIcon from "@material-ui/icons/Delete";
+import CategoryForm from './CategoryForm';
+import Toolbar from '@material-ui/core/Toolbar';
+import Typography from '@material-ui/core/Typography';
+import AppBar from '@material-ui/core/AppBar';
+import SaveIcon from '@material-ui/icons/Save';
+import {Button, Container, IconButton} from '@material-ui/core';
+import finance from '../../api/finance';
+import DeleteIcon from '@material-ui/icons/Delete';
 
 function EditCategory(props) {
     const [categoryId] = React.useState(props.match.params.id);
@@ -47,10 +47,10 @@ function EditCategory(props) {
 
     return (
         <React.Fragment>
-            <AppBar position="static">
+            <AppBar position='static'>
                 <Toolbar>
-                    <Typography variant="h6" className="appBarTitle">Edit Category</Typography>
-                    <IconButton color="inherit" onClick={onEditCategory}>
+                    <Typography variant='h6' className='appBarTitle'>Edit Category</Typography>
+                    <IconButton color='inherit' onClick={onEditCategory}>
                         <SaveIcon/>
                     </IconButton>
                 </Toolbar>
@@ -62,10 +62,10 @@ function EditCategory(props) {
                     onChange={onChange}
                 />
                 <Button
-                    variant="contained"
-                    color="secondary"
+                    variant='contained'
+                    color='secondary'
                     startIcon={<DeleteIcon/>}
-                    size="large"
+                    size='large'
                     style={{width: '100%', marginTop: '16px'}}
                     onClick={onDeleteCategory}
                 >

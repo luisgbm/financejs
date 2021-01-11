@@ -1,16 +1,14 @@
 import React from 'react';
-import {FormControl, InputLabel, makeStyles, MenuItem, Select, TextField} from "@material-ui/core";
-import CategoryTypes from "./CategoryTypes";
+import {FormControl, InputLabel, makeStyles, MenuItem, Select, TextField} from '@material-ui/core';
+import CategoryTypes from './CategoryTypes';
 
 const useStyles = makeStyles(theme => ({
     textField: {
-        width: '100%'
+        width: '100%',
+        marginBottom: theme.spacing(2)
     },
     formControl: {
         width: '100%'
-    },
-    select: {
-        marginTop: theme.spacing(2)
     }
 }));
 
@@ -32,7 +30,6 @@ function CategoryForm(props) {
                     value={props.categoryType}
                     onChange={event => props.onChange('categoryType', event.target.value)}
                     label='Type'
-                    className={classes.select}
                 >
                     <MenuItem value={CategoryTypes.EXPENSE}>Expense</MenuItem>
                     <MenuItem value={CategoryTypes.INCOME}>Income</MenuItem>

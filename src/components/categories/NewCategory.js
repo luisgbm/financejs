@@ -1,17 +1,17 @@
 import React from 'react';
 
-import Toolbar from "@material-ui/core/Toolbar";
-import Typography from "@material-ui/core/Typography";
-import AppBar from "@material-ui/core/AppBar";
-import CategoryForm from "./CategoryForm";
-import {Container, IconButton} from "@material-ui/core";
-import {Done} from "@material-ui/icons";
-import finance from "../../api/finance";
-import CategoryTypes from "./CategoryTypes";
+import Toolbar from '@material-ui/core/Toolbar';
+import Typography from '@material-ui/core/Typography';
+import AppBar from '@material-ui/core/AppBar';
+import CategoryForm from './CategoryForm';
+import {Container, IconButton} from '@material-ui/core';
+import {Done} from '@material-ui/icons';
+import finance from '../../api/finance';
+import CategoryTypes from './CategoryTypes';
 
 function NewCategory(props) {
     const [categoryName, setCategoryName] = React.useState('');
-    const [categoryType, setCategoryType] = React.useState(CategoryTypes.EXPENSE);
+    const [categoryType, setCategoryType] = React.useState(props.match.params.type === 'expense' ? CategoryTypes.EXPENSE : CategoryTypes.INCOME);
 
     const onChange = (fieldName, fieldValue) => {
         if (fieldName === 'categoryName') {
@@ -32,10 +32,10 @@ function NewCategory(props) {
 
     return (
         <React.Fragment>
-            <AppBar position="static">
+            <AppBar position='static'>
                 <Toolbar>
-                    <Typography variant="h6" className="appBarTitle">New Category</Typography>
-                    <IconButton color="inherit" onClick={onNewCategory}>
+                    <Typography variant='h6' className='appBarTitle'>New Category</Typography>
+                    <IconButton color='inherit' onClick={onNewCategory}>
                         <Done/>
                     </IconButton>
                 </Toolbar>
