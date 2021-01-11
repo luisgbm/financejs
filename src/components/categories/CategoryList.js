@@ -25,7 +25,7 @@ class CategoryList extends React.Component {
 
         this.state = {
             categories: [],
-            currentTab: props.match.params.type === 'expense' ? 0 : 1,
+            currentTab: props.match.params.type ? (props.match.params.type === 'expense' ? 0 : 1) : 0,
             showLoadingModal: true
         };
 
