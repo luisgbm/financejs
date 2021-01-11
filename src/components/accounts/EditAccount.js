@@ -52,7 +52,7 @@ class EditAccount extends React.Component {
                 <LoadingModal
                     show={this.state.showLoadingModal}
                 />
-                <AppBar position='static'>
+                <AppBar position='sticky'>
                     <Toolbar>
                         <Typography variant='h6' className='appBarTitle'>Edit Account</Typography>
                         <IconButton color='inherit' onClick={this.onEditAccount}>

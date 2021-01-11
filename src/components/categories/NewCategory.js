@@ -41,7 +41,7 @@ function NewCategory(props) {
             <LoadingModal
                 show={showLoadingModal}
             />
-            <AppBar position='static'>
+            <AppBar position='sticky'>
                 <Toolbar>
                     <Typography variant='h6' className='appBarTitle'>New Category</Typography>
                     <IconButton color='inherit' onClick={onNewCategory}>

@@ -62,7 +62,7 @@ function EditCategory(props) {
             <LoadingModal
                 show={showLoadingModal}
             />
-            <AppBar position='static'>
+            <AppBar position='sticky'>
                 <Toolbar>
                     <Typography variant='h6' className='appBarTitle'>Edit Category</Typography>
                     <IconButton color='inherit' onClick={onEditCategory}>

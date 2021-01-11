@@ -31,7 +31,7 @@ class NewAccount extends React.Component {
                 <LoadingModal
                     show={this.state.showLoadingModal}
                 />
-                <AppBar position='static'>
+                <AppBar position='sticky'>
                     <Toolbar>
                         <Typography variant='h6' className='appBarTitle'>New Account</Typography>
                         <IconButton color='inherit' onClick={this.onNewAccount}>

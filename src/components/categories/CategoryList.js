@@ -55,7 +55,7 @@ class CategoryList extends React.Component {
                 <LoadingModal
                     show={this.state.showLoadingModal}
                 />
-                <AppBar position='static'>
+                <AppBar position='sticky'>
                     <Toolbar>
                         <Typography variant='h6' className='appBarTitle'>Categories</Typography>
                         <IconButton color='inherit' component={Link}
@@ -63,8 +63,6 @@ class CategoryList extends React.Component {
                             <Add/>
                         </IconButton>
                     </Toolbar>
-                </AppBar>
-                <AppBar position='static'>
                     <Tabs value={this.state.currentTab} onChange={this.onChangeTab} centered>
                         <Tab icon={<ThumbDownIcon/>} label='Expenses'/>
                         <Tab icon={<ThumbUpIcon/>} label='Incomes'/>
