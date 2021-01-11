@@ -13,6 +13,12 @@ import CreateIcon from "@material-ui/icons/Create";
 const styles = theme => ({
     card: {
         margin: theme.spacing(2)
+    },
+    green: {
+        color: 'green'
+    },
+    red: {
+        color: 'red'
     }
 });
 
@@ -64,7 +70,10 @@ class AccountList extends React.Component {
                                         </Link>
                                     }
                                     subheader={
-                                        `Balance: ${account.balance}`
+                                        <React.Fragment>
+                                            Balance: <span
+                                            className={account.balance >= 0 ? classes.green : classes.red}>{account.balance}</span>
+                                        </React.Fragment>
                                     }
                                 />
                             </Card>

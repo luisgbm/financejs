@@ -6,7 +6,22 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import AppBar from '@material-ui/core/AppBar';
 import {Add} from '@material-ui/icons';
-import {IconButton} from '@material-ui/core';
+import {Card, CardHeader, Chip, IconButton} from '@material-ui/core';
+import CreateIcon from "@material-ui/icons/Create";
+import {withStyles} from "@material-ui/core/styles";
+import moment from 'moment';
+
+const styles = theme => ({
+    card: {
+        margin: theme.spacing(2)
+    },
+    green: {
+        color: 'green'
+    },
+    red: {
+        color: 'red'
+    }
+});
 
 class TransactionList extends React.Component {
     constructor(props) {
@@ -25,38 +40,51 @@ class TransactionList extends React.Component {
     }
 
     render() {
+        const {classes} = this.props;
+
         return (
             <React.Fragment>
                 <AppBar position='sticky'>
                     <Toolbar>
-                        <Typography variant='h6' className='appBarTitle'>{this.state.accountName}</Typography>
+                        <Typography variant='h6' className='appBarTitle'>{this.state.accountName} <Chip
+                            label={this.state.accountBalance}/></Typography>
                         <IconButton color='inherit' component={Link}
                                     to={`/transactions/account/${this.state.accountId}/new`}>
                             <Add/>
                         </IconButton>
                     </Toolbar>
                 </AppBar>
-                <p>Balance: {this.state.accountBalance}</p>
-                <ul>
-                    {
-                        this.state.transactions.map(transaction =>
-                            <li key={transaction.id}>
-                                <b>Value:</b> {transaction.value}
-                                <br/>
-                                <b>Description:</b> {transaction.description}
-                                <br/>
-                                <b>Category:</b> {transaction.category_name} ({transaction.category_type})
-                                <br/>
-                                <b>Date:</b> {transaction.date}
-                                <br/>
-                                <Link to={`/transactions/${transaction.id}`}>Edit</Link>
-                            </li>
-                        )
-                    }
-                </ul>
+                {
+                    this.state.transactions.map(transaction =>
+                        <Card key={transaction.id} className={classes.card} variant='outlined'>
+                            <CardHeader
+                                action={
+                                    <IconButton component={Link} to={`/transactions/${transaction.id}`}>
+                                        <CreateIcon/>
+                                    </IconButton>
+                                }
+                                title={
+                                    <Typography variant='h6'
+                                                className={transaction.category_type === 'Expense' ? classes.red : classes.green}>
+                                        {transaction.value}
+                                    </Typography>
+                                }
+                                subheader={
+                                    <React.Fragment>
+                                        <b>Description:</b> {transaction.description}
+                                        <br/>
+                                        <b>Category:</b> {transaction.category_name} ({transaction.category_type})
+                                        <br/>
+                                        <b>Date:</b> {moment(transaction.date).format('DD/MM/YYYY hh:mm')}
+                                    </React.Fragment>
+                                }
+                            />
+                        </Card>
+                    )
+                }
             </React.Fragment>
         );
     }
 }
 
-export default TransactionList;
+export default withStyles(styles, {withTheme: true})(TransactionList);
