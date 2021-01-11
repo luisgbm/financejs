@@ -28,8 +28,6 @@ class EditTransaction extends React.Component {
             categoryId: '',
             categoryName: '',
             date: moment(),
-            dateOnly: '',
-            timeOnly: '',
             showLoadingModal: true
         };
 
@@ -70,7 +68,7 @@ class EditTransaction extends React.Component {
         this.setState({
             value: transaction.data.value,
             description: transaction.data.description,
-            date: transaction.data.date,
+            date: moment(transaction.data.date),
             accountId: transaction.data.account_id,
             accountName: transaction.data.account_name,
             categoryId: transaction.data.category_id,
