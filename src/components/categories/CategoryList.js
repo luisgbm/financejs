@@ -73,7 +73,7 @@ class CategoryList extends React.Component {
                                 category.categorytype === 'Income')
                             .sort((a, b) => a.name.localeCompare(b.name))
                             .map(category =>
-                                <Card key={category.id} variant='outlined'>
+                                <Card key={category.id} variant='outlined' style={{'marginBottom': '16px'}}>
                                     <CardHeader
                                         action={
                                             <IconButton component={Link} to={`/categories/edit/${category.id}`}>

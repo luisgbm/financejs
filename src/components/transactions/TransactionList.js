@@ -73,7 +73,7 @@ class TransactionList extends React.Component {
                 <Container maxWidth='sm' style={{paddingTop: '16px'}}>
                     {
                         this.state.transactions.map(transaction =>
-                            <Card key={transaction.id} variant='outlined'>
+                            <Card key={transaction.id} variant='outlined' style={{'marginBottom': '16px'}}>
                                 <CardHeader
                                     action={
                                         <IconButton component={Link} to={`/transactions/${transaction.id}`}>
