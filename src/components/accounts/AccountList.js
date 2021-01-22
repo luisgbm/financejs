@@ -10,10 +10,7 @@ import {Add} from '@material-ui/icons';
 import CreateIcon from "@material-ui/icons/Create";
 import LoadingModal from "../LoadingModal";
 
-const styles = theme => ({
-    card: {
-        margin: theme.spacing(2)
-    },
+const styles = () => ({
     green: {
         color: 'green'
     },
@@ -65,7 +62,7 @@ class AccountList extends React.Component {
                         this.state.accounts
                             .sort((a, b) => a.name.localeCompare(b.name))
                             .map(account =>
-                                <Card key={account.id} className={classes.card} variant='outlined'>
+                                <Card key={account.id} variant='outlined'>
                                     <CardHeader
                                         action={
                                             <IconButton component={Link} to={`/accounts/edit/${account.id}`}>

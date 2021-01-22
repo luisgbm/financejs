@@ -1,6 +1,5 @@
 import React from 'react';
 
-import {withStyles} from '@material-ui/core/styles';
 import {Link} from 'react-router-dom'
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
@@ -12,12 +11,6 @@ import {Card, CardHeader, Container, IconButton, Tab, Tabs} from '@material-ui/c
 import CreateIcon from '@material-ui/icons/Create';
 import LoadingModal from "../LoadingModal";
 import {categoryService} from "../../api/category.service";
-
-const styles = theme => ({
-    card: {
-        margin: theme.spacing(2)
-    }
-});
 
 class CategoryList extends React.Component {
     constructor(props) {
@@ -54,8 +47,6 @@ class CategoryList extends React.Component {
     }
 
     render() {
-        const {classes} = this.props;
-
         return (
             <React.Fragment>
                 <LoadingModal
@@ -82,7 +73,7 @@ class CategoryList extends React.Component {
                                 category.categorytype === 'Income')
                             .sort((a, b) => a.name.localeCompare(b.name))
                             .map(category =>
-                                <Card key={category.id} className={classes.card} variant='outlined'>
+                                <Card key={category.id} variant='outlined'>
                                     <CardHeader
                                         action={
                                             <IconButton component={Link} to={`/categories/edit/${category.id}`}>
@@ -100,4 +91,4 @@ class CategoryList extends React.Component {
     }
 }
 
-export default withStyles(styles, {withTheme: true})(CategoryList);
+export default CategoryList;
