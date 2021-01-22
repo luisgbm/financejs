@@ -13,10 +13,7 @@ import LoadingModal from "../LoadingModal";
 import {transactionService} from "../../api/transaction.service";
 import {accountService} from "../../api/account.service";
 
-const styles = theme => ({
-    card: {
-        margin: theme.spacing(2)
-    },
+const styles = () => ({
     green: {
         color: 'green'
     },
@@ -76,7 +73,7 @@ class TransactionList extends React.Component {
                 <Container maxWidth='sm' style={{paddingTop: '16px'}}>
                     {
                         this.state.transactions.map(transaction =>
-                            <Card key={transaction.id} className={classes.card} variant='outlined'>
+                            <Card key={transaction.id} variant='outlined'>
                                 <CardHeader
                                     action={
                                         <IconButton component={Link} to={`/transactions/${transaction.id}`}>
