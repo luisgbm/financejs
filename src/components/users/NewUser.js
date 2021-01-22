@@ -15,7 +15,8 @@ class NewUser extends React.Component {
         this.state = {
             userName: '',
             password: '',
-            showLoadingModal: false
+            showLoadingModal: false,
+            error: false
         };
 
         this.onChange = this.onChange.bind(this);
@@ -27,13 +28,23 @@ class NewUser extends React.Component {
     }
 
     async onNewUser() {
-        this.setState({showLoadingModal: true});
+        try {
+            this.setState({showLoadingModal: true});
 
-        await authenticationService.newUser(this.state.userName, this.state.password);
+            await authenticationService.newUser(this.state.userName, this.state.password);
 
-        this.setState({showLoadingModal: false});
+            this.setState({showLoadingModal: false});
 
-        this.props.history.push('/accounts');
+            this.props.history.push('/accounts');
+        } catch (e) {
+            this.setState({
+                userName: '',
+                password: '',
+                error: true,
+                showLoadingModal: false
+            });
+        }
+
     }
 
     render() {
@@ -55,7 +66,7 @@ class NewUser extends React.Component {
                         userName={this.state.userName}
                         password={this.state.password}
                         onChange={this.onChange}
-                        error={false}
+                        error={this.state.error}
                     />
                 </Container>
             </React.Fragment>

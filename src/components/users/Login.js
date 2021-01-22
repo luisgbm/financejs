@@ -3,11 +3,11 @@ import {authenticationService} from '../../api/authentication.service';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
-import {Button, Container} from '@material-ui/core';
+import {Button, Container, IconButton} from '@material-ui/core';
 import LoadingModal from "../LoadingModal";
 import UserForm from "./UserForm";
 import VpnKeyIcon from '@material-ui/icons/VpnKey';
-import AddCircleIcon from '@material-ui/icons/AddCircle';
+import {Add} from "@material-ui/icons";
 
 class Login extends React.Component {
     constructor(props) {
@@ -69,6 +69,9 @@ class Login extends React.Component {
                 <AppBar position='sticky'>
                     <Toolbar>
                         <Typography variant='h6' className='appBarTitle'>Login</Typography>
+                        <IconButton color='inherit' onClick={this.onNewUser}>
+                            <Add/>
+                        </IconButton>
                     </Toolbar>
                 </AppBar>
                 <Container maxWidth='sm' style={{paddingTop: '16px'}}>
@@ -87,16 +90,6 @@ class Login extends React.Component {
                         onClick={this.onLogin}
                     >
                         Login
-                    </Button>
-                    <Button
-                        variant='contained'
-                        color='secondary'
-                        startIcon={<AddCircleIcon/>}
-                        size='large'
-                        style={{marginTop: '16px', width: '100%', backgroundColor: 'green'}}
-                        onClick={this.onNewUser}
-                    >
-                        New User
                     </Button>
                 </Container>
             </React.Fragment>

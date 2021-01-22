@@ -5,7 +5,7 @@ import {Link} from 'react-router-dom'
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
-import {Card, CardHeader, IconButton} from '@material-ui/core';
+import {Card, CardHeader, Container, IconButton} from '@material-ui/core';
 import {Add} from '@material-ui/icons';
 import CreateIcon from "@material-ui/icons/Create";
 import LoadingModal from "../LoadingModal";
@@ -60,36 +60,38 @@ class AccountList extends React.Component {
                         </IconButton>
                     </Toolbar>
                 </AppBar>
-                {
-                    this.state.accounts
-                        .sort((a, b) => a.name.localeCompare(b.name))
-                        .map(account =>
-                            <Card key={account.id} className={classes.card} variant='outlined'>
-                                <CardHeader
-                                    action={
-                                        <IconButton component={Link} to={`/accounts/edit/${account.id}`}>
-                                            <CreateIcon/>
-                                        </IconButton>
-                                    }
-                                    title={
-                                        <Link
-                                            underline='none'
-                                            to={`/transactions/account/${account.id}`}>
-                                            <Typography variant='h6' style={{textDecoration: 'none'}}>
-                                                {account.name}
-                                            </Typography>
-                                        </Link>
-                                    }
-                                    subheader={
-                                        <React.Fragment>
-                                            Balance: <span
-                                            className={account.balance >= 0 ? classes.green : classes.red}>{account.balance}</span>
-                                        </React.Fragment>
-                                    }
-                                />
-                            </Card>
-                        )
-                }
+                <Container maxWidth='sm' style={{paddingTop: '16px'}}>
+                    {
+                        this.state.accounts
+                            .sort((a, b) => a.name.localeCompare(b.name))
+                            .map(account =>
+                                <Card key={account.id} className={classes.card} variant='outlined'>
+                                    <CardHeader
+                                        action={
+                                            <IconButton component={Link} to={`/accounts/edit/${account.id}`}>
+                                                <CreateIcon/>
+                                            </IconButton>
+                                        }
+                                        title={
+                                            <Link
+                                                underline='none'
+                                                to={`/transactions/account/${account.id}`}>
+                                                <Typography variant='h6' style={{textDecoration: 'none'}}>
+                                                    {account.name}
+                                                </Typography>
+                                            </Link>
+                                        }
+                                        subheader={
+                                            <React.Fragment>
+                                                Balance: <span
+                                                className={account.balance >= 0 ? classes.green : classes.red}>{account.balance}</span>
+                                            </React.Fragment>
+                                        }
+                                    />
+                                </Card>
+                            )
+                    }
+                </Container>
             </React.Fragment>
         );
     }

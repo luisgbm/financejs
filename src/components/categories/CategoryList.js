@@ -8,7 +8,7 @@ import AppBar from '@material-ui/core/AppBar';
 import {Add} from '@material-ui/icons';
 import ThumbUpIcon from '@material-ui/icons/ThumbUp';
 import ThumbDownIcon from '@material-ui/icons/ThumbDown';
-import {Card, CardHeader, IconButton, Tab, Tabs} from '@material-ui/core';
+import {Card, CardHeader, Container, IconButton, Tab, Tabs} from '@material-ui/core';
 import CreateIcon from '@material-ui/icons/Create';
 import LoadingModal from "../LoadingModal";
 import {categoryService} from "../../api/category.service";
@@ -74,25 +74,27 @@ class CategoryList extends React.Component {
                         <Tab icon={<ThumbUpIcon/>} label='Incomes'/>
                     </Tabs>
                 </AppBar>
-                {
-                    this.state.categories
-                        .filter(category => this.state.currentTab === 0 ?
-                            category.categorytype === 'Expense' :
-                            category.categorytype === 'Income')
-                        .sort((a, b) => a.name.localeCompare(b.name))
-                        .map(category =>
-                            <Card key={category.id} className={classes.card} variant='outlined'>
-                                <CardHeader
-                                    action={
-                                        <IconButton component={Link} to={`/categories/edit/${category.id}`}>
-                                            <CreateIcon/>
-                                        </IconButton>
-                                    }
-                                    title={<Typography variant='h6'>{category.name}</Typography>}
-                                />
-                            </Card>
-                        )
-                }
+                <Container maxWidth='sm' style={{paddingTop: '16px'}}>
+                    {
+                        this.state.categories
+                            .filter(category => this.state.currentTab === 0 ?
+                                category.categorytype === 'Expense' :
+                                category.categorytype === 'Income')
+                            .sort((a, b) => a.name.localeCompare(b.name))
+                            .map(category =>
+                                <Card key={category.id} className={classes.card} variant='outlined'>
+                                    <CardHeader
+                                        action={
+                                            <IconButton component={Link} to={`/categories/edit/${category.id}`}>
+                                                <CreateIcon/>
+                                            </IconButton>
+                                        }
+                                        title={<Typography variant='h6'>{category.name}</Typography>}
+                                    />
+                                </Card>
+                            )
+                    }
+                </Container>
             </React.Fragment>
         );
     }
