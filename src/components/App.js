@@ -31,7 +31,9 @@ function BottomNavBar(props) {
     const [hide, setHide] = React.useState(false);
 
     React.useEffect(() => {
-        if (location.pathname === '/') {
+        const hideForPaths = ['/', '/users/new'];
+
+        if (hideForPaths.includes(location.pathname)) {
             setHide(true);
             props.setValue(0);
         } else {
