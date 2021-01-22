@@ -1,5 +1,4 @@
 import React from 'react';
-import finance from '../../api/finance';
 
 import {withStyles} from '@material-ui/core/styles';
 import {Link} from 'react-router-dom'
@@ -12,6 +11,7 @@ import ThumbDownIcon from '@material-ui/icons/ThumbDown';
 import {Card, CardHeader, IconButton, Tab, Tabs} from '@material-ui/core';
 import CreateIcon from '@material-ui/icons/Create';
 import LoadingModal from "../LoadingModal";
+import {categoryService} from "../../api/category.service";
 
 const styles = theme => ({
     card: {
@@ -33,12 +33,18 @@ class CategoryList extends React.Component {
     }
 
     async componentDidMount() {
-        const response = await finance.get('/categories');
+        try {
+            const response = await categoryService.getAllCategories();
 
-        this.setState({
-            categories: response.data,
-            showLoadingModal: false
-        });
+            this.setState({
+                categories: response.data,
+                showLoadingModal: false
+            });
+        } catch (e) {
+            if (e.response.status === 401) {
+                this.props.history.push('/');
+            }
+        }
     }
 
     onChangeTab(event, newValue) {
@@ -75,7 +81,7 @@ class CategoryList extends React.Component {
                             category.categorytype === 'Income')
                         .sort((a, b) => a.name.localeCompare(b.name))
                         .map(category =>
-                            <Card className={classes.card} variant='outlined'>
+                            <Card key={category.id} className={classes.card} variant='outlined'>
                                 <CardHeader
                                     action={
                                         <IconButton component={Link} to={`/categories/edit/${category.id}`}>

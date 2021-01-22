@@ -1,5 +1,4 @@
 import React from 'react';
-import finance from '../../api/finance';
 
 import {Link} from 'react-router-dom'
 import Toolbar from '@material-ui/core/Toolbar';
@@ -11,6 +10,8 @@ import CreateIcon from "@material-ui/icons/Create";
 import {withStyles} from "@material-ui/core/styles";
 import moment from 'moment';
 import LoadingModal from "../LoadingModal";
+import {transactionService} from "../../api/transaction.service";
+import {accountService} from "../../api/account.service";
 
 const styles = theme => ({
     card: {
@@ -37,14 +38,21 @@ class TransactionList extends React.Component {
     }
 
     async componentDidMount() {
-        const transactions = await finance.get(`/transactions/account/${this.state.accountId}`);
-        const account = await finance.get(`/accounts/${this.state.accountId}`);
-        this.setState({
-            transactions: transactions.data,
-            accountName: account.data.name,
-            accountBalance: account.data.balance,
-            showLoadingModal: false
-        });
+        try {
+            const transactions = await transactionService.getAllTransactionsForAccountId(this.state.accountId);
+            const account = await accountService.getAccountById(this.state.accountId);
+
+            this.setState({
+                transactions: transactions.data,
+                accountName: account.data.name,
+                accountBalance: account.data.balance,
+                showLoadingModal: false
+            });
+        } catch (e) {
+            if (e.response.status === 401) {
+                this.props.history.push('/');
+            }
+        }
     }
 
     render() {

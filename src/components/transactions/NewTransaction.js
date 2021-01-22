@@ -5,11 +5,13 @@ import Typography from '@material-ui/core/Typography';
 import AppBar from '@material-ui/core/AppBar';
 import {Container, IconButton} from '@material-ui/core';
 import TransactionForm from './TransactionForm';
-import finance from '../../api/finance';
 import CategoryTypes from '../categories/CategoryTypes';
 import DoneIcon from '@material-ui/icons/Done';
 import moment from 'moment';
 import LoadingModal from "../LoadingModal";
+import {accountService} from "../../api/account.service";
+import {categoryService} from "../../api/category.service";
+import {transactionService} from "../../api/transaction.service";
 
 class NewTransaction extends React.Component {
     constructor(props) {
@@ -42,44 +44,64 @@ class NewTransaction extends React.Component {
     }
 
     async onNewTransaction() {
-        this.setState({showLoadingModal: true});
+        try {
+            this.setState({showLoadingModal: true});
 
-        await finance.post(`/transactions/account/${this.state.accountId}`, {
-            value: parseInt(this.state.value),
-            description: this.state.description,
-            date: this.state.date.format('yyyy-MM-DDTHH:mm:ss'),
-            category: parseInt(this.state.categoryId)
-        });
+            await transactionService.newTransaction(
+                this.state.accountId,
+                parseInt(this.state.value),
+                this.state.description,
+                this.state.date.format('yyyy-MM-DDTHH:mm:ss'),
+                parseInt(this.state.categoryId)
+            );
 
-        this.setState({showLoadingModal: false});
+            this.setState({showLoadingModal: false});
 
-        this.props.history.push(`/transactions/account/${this.state.accountId}`);
+            this.props.history.push(`/transactions/account/${this.state.accountId}`);
+        } catch (e) {
+            if (e.response.status === 401) {
+                this.props.history.push('/');
+            }
+        }
     }
 
     async updateCategoriesAndSelectFirst(categoryType) {
-        this.setState({showLoadingModal: true});
+        try {
+            this.setState({showLoadingModal: true});
 
-        const categories = await finance.get(`/categories/${categoryType.toLowerCase()}`);
-        this.setState({categories: categories.data, showLoadingModal: false});
+            const categories = await categoryService.getAllCategoriesByType(categoryType.toLowerCase());
 
-        if (categories.data && categories.data.length) {
-            this.setState({
-                categoryId: categories.data[0].id,
-                categoryName: categories.data[0].name
-            });
+            this.setState({categories: categories.data, showLoadingModal: false});
+
+            if (categories.data && categories.data.length) {
+                this.setState({
+                    categoryId: categories.data[0].id,
+                    categoryName: categories.data[0].name
+                });
+            }
+        } catch (e) {
+            if (e.response.status === 401) {
+                this.props.history.push('/');
+            }
         }
     }
 
     async componentDidMount() {
-        const accounts = await finance.get('/accounts');
+        try {
+            const accounts = await accountService.getAllAccounts();
 
-        this.setState({
-            accounts: accounts.data,
-            accountId: this.props.match.params.accountId,
-            showLoadingModal: false
-        });
+            this.setState({
+                accounts: accounts.data,
+                accountId: this.props.match.params.accountId,
+                showLoadingModal: false
+            });
 
-        await this.updateCategoriesAndSelectFirst(this.state.categoryType);
+            await this.updateCategoriesAndSelectFirst(this.state.categoryType);
+        } catch (e) {
+            if (e.response.status === 401) {
+                this.props.history.push('/');
+            }
+        }
     }
 
     render() {

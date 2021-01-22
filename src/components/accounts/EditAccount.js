@@ -2,8 +2,8 @@ import React from 'react';
 import SaveIcon from '@material-ui/icons/Save';
 import DeleteIcon from '@material-ui/icons/Delete';
 import {AppBar, Button, Container, IconButton, TextField, Toolbar, Typography} from '@material-ui/core';
-import finance from '../../api/finance';
 import LoadingModal from "../LoadingModal";
+import {accountService} from "../../api/account.service";
 
 class EditAccount extends React.Component {
     constructor(props) {
@@ -20,30 +20,47 @@ class EditAccount extends React.Component {
     }
 
     async componentDidMount() {
-        const account = await finance.get(`/accounts/${this.state.accountId}`);
-        this.setState({accountName: account.data.name, showLoadingModal: false});
+        try {
+            const account = await accountService.getAccountById(this.state.accountId);
+
+            this.setState({accountName: account.data.name, showLoadingModal: false});
+        } catch (e) {
+            if (e.response.status === 401) {
+                this.props.history.push('/');
+            }
+        }
     }
 
     async onEditAccount() {
-        this.setState({showLoadingModal: true});
+        try {
+            this.setState({showLoadingModal: true});
 
-        await finance.patch(`/accounts/${this.state.accountId}`, {
-            name: this.state.accountName
-        });
+            await accountService.editAccountById(this.state.accountId, this.state.accountName);
 
-        this.setState({showLoadingModal: false});
+            this.setState({showLoadingModal: false});
 
-        this.props.history.push('/');
+            this.props.history.push('/accounts');
+        } catch (e) {
+            if (e.response.status === 401) {
+                this.props.history.push('/');
+            }
+        }
     }
 
     async onDeleteAccount() {
-        this.setState({showLoadingModal: true});
+        try {
+            this.setState({showLoadingModal: true});
 
-        await finance.delete(`/accounts/${this.state.accountId}`);
+            await accountService.deleteAccountById(this.state.accountId);
 
-        this.setState({showLoadingModal: false});
+            this.setState({showLoadingModal: false});
 
-        this.props.history.push('/');
+            this.props.history.push('/accounts');
+        } catch (e) {
+            if (e.response.status === 401) {
+                this.props.history.push('/');
+            }
+        }
     }
 
     render() {

@@ -6,9 +6,9 @@ import Typography from '@material-ui/core/Typography';
 import AppBar from '@material-ui/core/AppBar';
 import SaveIcon from '@material-ui/icons/Save';
 import {Button, Container, IconButton} from '@material-ui/core';
-import finance from '../../api/finance';
 import DeleteIcon from '@material-ui/icons/Delete';
 import LoadingModal from "../LoadingModal";
+import {categoryService} from "../../api/category.service";
 
 function EditCategory(props) {
     const [categoryId] = React.useState(props.match.params.id);
@@ -17,26 +17,35 @@ function EditCategory(props) {
     const [showLoadingModal, setShowLoadingModal] = React.useState(false);
 
     const onEditCategory = async () => {
-        setShowLoadingModal(true);
+        try {
+            setShowLoadingModal(true);
 
-        await finance.patch(`/categories/${categoryId}`, {
-            name: categoryName,
-            categorytype: categoryType
-        });
+            await categoryService.editCategoryById(categoryId, categoryName, categoryType);
 
-        setShowLoadingModal(false);
+            setShowLoadingModal(false);
 
-        props.history.push(`/categories/${categoryType.toLowerCase()}`);
+            props.history.push(`/categories/${categoryType.toLowerCase()}`);
+        } catch (e) {
+            if (e.response.status === 401) {
+                this.props.history.push('/');
+            }
+        }
     };
 
     const onDeleteCategory = async () => {
-        setShowLoadingModal(true);
+        try {
+            setShowLoadingModal(true);
 
-        await finance.delete(`/categories/${categoryId}`);
+            await categoryService.deleteCategoryById(categoryId);
 
-        setShowLoadingModal(false);
+            setShowLoadingModal(false);
 
-        props.history.push(`/categories/${categoryType.toLowerCase()}`);
+            props.history.push(`/categories/${categoryType.toLowerCase()}`);
+        } catch (e) {
+            if (e.response.status === 401) {
+                this.props.history.push('/');
+            }
+        }
     }
 
     const onChange = (fieldName, fieldValue) => {
@@ -50,12 +59,12 @@ function EditCategory(props) {
     useEffect(() => {
         (async function getCategoryData() {
             setShowLoadingModal(true);
-            const category = await finance.get(`/categories/${categoryId}`);
+            const category = await categoryService.getCategoryById(categoryId);
             setCategoryName(category.data.name);
             setCategoryType(category.data.categorytype);
             setShowLoadingModal(false);
         })()
-    }, []);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
         <React.Fragment>

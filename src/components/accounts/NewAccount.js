@@ -1,8 +1,8 @@
 import React from 'react';
 import DoneIcon from '@material-ui/icons/Done';
 import {AppBar, Container, IconButton, TextField, Toolbar, Typography} from '@material-ui/core';
-import finance from '../../api/finance';
 import LoadingModal from "../LoadingModal";
+import {accountService} from "../../api/account.service";
 
 class NewAccount extends React.Component {
     state = {accountName: '', showLoadingModal: false};
@@ -14,15 +14,19 @@ class NewAccount extends React.Component {
     }
 
     async onNewAccount() {
-        this.setState({showLoadingModal: true});
+        try {
+            this.setState({showLoadingModal: true});
 
-        await finance.post('/accounts', {
-            name: this.state.accountName
-        });
+            await accountService.newAccount(this.state.accountName);
 
-        this.setState({showLoadingModal: false});
+            this.setState({showLoadingModal: false});
 
-        this.props.history.push('/');
+            this.props.history.push('/accounts');
+        } catch (e) {
+            if (e.response.status === 401) {
+                this.props.history.push('/');
+            }
+        }
     }
 
     render() {

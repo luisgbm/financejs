@@ -6,9 +6,9 @@ import AppBar from '@material-ui/core/AppBar';
 import CategoryForm from './CategoryForm';
 import {Container, IconButton} from '@material-ui/core';
 import {Done} from '@material-ui/icons';
-import finance from '../../api/finance';
 import CategoryTypes from './CategoryTypes';
 import LoadingModal from "../LoadingModal";
+import {categoryService} from "../../api/category.service";
 
 function NewCategory(props) {
     const [categoryName, setCategoryName] = React.useState('');
@@ -24,16 +24,19 @@ function NewCategory(props) {
     };
 
     const onNewCategory = async () => {
-        setShowLoadingModal(true);
+        try {
+            setShowLoadingModal(true);
 
-        await finance.post('/categories', {
-            name: categoryName,
-            categorytype: categoryType
-        });
+            await categoryService.newCategory(categoryName, categoryType);
 
-        setShowLoadingModal(false);
+            setShowLoadingModal(false);
 
-        props.history.push(`/categories/${categoryType.toLowerCase()}`);
+            props.history.push(`/categories/${categoryType.toLowerCase()}`);
+        } catch (e) {
+            if (e.response.status === 401) {
+                this.props.history.push('/');
+            }
+        }
     };
 
     return (

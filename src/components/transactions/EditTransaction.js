@@ -8,9 +8,11 @@ import SaveIcon from '@material-ui/icons/Save';
 import {Button, Container, IconButton} from '@material-ui/core';
 import CategoryTypes from '../categories/CategoryTypes';
 import moment from 'moment';
-import finance from '../../api/finance';
 import DeleteIcon from '@material-ui/icons/Delete';
 import LoadingModal from "../LoadingModal";
+import {transactionService} from "../../api/transaction.service";
+import {categoryService} from "../../api/category.service";
+import {accountService} from "../../api/account.service";
 
 class EditTransaction extends React.Component {
     constructor(props) {
@@ -38,68 +40,93 @@ class EditTransaction extends React.Component {
     }
 
     async onDeleteTransaction() {
-        this.setState({showLoadingModal: true});
+        try {
+            this.setState({showLoadingModal: true});
 
-        await finance.delete(`/transactions/${this.state.transactionId}`);
+            await transactionService.deleteTransactionById(this.state.transactionId);
 
-        this.setState({showLoadingModal: false});
+            this.setState({showLoadingModal: false});
 
-        this.props.history.push(`/transactions/account/${this.state.accountId}`);
+            this.props.history.push(`/transactions/account/${this.state.accountId}`);
+        } catch (e) {
+            if (e.response.status === 401) {
+                this.props.history.push('/');
+            }
+        }
     }
 
     async updateCategoriesAndSelectFirst(categoryType) {
-        this.setState({showLoadingModal: true});
+        try {
+            this.setState({showLoadingModal: true});
 
-        const categories = await finance.get(`/categories/${categoryType.toLowerCase()}`);
+            const categories = await categoryService.getAllCategoriesByType(categoryType.toLowerCase());
 
-        this.setState({categories: categories.data, showLoadingModal: false});
+            this.setState({categories: categories.data, showLoadingModal: false});
 
-        if (categories.data && categories.data.length) {
-            this.setState({
-                categoryId: categories.data[0].id,
-                categoryName: categories.data[0].name
-            });
+            if (categories.data && categories.data.length) {
+                this.setState({
+                    categoryId: categories.data[0].id,
+                    categoryName: categories.data[0].name
+                });
+            }
+        } catch (e) {
+            if (e.response.status === 401) {
+                this.props.history.push('/');
+            }
         }
     }
 
     async componentDidMount() {
-        const transaction = await finance.get(`/transactions/${this.state.transactionId}`);
+        try {
+            const transaction = await transactionService.getTransactionById(this.state.transactionId);
 
-        this.setState({
-            value: transaction.data.value,
-            description: transaction.data.description,
-            date: moment(transaction.data.date),
-            accountId: transaction.data.account_id,
-            accountName: transaction.data.account_name,
-            categoryId: transaction.data.category_id,
-            categoryName: transaction.data.category_name,
-            categoryType: transaction.data.category_type
-        });
+            this.setState({
+                value: transaction.data.value,
+                description: transaction.data.description,
+                date: moment(transaction.data.date),
+                accountId: transaction.data.account_id,
+                accountName: transaction.data.account_name,
+                categoryId: transaction.data.category_id,
+                categoryName: transaction.data.category_name,
+                categoryType: transaction.data.category_type
+            });
 
-        const categories = await finance.get(`/categories/${this.state.categoryType.toLowerCase()}`);
-        const accounts = await finance.get('/accounts');
+            const categories = await categoryService.getAllCategoriesByType(this.state.categoryType.toLowerCase());
+            const accounts = await accountService.getAllAccounts();
 
-        this.setState({
-            categories: categories.data,
-            accounts: accounts.data,
-            showLoadingModal: false
-        });
+            this.setState({
+                categories: categories.data,
+                accounts: accounts.data,
+                showLoadingModal: false
+            });
+        } catch (e) {
+            if (e.response.status === 401) {
+                this.props.history.push('/');
+            }
+        }
     }
 
     async onEditTransaction() {
-        this.setState({showLoadingModal: true});
+        try {
+            this.setState({showLoadingModal: true});
 
-        await finance.patch(`/transactions/${this.state.transactionId}`, {
-            value: parseInt(this.state.value),
-            description: this.state.description,
-            date: this.state.date.format('YYYY-MM-DDTHH:mm:ss'),
-            account: parseInt(this.state.accountId),
-            category: parseInt(this.state.categoryId)
-        });
+            await transactionService.editTransactionById(
+                this.state.transactionId,
+                parseInt(this.state.value),
+                this.state.description,
+                this.state.date.format('YYYY-MM-DDTHH:mm:ss'),
+                parseInt(this.state.accountId),
+                parseInt(this.state.categoryId)
+            );
 
-        this.setState({showLoadingModal: false});
+            this.setState({showLoadingModal: false});
 
-        this.props.history.push(`/transactions/account/${this.state.accountId}`);
+            this.props.history.push(`/transactions/account/${this.state.accountId}`);
+        } catch (e) {
+            if (e.response.status === 401) {
+                this.props.history.push('/');
+            }
+        }
     }
 
     async onChange(fieldName, fieldValue) {

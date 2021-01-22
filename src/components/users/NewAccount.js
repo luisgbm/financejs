@@ -1,5 +1,6 @@
 import React from 'react';
-import {accountService} from '../../api/account.service';
+import finance from '../../api/finance';
+
 import {withStyles} from '@material-ui/core/styles';
 import {Link} from 'react-router-dom'
 import AppBar from '@material-ui/core/AppBar';
@@ -33,15 +34,8 @@ class AccountList extends React.Component {
     }
 
     async componentDidMount() {
-        try {
-            const accounts = await accountService.getAllAccounts();
-
-            this.setState({accounts: accounts.data, showLoadingModal: false});
-        } catch (e) {
-            if (e.response.status === 401) {
-                this.props.history.push('/');
-            }
-        }
+        const accounts = await finance.get('/accounts');
+        this.setState({accounts: accounts.data, showLoadingModal: false});
     }
 
     render() {
