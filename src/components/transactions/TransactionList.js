@@ -55,6 +55,14 @@ class TransactionList extends React.Component {
     render() {
         const {classes} = this.props;
 
+        const getValueClass = (categoryType) => {
+            if (categoryType === 'Expense' || categoryType === 'TransferExpense') {
+                return classes.red;
+            } else if (categoryType === 'Income' || categoryType === 'TransferIncome') {
+                return classes.green;
+            }
+        };
+
         return (
             <React.Fragment>
                 <LoadingModal
@@ -82,7 +90,7 @@ class TransactionList extends React.Component {
                                     }
                                     title={
                                         <Typography variant='h6'
-                                                    className={transaction.category_type === 'Expense' ? classes.red : classes.green}>
+                                                    className={getValueClass(transaction.category_type)}>
                                             {transaction.value}
                                         </Typography>
                                     }

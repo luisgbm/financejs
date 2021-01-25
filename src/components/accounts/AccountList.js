@@ -62,7 +62,7 @@ class AccountList extends React.Component {
                         this.state.accounts
                             .sort((a, b) => a.name.localeCompare(b.name))
                             .map(account =>
-                                <Card key={account.id} variant='outlined'>
+                                <Card key={account.id} variant='outlined' style={{marginBottom: '16px'}}>
                                     <CardHeader
                                         action={
                                             <IconButton component={Link} to={`/accounts/edit/${account.id}`}>
