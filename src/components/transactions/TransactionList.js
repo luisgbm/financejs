@@ -63,6 +63,14 @@ class TransactionList extends React.Component {
             }
         };
 
+        const getEditLink = (categoryType, id) => {
+            if (categoryType === 'Expense' || categoryType === 'Income') {
+                return `/transactions/${id}`;
+            } else if (categoryType === 'TransferExpense' || categoryType === 'TransferIncome') {
+                return `/transfers/${id}/from/${this.state.accountId}`;
+            }
+        };
+
         return (
             <React.Fragment>
                 <LoadingModal
@@ -84,7 +92,8 @@ class TransactionList extends React.Component {
                             <Card key={transaction.id} variant='outlined' style={{'marginBottom': '16px'}}>
                                 <CardHeader
                                     action={
-                                        <IconButton component={Link} to={`/transactions/${transaction.id}`}>
+                                        <IconButton component={Link}
+                                                    to={getEditLink(transaction.category_type, transaction.id)}>
                                             <CreateIcon/>
                                         </IconButton>
                                     }

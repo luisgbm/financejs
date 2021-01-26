@@ -15,7 +15,7 @@ import {transactionService} from "../../api/transaction.service";
 import AutorenewIcon from '@material-ui/icons/Autorenew';
 import AttachMoneyIcon from '@material-ui/icons/AttachMoney';
 import TransferForm from "./TransferForm";
-import {transactionService as transferService} from "../../api/transfer.service";
+import {transferService} from "../../api/transfer.service";
 
 class NewTransaction extends React.Component {
     constructor(props) {

@@ -12,6 +12,39 @@ const newTransfer = async (value, description, from, to, date) => {
     }
 };
 
-export const transactionService = {
-    newTransfer
+const getTransferById = async (transferId) => {
+    try {
+        return await authenticationService.getWithAuth(`/transfers/${transferId}`);
+    } catch (e) {
+        throw(e);
+    }
+};
+
+const deleteTransferById = async (transferId) => {
+    try {
+        return await authenticationService.deleteWithAuth(`/transfers/${transferId}`);
+    } catch (e) {
+        throw(e);
+    }
+};
+
+const editTransferById = async (transferId, value, description, date, from, to) => {
+    try {
+        return await authenticationService.patchWithAuth(`/transfers/${transferId}`, {
+            origin_account: from,
+            destination_account: to,
+            value,
+            description,
+            date
+        });
+    } catch (e) {
+        throw(e);
+    }
+};
+
+export const transferService = {
+    newTransfer,
+    getTransferById,
+    deleteTransferById,
+    editTransferById
 };

@@ -19,6 +19,7 @@ import Login from "./users/Login";
 import SettingsIcon from '@material-ui/icons/Settings';
 import Settings from './Settings';
 import NewUser from './users/NewUser';
+import EditTransfer from "./transactions/EditTransfer";
 
 const theme = createMuiTheme({
     palette: {
@@ -98,6 +99,7 @@ function App() {
                         <Route exact path='/' component={Login}/>
                         <Route exact path='/settings' component={Settings}/>
                         <Route exact path='/users/new' component={NewUser}/>
+                        <Route exact path='/transfers/:transferId/from/:fromAccountId' component={EditTransfer}/>
                     </Switch>
                     <BottomNavBar
                         value={value}
