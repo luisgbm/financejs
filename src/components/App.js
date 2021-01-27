@@ -43,7 +43,9 @@ function BottomNavBar(props) {
     }, [location, props]);
 
     if (hide) {
-        return '';
+        return (
+            <></>
+        );
     } else {
         return (
             <BottomNavigation

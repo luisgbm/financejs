@@ -108,6 +108,7 @@ const Login = (props) => {
             <Container maxWidth='sm' className={classes.container}>
                 <form onSubmit={formik.handleSubmit}>
                     <TextField
+                        autoCapitalize='none'
                         fullWidth
                         id='userName'
                         name='userName'
