@@ -1,100 +1,152 @@
-import React from 'react';
-import {authenticationService} from '../../api/authentication.service';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
-import {Button, Container, IconButton} from '@material-ui/core';
-import LoadingModal from "../LoadingModal";
-import UserForm from "./UserForm";
-import VpnKeyIcon from '@material-ui/icons/VpnKey';
+import React, {useEffect} from 'react';
+import {Button, Container, IconButton, makeStyles} from "@material-ui/core";
+import * as yup from "yup";
+import {useFormik} from "formik";
+import {authenticationService} from "../../api/authentication.service";
+import MessageModal from "../MessageModal";
+import LoadingModalV2 from "../LoadingModalV2";
+import Toolbar from "@material-ui/core/Toolbar";
+import Typography from "@material-ui/core/Typography";
+import AppBar from "@material-ui/core/AppBar";
 import {Add} from "@material-ui/icons";
+import TextField from "@material-ui/core/TextField";
+import VpnKeyIcon from "@material-ui/icons/VpnKey";
 
-class Login extends React.Component {
-    constructor(props) {
-        super(props);
+const validationSchema = yup.object({
+    userName: yup
+        .string('Enter your user name')
+        .required('User name is required'),
+    password: yup
+        .string('Enter your password')
+        .required('Password is required'),
+});
 
-        this.state = {
+const useStyles = makeStyles(theme => ({
+    textField: {
+        width: '100%',
+        marginBottom: theme.spacing(3)
+    },
+    container: {
+        paddingTop: theme.spacing(3)
+    },
+    appBarTitle: {
+        flexGrow: 1
+    }
+}));
+
+const Login = (props) => {
+    const [loadingModalOpen, setLoadingModalOpen] = React.useState(true);
+    const [messageModalOpen, setMessageModalOpen] = React.useState(false);
+    const [messageModalTitle, setMessageModalTitle] = React.useState('');
+    const [messageModalMessage, setMessageModalMessage] = React.useState('');
+
+    const classes = useStyles();
+
+    const formik = useFormik({
+        initialValues: {
             userName: '',
             password: '',
-            showLoadingModal: true,
-            error: false
-        };
+        },
+        validationSchema: validationSchema,
+        onSubmit: async (values, {resetForm}) => {
+            const {userName, password} = values;
 
-        this.onChange = this.onChange.bind(this);
-        this.onLogin = this.onLogin.bind(this);
-        this.onNewUser = this.onNewUser.bind(this);
-    }
+            try {
+                setLoadingModalOpen(true);
+                await authenticationService.login(userName, password);
+                setLoadingModalOpen(false);
+                props.history.push('/accounts');
+            } catch (e) {
+                resetForm();
 
-    async componentDidMount() {
-        if (await authenticationService.isTokenValid()) {
-            this.props.history.push('/accounts');
-        }
+                setLoadingModalOpen(false);
 
-        this.setState({showLoadingModal: false});
-    }
+                setMessageModalTitle('Error');
+                setMessageModalMessage('An error occurred while processing your request, please try again.');
 
-    onChange(fieldName, fieldValue) {
-        this.setState({[fieldName]: fieldValue});
-    }
+                if (e.response && e.response.status === 401) {
+                    setMessageModalTitle('Login failed');
+                    setMessageModalMessage('Wrong user name or password, please try again.');
+                }
 
-    onNewUser() {
-        this.props.history.push('/users/new');
-    }
+                setMessageModalOpen(true);
+            }
+        },
+    });
 
-    async onLogin() {
-        try {
-            this.setState({showLoadingModal: true});
+    const onNewUser = () => {
+        props.history.push('/users/new');
+    };
 
-            await authenticationService.login(this.state.userName, this.state.password);
+    useEffect(() => {
+        (async function checkToken() {
+            if (await authenticationService.isTokenValid()) {
+                props.history.push('/accounts');
+            }
 
-            this.setState({showLoadingModal: false});
+            setLoadingModalOpen(false);
+        })();
+    }, [props.history]);
 
-            this.props.history.push('/accounts');
-        } catch (e) {
-            this.setState({
-                userName: '',
-                password: '',
-                error: true,
-                showLoadingModal: false
-            });
-        }
-    }
-
-    render() {
-        return (
-            <React.Fragment>
-                <LoadingModal
-                    show={this.state.showLoadingModal}
-                />
-                <AppBar position='sticky'>
-                    <Toolbar>
-                        <Typography variant='h6' className='appBarTitle'>Login</Typography>
-                        <IconButton color='inherit' onClick={this.onNewUser}>
-                            <Add/>
-                        </IconButton>
-                    </Toolbar>
-                </AppBar>
-                <Container maxWidth='sm' style={{paddingTop: '16px'}}>
-                    <UserForm
-                        userName={this.state.userName}
-                        password={this.state.password}
-                        onChange={this.onChange}
-                        error={this.state.error}
+    return (
+        <>
+            <MessageModal
+                open={messageModalOpen}
+                title={messageModalTitle}
+                message={messageModalMessage}
+                handleClose={() => setMessageModalOpen(false)}
+            />
+            <LoadingModalV2 open={loadingModalOpen}/>
+            <AppBar position='sticky'>
+                <Toolbar>
+                    <Typography variant='h6' className={classes.appBarTitle}>Login</Typography>
+                    <IconButton color='inherit' onClick={onNewUser}>
+                        <Add/>
+                    </IconButton>
+                </Toolbar>
+            </AppBar>
+            <Container maxWidth='sm' className={classes.container}>
+                <form onSubmit={formik.handleSubmit}>
+                    <TextField
+                        fullWidth
+                        id='userName'
+                        name='userName'
+                        label='User Name'
+                        variant='outlined'
+                        autoComplete='off'
+                        className={classes.textField}
+                        value={formik.values.userName}
+                        onChange={formik.handleChange}
+                        error={formik.touched.userName && Boolean(formik.errors.userName)}
+                        helperText={formik.touched.userName && formik.errors.userName}
+                    />
+                    <TextField
+                        fullWidth
+                        id='password'
+                        name='password'
+                        label='Password'
+                        variant='outlined'
+                        type='password'
+                        className={classes.textField}
+                        value={formik.values.password}
+                        onChange={formik.handleChange}
+                        error={formik.touched.password && Boolean(formik.errors.password)}
+                        helperText={formik.touched.password && formik.errors.password}
                     />
                     <Button
+                        type='submit'
+                        fullWidth
                         variant='contained'
                         color='primary'
                         startIcon={<VpnKeyIcon/>}
                         size='large'
-                        style={{width: '100%'}}
-                        onClick={this.onLogin}
                     >
                         Login
                     </Button>
-                </Container>
-            </React.Fragment>
-        );
-    }
-}
+                </form>
+            </Container>
+        </>
+    );
+};
 
 export default Login;

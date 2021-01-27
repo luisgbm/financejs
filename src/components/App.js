@@ -15,11 +15,11 @@ import HomeIcon from '@material-ui/icons/Home';
 import {BrowserRouter as Router, Link, Route, Switch, useLocation} from 'react-router-dom';
 import AccountList from './accounts/AccountList';
 import {createMuiTheme, ThemeProvider} from '@material-ui/core';
-import Login from "./users/Login";
 import SettingsIcon from '@material-ui/icons/Settings';
 import Settings from './Settings';
-import NewUserV2 from './users/NewUserV2';
+import NewUser from './users/NewUser';
 import EditTransfer from "./transactions/EditTransfer";
+import Login from "./users/Login";
 
 const theme = createMuiTheme({
     palette: {
@@ -98,7 +98,7 @@ function App() {
                         <Route exact path='/transactions/:transactionId' component={EditTransaction}/>
                         <Route exact path='/' component={Login}/>
                         <Route exact path='/settings' component={Settings}/>
-                        <Route exact path='/users/new' component={NewUserV2}/>
+                        <Route exact path='/users/new' component={NewUser}/>
                         <Route exact path='/transfers/:transferId/from/:fromAccountId' component={EditTransfer}/>
                     </Switch>
                     <BottomNavBar
