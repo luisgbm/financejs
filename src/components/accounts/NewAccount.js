@@ -52,6 +52,10 @@ const NewAccount = (props) => {
                 setLoadingModalOpen(false);
                 props.history.push('/accounts');
             } catch (e) {
+                if (e.response && e.response.status === 401) {
+                    props.history.push('/');
+                }
+
                 setLoadingModalOpen(false);
 
                 setMessageModalTitle('Error');

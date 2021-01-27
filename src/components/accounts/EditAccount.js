@@ -1,104 +1,160 @@
-import React from 'react';
-import SaveIcon from '@material-ui/icons/Save';
-import DeleteIcon from '@material-ui/icons/Delete';
-import {AppBar, Button, Container, IconButton, TextField, Toolbar, Typography} from '@material-ui/core';
-import LoadingModal from "../LoadingModal";
+import React, {useEffect} from "react";
+import {Button, Container, IconButton, makeStyles} from "@material-ui/core";
+import {useFormik} from "formik";
 import {accountService} from "../../api/account.service";
+import * as yup from "yup";
+import MessageModal from "../MessageModal";
+import LoadingModalV2 from "../LoadingModalV2";
+import AppBar from "@material-ui/core/AppBar";
+import Toolbar from "@material-ui/core/Toolbar";
+import Typography from "@material-ui/core/Typography";
+import TextField from "@material-ui/core/TextField";
+import SaveIcon from "@material-ui/icons/Save";
+import DeleteIcon from "@material-ui/icons/Delete";
 
-class EditAccount extends React.Component {
-    constructor(props) {
-        super(props);
+const validationSchema = yup.object({
+    accountName: yup
+        .string('Enter the account name')
+        .required('Account name is required')
+});
 
-        this.onEditAccount = this.onEditAccount.bind(this);
-        this.onDeleteAccount = this.onDeleteAccount.bind(this);
-
-        this.state = {
-            accountId: props.match.params.id,
-            accountName: '',
-            showLoadingModal: true
-        };
+const useStyles = makeStyles(theme => ({
+    textField: {
+        width: '100%',
+        marginBottom: theme.spacing(3)
+    },
+    container: {
+        paddingTop: theme.spacing(3)
+    },
+    appBarTitle: {
+        flexGrow: 1
     }
+}));
 
-    async componentDidMount() {
-        try {
-            const account = await accountService.getAccountById(this.state.accountId);
+const EditAccount = (props) => {
+    const accountId = props.match.params.id;
 
-            this.setState({accountName: account.data.name, showLoadingModal: false});
-        } catch (e) {
-            if (e.response.status === 401) {
-                this.props.history.push('/');
+    const [loadingModalOpen, setLoadingModalOpen] = React.useState(true);
+    const [messageModalOpen, setMessageModalOpen] = React.useState(false);
+    const [messageModalTitle, setMessageModalTitle] = React.useState('');
+    const [messageModalMessage, setMessageModalMessage] = React.useState('');
+
+    const classes = useStyles();
+
+    const formik = useFormik({
+        initialValues: {
+            accountName: ''
+        },
+        validationSchema: validationSchema,
+        onSubmit: async (values) => {
+            const {accountName} = values;
+
+            try {
+                setLoadingModalOpen(true);
+                await accountService.editAccountById(accountId, accountName);
+                setLoadingModalOpen(false);
+                props.history.push('/accounts');
+            } catch (e) {
+                if (e.response && e.response.status === 401) {
+                    props.history.push('/')
+                }
+
+                setLoadingModalOpen(false);
+
+                setMessageModalTitle('Error');
+                setMessageModalMessage('An error occurred while processing your request, please try again.');
+                setMessageModalOpen(true);
             }
-        }
-    }
+        },
+    });
 
-    async onEditAccount() {
-        try {
-            this.setState({showLoadingModal: true});
+    useEffect(() => {
+        (async function loadAccountData() {
+            try {
+                const account = await accountService.getAccountById(accountId);
+                formik.values.accountName = account.data.name;
+                setLoadingModalOpen(false);
+            } catch (e) {
+                if (e.response && e.response.status === 401) {
+                    props.history.push('/')
+                }
 
-            await accountService.editAccountById(this.state.accountId, this.state.accountName);
+                setLoadingModalOpen(false);
 
-            this.setState({showLoadingModal: false});
-
-            this.props.history.push('/accounts');
-        } catch (e) {
-            if (e.response.status === 401) {
-                this.props.history.push('/');
+                setMessageModalTitle('Error');
+                setMessageModalMessage('An error occurred while processing your request, please try again.');
+                setMessageModalOpen(true);
             }
-        }
-    }
 
-    async onDeleteAccount() {
+        })();
+        // eslint-disable-next-line
+    }, []);
+
+    const onDeleteAccount = async () => {
         try {
-            this.setState({showLoadingModal: true});
-
-            await accountService.deleteAccountById(this.state.accountId);
-
-            this.setState({showLoadingModal: false});
-
-            this.props.history.push('/accounts');
+            setLoadingModalOpen(true);
+            await accountService.deleteAccountById(accountId);
+            setLoadingModalOpen(false);
+            props.history.push('/accounts');
         } catch (e) {
-            if (e.response.status === 401) {
-                this.props.history.push('/');
+            if (e.response && e.response.status === 401) {
+                props.history.push('/')
             }
-        }
-    }
 
-    render() {
-        return (
-            <React.Fragment>
-                <LoadingModal
-                    show={this.state.showLoadingModal}
-                />
-                <AppBar position='sticky'>
-                    <Toolbar>
-                        <Typography variant='h6' className='appBarTitle'>Edit Account</Typography>
-                        <IconButton color='inherit' onClick={this.onEditAccount}>
-                            <SaveIcon/>
-                        </IconButton>
-                    </Toolbar>
-                </AppBar>
-                <Container maxWidth='sm' style={{paddingTop: '16px'}}>
+            setLoadingModalOpen(false);
+
+            setMessageModalTitle('Error');
+            setMessageModalMessage('An error occurred while processing your request, please try again.');
+            setMessageModalOpen(true);
+        }
+    };
+
+    return (
+        <>
+            <MessageModal
+                open={messageModalOpen}
+                title={messageModalTitle}
+                message={messageModalMessage}
+                handleClose={() => setMessageModalOpen(false)}
+            />
+            <LoadingModalV2 open={loadingModalOpen}/>
+            <AppBar position='sticky'>
+                <Toolbar>
+                    <Typography variant='h6' className={classes.appBarTitle}>Edit Account</Typography>
+                    <IconButton color='inherit' onClick={formik.handleSubmit}>
+                        <SaveIcon/>
+                    </IconButton>
+                </Toolbar>
+            </AppBar>
+            <Container maxWidth='sm' className={classes.container}>
+                <form onSubmit={formik.handleSubmit}>
                     <TextField
+                        fullWidth
+                        id='accountName'
+                        name='accountName'
                         label='Account Name'
                         variant='outlined'
-                        style={{width: '100%'}}
-                        value={this.state.accountName}
-                        onChange={event => this.setState({accountName: event.target.value})}
+                        autoComplete='off'
+                        className={classes.textField}
+                        value={formik.values.accountName}
+                        onChange={formik.handleChange}
+                        error={formik.touched.accountName && Boolean(formik.errors.accountName)}
+                        helperText={formik.touched.accountName && formik.errors.accountName}
                     />
                     <Button
+                        fullWidth
                         variant='contained'
                         color='secondary'
                         startIcon={<DeleteIcon/>}
                         size='large'
-                        style={{width: '100%', marginTop: '16px'}}
-                        onClick={this.onDeleteAccount}
+                        onClick={onDeleteAccount}
                     >
                         Delete
                     </Button>
-                </Container>
-            </React.Fragment>
-        );
-    }
-}
+                </form>
+            </Container>
+        </>
+    );
+};
 
 export default EditAccount;
