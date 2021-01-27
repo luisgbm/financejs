@@ -27,31 +27,29 @@ const theme = createMuiTheme({
     }
 });
 
-function BottomNavBar(props) {
-    let location = useLocation();
+const BottomNavBar = () => {
+    const [value, setValue] = React.useState(0);
     const [hide, setHide] = React.useState(false);
+
+    let location = useLocation();
 
     React.useEffect(() => {
         const hideForPaths = ['/', '/users/new'];
 
         if (hideForPaths.includes(location.pathname)) {
             setHide(true);
-            props.setValue(0);
+            setValue(0);
         } else {
             setHide(false);
         }
-    }, [location, props]);
+    }, [location]);
 
-    if (hide) {
-        return (
-            <></>
-        );
-    } else {
+    if (!hide) {
         return (
             <BottomNavigation
-                value={props.value}
+                value={value}
                 onChange={(event, newValue) => {
-                    props.setValue(newValue);
+                    setValue(newValue);
                 }}
                 showLabels
                 className='bottomNav'
@@ -76,39 +74,36 @@ function BottomNavBar(props) {
                 />
             </BottomNavigation>
         );
+    } else {
+        return (
+            <></>
+        );
     }
 }
 
-function App() {
-    const [value, setValue] = React.useState(0);
-
+const App = () => {
     return (
         <ThemeProvider theme={theme}>
-            <React.Fragment>
-                <CssBaseline/>
-                <Router>
-                    <Switch>
-                        <Route exact path='/accounts' component={AccountList}/>
-                        <Route exact path='/accounts/new' component={NewAccount}/>
-                        <Route exact path='/accounts/edit/:id' component={EditAccount}/>
-                        <Route exact path='/categories/new/:type' component={NewCategory}/>
-                        <Route exact path='/categories/edit/:id' component={EditCategory}/>
-                        <Route exact path='/categories/' component={CategoryList}/>
-                        <Route exact path='/categories/:type' component={CategoryList}/>
-                        <Route exact path='/transactions/account/:accountId' component={TransactionList}/>
-                        <Route exact path='/transactions/account/:accountId/new' component={NewTransaction}/>
-                        <Route exact path='/transactions/:transactionId' component={EditTransaction}/>
-                        <Route exact path='/' component={Login}/>
-                        <Route exact path='/settings' component={Settings}/>
-                        <Route exact path='/users/new' component={NewUser}/>
-                        <Route exact path='/transfers/:transferId/from/:fromAccountId' component={EditTransfer}/>
-                    </Switch>
-                    <BottomNavBar
-                        value={value}
-                        setValue={setValue}
-                    />
-                </Router>
-            </React.Fragment>
+            <CssBaseline/>
+            <Router>
+                <Switch>
+                    <Route exact path='/accounts' component={AccountList}/>
+                    <Route exact path='/accounts/new' component={NewAccount}/>
+                    <Route exact path='/accounts/edit/:id' component={EditAccount}/>
+                    <Route exact path='/categories/new/:type' component={NewCategory}/>
+                    <Route exact path='/categories/edit/:id' component={EditCategory}/>
+                    <Route exact path='/categories/' component={CategoryList}/>
+                    <Route exact path='/categories/:type' component={CategoryList}/>
+                    <Route exact path='/transactions/account/:accountId' component={TransactionList}/>
+                    <Route exact path='/transactions/account/:accountId/new' component={NewTransaction}/>
+                    <Route exact path='/transactions/:transactionId' component={EditTransaction}/>
+                    <Route exact path='/' component={Login}/>
+                    <Route exact path='/settings' component={Settings}/>
+                    <Route exact path='/users/new' component={NewUser}/>
+                    <Route exact path='/transfers/:transferId/from/:fromAccountId' component={EditTransfer}/>
+                </Switch>
+                <BottomNavBar/>
+            </Router>
         </ThemeProvider>
     );
 }
