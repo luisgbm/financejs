@@ -1,60 +1,102 @@
-import React from 'react';
-import DoneIcon from '@material-ui/icons/Done';
-import {AppBar, Container, IconButton, TextField, Toolbar, Typography} from '@material-ui/core';
-import LoadingModal from "../LoadingModal";
+import React from "react";
+import MessageModal from "../MessageModal";
+import LoadingModalV2 from "../LoadingModalV2";
+import Toolbar from "@material-ui/core/Toolbar";
+import Typography from "@material-ui/core/Typography";
+import {Container, IconButton, makeStyles} from "@material-ui/core";
+import AppBar from "@material-ui/core/AppBar";
+import DoneIcon from "@material-ui/icons/Done";
+import {useFormik} from "formik";
+import * as yup from "yup";
 import {accountService} from "../../api/account.service";
+import TextField from "@material-ui/core/TextField";
 
-class NewAccount extends React.Component {
-    state = {accountName: '', showLoadingModal: false};
+const validationSchema = yup.object({
+    accountName: yup
+        .string('Enter the account name')
+        .required('Account name is required')
+});
 
-    constructor(props) {
-        super(props);
-
-        this.onNewAccount = this.onNewAccount.bind(this);
+const useStyles = makeStyles(theme => ({
+    textField: {
+        width: '100%',
+        marginBottom: theme.spacing(3)
+    },
+    container: {
+        paddingTop: theme.spacing(3)
+    },
+    appBarTitle: {
+        flexGrow: 1
     }
+}));
 
-    async onNewAccount() {
-        try {
-            this.setState({showLoadingModal: true});
+const NewAccount = (props) => {
+    const [loadingModalOpen, setLoadingModalOpen] = React.useState(false);
+    const [messageModalOpen, setMessageModalOpen] = React.useState(false);
+    const [messageModalTitle, setMessageModalTitle] = React.useState('');
+    const [messageModalMessage, setMessageModalMessage] = React.useState('');
 
-            await accountService.newAccount(this.state.accountName);
+    const classes = useStyles();
 
-            this.setState({showLoadingModal: false});
+    const formik = useFormik({
+        initialValues: {
+            accountName: ''
+        },
+        validationSchema: validationSchema,
+        onSubmit: async (values) => {
+            const {accountName} = values;
 
-            this.props.history.push('/accounts');
-        } catch (e) {
-            if (e.response.status === 401) {
-                this.props.history.push('/');
+            try {
+                setLoadingModalOpen(true);
+                await accountService.newAccount(accountName);
+                setLoadingModalOpen(false);
+                props.history.push('/accounts');
+            } catch (e) {
+                setLoadingModalOpen(false);
+
+                setMessageModalTitle('Error');
+                setMessageModalMessage('An error occurred while processing your request, please try again.');
+                setMessageModalOpen(true);
             }
-        }
-    }
+        },
+    });
 
-    render() {
-        return (
-            <React.Fragment>
-                <LoadingModal
-                    show={this.state.showLoadingModal}
-                />
-                <AppBar position='sticky'>
-                    <Toolbar>
-                        <Typography variant='h6' className='appBarTitle'>New Account</Typography>
-                        <IconButton color='inherit' onClick={this.onNewAccount}>
-                            <DoneIcon/>
-                        </IconButton>
-                    </Toolbar>
-                </AppBar>
-                <Container maxWidth='sm' style={{paddingTop: '16px'}}>
+    return (
+        <>
+            <MessageModal
+                open={messageModalOpen}
+                title={messageModalTitle}
+                message={messageModalMessage}
+                handleClose={() => setMessageModalOpen(false)}
+            />
+            <LoadingModalV2 open={loadingModalOpen}/>
+            <AppBar position='sticky'>
+                <Toolbar>
+                    <Typography variant='h6' className={classes.appBarTitle}>New Account</Typography>
+                    <IconButton color='inherit' onClick={formik.handleSubmit}>
+                        <DoneIcon/>
+                    </IconButton>
+                </Toolbar>
+            </AppBar>
+            <Container maxWidth='sm' className={classes.container}>
+                <form onSubmit={formik.handleSubmit}>
                     <TextField
+                        fullWidth
+                        id='accountName'
+                        name='accountName'
                         label='Account Name'
                         variant='outlined'
-                        style={{width: '100%'}}
-                        value={this.state.accountName}
-                        onChange={event => this.setState({accountName: event.target.value})}
+                        autoComplete='off'
+                        className={classes.textField}
+                        value={formik.values.accountName}
+                        onChange={formik.handleChange}
+                        error={formik.touched.accountName && Boolean(formik.errors.accountName)}
+                        helperText={formik.touched.accountName && formik.errors.accountName}
                     />
-                </Container>
-            </React.Fragment>
-        );
-    }
-}
+                </form>
+            </Container>
+        </>
+    );
+};
 
 export default NewAccount;
