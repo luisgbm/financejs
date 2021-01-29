@@ -3,51 +3,55 @@ import {authenticationService} from '../api/authentication.service';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
-import {Button, Container} from '@material-ui/core';
+import {Button, Container, makeStyles} from '@material-ui/core';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
+import LoadingModalV2 from "./LoadingModalV2";
 
-class Settings extends React.Component {
-    constructor(props) {
-        super(props);
-
-        this.state = {};
-
-        this.onLogout = this.onLogout.bind(this);
+const useStyles = makeStyles(theme => ({
+    appBarTitle: {
+        flexGrow: 1
+    },
+    container: {
+        padding: theme.spacing(3)
     }
+}));
 
-    async onLogout() {
-        this.setState({showLoadingModal: true});
+const Settings = (props) => {
+    const [loadingModalOpen, setLoadingModalOpen] = React.useState(false);
 
+    const classes = useStyles();
+
+    const onLogout = () => {
+        setLoadingModalOpen(true);
         authenticationService.logout();
+        setLoadingModalOpen(false);
+        props.history.push('/');
+    };
 
-        this.setState({showLoadingModal: false});
-
-        this.props.history.push('/');
-    }
-
-    render() {
-        return (
-            <React.Fragment>
-                <AppBar position='sticky'>
-                    <Toolbar>
-                        <Typography variant='h6' className='appBarTitle'>Settings</Typography>
-                    </Toolbar>
-                </AppBar>
-                <Container maxWidth='sm' style={{paddingTop: '16px'}}>
-                    <Button
-                        variant='contained'
-                        color='secondary'
-                        startIcon={<ExitToAppIcon/>}
-                        size='large'
-                        style={{width: '100%'}}
-                        onClick={this.onLogout}
-                    >
-                        Logout
-                    </Button>
-                </Container>
-            </React.Fragment>
-        );
-    }
-}
+    return (
+        <>
+            <LoadingModalV2
+                open={loadingModalOpen}
+            />
+            <AppBar position='sticky'>
+                <Toolbar>
+                    <Typography variant='h6' className={classes.appBarTitle}>Settings</Typography>
+                </Toolbar>
+            </AppBar>
+            <Container maxWidth='sm' className={classes.container}>
+                <Button
+                    fullWidth
+                    variant='contained'
+                    color='secondary'
+                    startIcon={<ExitToAppIcon/>}
+                    size='large'
+                    onClick={onLogout}
+                >
+                    Logout
+                </Button>
+            </Container>
+        </>
+    );
+};
 
 export default Settings;

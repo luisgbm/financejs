@@ -23,7 +23,7 @@ const useStyles = makeStyles(theme => ({
         marginBottom: theme.spacing(3)
     },
     container: {
-        paddingTop: theme.spacing(3)
+        padding: theme.spacing(3)
     },
     appBarTitle: {
         flexGrow: 1

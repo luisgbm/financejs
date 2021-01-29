@@ -24,7 +24,7 @@ const useStyles = makeStyles(theme => ({
         marginBottom: theme.spacing(3)
     },
     container: {
-        paddingTop: theme.spacing(3)
+        padding: theme.spacing(3)
     },
     appBarTitle: {
         flexGrow: 1
@@ -85,7 +85,6 @@ const EditAccount = (props) => {
                 setMessageModalMessage('An error occurred while processing your request, please try again.');
                 setMessageModalOpen(true);
             }
-
         })();
         // eslint-disable-next-line
     }, []);
