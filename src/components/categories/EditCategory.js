@@ -1,102 +1,194 @@
 import React, {useEffect} from 'react';
 
-import CategoryForm from './CategoryForm';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import AppBar from '@material-ui/core/AppBar';
 import SaveIcon from '@material-ui/icons/Save';
-import {Button, Container, IconButton} from '@material-ui/core';
+import {
+    Button,
+    Container,
+    FormControl,
+    FormHelperText,
+    IconButton,
+    InputLabel,
+    makeStyles,
+    MenuItem,
+    Select
+} from '@material-ui/core';
 import DeleteIcon from '@material-ui/icons/Delete';
-import LoadingModal from "../LoadingModal";
 import {categoryService} from "../../api/category.service";
+import MessageModal from "../MessageModal";
+import LoadingModalV2 from "../LoadingModalV2";
+import * as yup from "yup";
+import {useFormik} from "formik";
+import CategoryTypes from "./CategoryTypes";
+import TextField from "@material-ui/core/TextField";
 
-function EditCategory(props) {
-    const [categoryId] = React.useState(props.match.params.id);
-    const [categoryName, setCategoryName] = React.useState('');
-    const [categoryType, setCategoryType] = React.useState('');
-    const [showLoadingModal, setShowLoadingModal] = React.useState(false);
+const validationSchema = yup.object({
+    categoryName: yup
+        .string('Enter the category name')
+        .required('Category name is required'),
+    categoryType: yup
+        .string('Select the category type')
+        .required('Category type is required')
+});
 
-    const onEditCategory = async () => {
-        try {
-            setShowLoadingModal(true);
+const useStyles = makeStyles(theme => ({
+    textField: {
+        marginBottom: theme.spacing(3)
+    },
+    container: {
+        padding: theme.spacing(3)
+    },
+    appBarTitle: {
+        flexGrow: 1
+    },
+    button: {
+        marginTop: theme.spacing(3)
+    }
+}));
 
-            await categoryService.editCategoryById(categoryId, categoryName, categoryType);
+const EditCategory = (props) => {
+    const categoryId = props.match.params.id;
 
-            setShowLoadingModal(false);
+    const [loadingModalOpen, setLoadingModalOpen] = React.useState(true);
+    const [messageModalOpen, setMessageModalOpen] = React.useState(false);
+    const [messageModalTitle, setMessageModalTitle] = React.useState('');
+    const [messageModalMessage, setMessageModalMessage] = React.useState('');
 
-            props.history.push(`/categories/${categoryType.toLowerCase()}`);
-        } catch (e) {
-            if (e.response.status === 401) {
-                this.props.history.push('/');
+    const classes = useStyles();
+
+    const formik = useFormik({
+        initialValues: {
+            categoryName: '',
+            categoryType: ''
+        },
+        validationSchema: validationSchema,
+        onSubmit: async (values) => {
+            const {categoryName, categoryType} = values;
+
+            try {
+                setLoadingModalOpen(true);
+                await categoryService.editCategoryById(categoryId, categoryName, categoryType);
+                setLoadingModalOpen(false);
+                props.history.push(`/categories/${categoryType.toLowerCase()}`);
+            } catch (e) {
+                if (e.response && e.response.status === 401) {
+                    props.history.push('/');
+                }
+
+                setLoadingModalOpen(false);
+
+                setMessageModalTitle('Error');
+                setMessageModalMessage('An error occurred while processing your request, please try again.');
+                setMessageModalOpen(true);
             }
-        }
-    };
+        },
+    });
 
     const onDeleteCategory = async () => {
         try {
-            setShowLoadingModal(true);
-
+            setLoadingModalOpen(true);
             await categoryService.deleteCategoryById(categoryId);
-
-            setShowLoadingModal(false);
-
-            props.history.push(`/categories/${categoryType.toLowerCase()}`);
+            setLoadingModalOpen(false);
+            props.history.push('/categories');
         } catch (e) {
-            if (e.response.status === 401) {
-                this.props.history.push('/');
+            if (e.response && e.response.status === 401) {
+                props.history.push('/')
             }
+
+            setLoadingModalOpen(false);
+
+            setMessageModalTitle('Error');
+            setMessageModalMessage('An error occurred while processing your request, please try again.');
+            setMessageModalOpen(true);
         }
     }
 
-    const onChange = (fieldName, fieldValue) => {
-        if (fieldName === 'categoryName') {
-            setCategoryName(fieldValue);
-        } else if (fieldName === 'categoryType') {
-            setCategoryType(fieldValue);
-        }
-    };
-
     useEffect(() => {
-        (async function getCategoryData() {
-            setShowLoadingModal(true);
-            const category = await categoryService.getCategoryById(categoryId);
-            setCategoryName(category.data.name);
-            setCategoryType(category.data.categorytype);
-            setShowLoadingModal(false);
+        (async function loadCategoryData() {
+            try {
+                const category = await categoryService.getCategoryById(categoryId);
+                formik.values.categoryName = category.data.name;
+                formik.values.categoryType = category.data.categorytype;
+                setLoadingModalOpen(false);
+            } catch (e) {
+                if (e.response && e.response.status === 401) {
+                    props.history.push('/')
+                }
+
+                setLoadingModalOpen(false);
+
+                setMessageModalTitle('Error');
+                setMessageModalMessage('An error occurred while processing your request, please try again.');
+                setMessageModalOpen(true);
+            }
         })()
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
-        <React.Fragment>
-            <LoadingModal
-                show={showLoadingModal}
+        <>
+            <MessageModal
+                open={messageModalOpen}
+                title={messageModalTitle}
+                message={messageModalMessage}
+                handleClose={() => setMessageModalOpen(false)}
             />
+            <LoadingModalV2 open={loadingModalOpen}/>
             <AppBar position='sticky'>
                 <Toolbar>
-                    <Typography variant='h6' className='appBarTitle'>Edit Category</Typography>
-                    <IconButton color='inherit' onClick={onEditCategory}>
+                    <Typography variant='h6' className={classes.appBarTitle}>Edit Category</Typography>
+                    <IconButton color='inherit' onClick={formik.handleSubmit}>
                         <SaveIcon/>
                     </IconButton>
                 </Toolbar>
             </AppBar>
-            <Container maxWidth='sm' style={{paddingTop: '16px'}}>
-                <CategoryForm
-                    categoryName={categoryName}
-                    categoryType={categoryType}
-                    onChange={onChange}
+            <Container maxWidth='sm' className={classes.container}>
+                <TextField
+                    fullWidth
+                    id='categoryName'
+                    name='categoryName'
+                    label='Category Name'
+                    variant='outlined'
+                    autoComplete='off'
+                    className={classes.textField}
+                    value={formik.values.categoryName}
+                    onChange={formik.handleChange}
+                    error={formik.touched.categoryName && Boolean(formik.errors.categoryName)}
+                    helperText={formik.touched.categoryName && formik.errors.categoryName}
                 />
+                <FormControl
+                    fullWidth
+                    variant='outlined'
+                    error={formik.touched.categoryType && Boolean(formik.errors.categoryType)}
+                >
+                    <InputLabel>Category Type</InputLabel>
+                    <Select
+                        id='categoryType'
+                        name='categoryType'
+                        label='Category Type'
+                        value={formik.values.categoryType}
+                        onChange={formik.handleChange}
+                    >
+                        <MenuItem value=''><em>Select...</em></MenuItem>
+                        <MenuItem value={CategoryTypes.EXPENSE}>Expense</MenuItem>
+                        <MenuItem value={CategoryTypes.INCOME}>Income</MenuItem>
+                    </Select>
+                    <FormHelperText>{formik.touched.categoryType && formik.errors.categoryType}</FormHelperText>
+                </FormControl>
                 <Button
+                    fullWidth
                     variant='contained'
                     color='secondary'
                     startIcon={<DeleteIcon/>}
                     size='large'
-                    style={{width: '100%', marginTop: '16px'}}
                     onClick={onDeleteCategory}
+                    className={classes.button}
                 >
                     Delete
                 </Button>
             </Container>
-        </React.Fragment>
+        </>
     );
 }
 
