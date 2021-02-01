@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 
 import {Link} from 'react-router-dom'
 import Toolbar from '@material-ui/core/Toolbar';
@@ -7,88 +7,114 @@ import AppBar from '@material-ui/core/AppBar';
 import {Add} from '@material-ui/icons';
 import ThumbUpIcon from '@material-ui/icons/ThumbUp';
 import ThumbDownIcon from '@material-ui/icons/ThumbDown';
-import {Card, CardHeader, Container, IconButton, Tab, Tabs} from '@material-ui/core';
-import CreateIcon from '@material-ui/icons/Create';
-import LoadingModal from "../LoadingModal";
+import {Container, IconButton, makeStyles, Tab, Tabs} from '@material-ui/core';
 import {categoryService} from "../../api/category.service";
+import CategoryCard from "./CategoryCard";
+import MessageModal from "../MessageModal";
+import LoadingModalV2 from "../LoadingModalV2";
 
-class CategoryList extends React.Component {
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            categories: [],
-            currentTab: props.match.params.type ? (props.match.params.type === 'expense' ? 0 : 1) : 0,
-            showLoadingModal: true
-        };
-
-        this.onChangeTab = this.onChangeTab.bind(this);
+const useStyles = makeStyles(theme => ({
+    container: {
+        padding: theme.spacing(3)
+    },
+    appBarTitle: {
+        flexGrow: 1
     }
+}));
 
-    async componentDidMount() {
-        try {
-            const response = await categoryService.getAllCategories();
+const CategoryList = (props) => {
+    const tabNameToValue = (tabName) => {
+        let tabValue = 0;
 
-            this.setState({
-                categories: response.data,
-                showLoadingModal: false
-            });
-        } catch (e) {
-            if (e.response.status === 401) {
-                this.props.history.push('/');
+        if (tabName) {
+            if (tabName === 'expense') {
+                tabValue = 0;
+            } else {
+                tabValue = 1;
             }
         }
-    }
 
-    onChangeTab(event, newValue) {
-        this.setState({
-            currentTab: newValue
-        });
-    }
+        return tabValue;
+    };
 
-    render() {
-        return (
-            <React.Fragment>
-                <LoadingModal
-                    show={this.state.showLoadingModal}
-                />
-                <AppBar position='sticky'>
-                    <Toolbar>
-                        <Typography variant='h6' className='appBarTitle'>Categories</Typography>
-                        <IconButton color='inherit' component={Link}
-                                    to={`/categories/new/${this.state.currentTab === 0 ? 'expense' : 'income'}`}>
-                            <Add/>
-                        </IconButton>
-                    </Toolbar>
-                    <Tabs value={this.state.currentTab} onChange={this.onChangeTab} centered>
-                        <Tab icon={<ThumbDownIcon/>} label='Expenses'/>
-                        <Tab icon={<ThumbUpIcon/>} label='Incomes'/>
-                    </Tabs>
-                </AppBar>
-                <Container maxWidth='sm' style={{paddingTop: '16px'}}>
-                    {
-                        this.state.categories
-                            .filter(category => this.state.currentTab === 0 ?
-                                category.categorytype === 'Expense' :
-                                category.categorytype === 'Income')
-                            .sort((a, b) => a.name.localeCompare(b.name))
-                            .map(category =>
-                                <Card key={category.id} variant='outlined' style={{'marginBottom': '16px'}}>
-                                    <CardHeader
-                                        action={
-                                            <IconButton component={Link} to={`/categories/edit/${category.id}`}>
-                                                <CreateIcon/>
-                                            </IconButton>
-                                        }
-                                        title={<Typography variant='h6'>{category.name}</Typography>}
-                                    />
-                                </Card>
-                            )
-                    }
-                </Container>
-            </React.Fragment>
-        );
-    }
-}
+    const tabValueToName = (tabValue) => {
+        return tabValue === 0 ? 'expense' : 'income';
+    };
+
+    const currentTab = tabNameToValue(props.match.params.type);
+
+    const [categories, setCategories] = React.useState([]);
+    const [loadingModalOpen, setLoadingModalOpen] = React.useState(true);
+    const [messageModalOpen, setMessageModalOpen] = React.useState(false);
+    const [messageModalTitle, setMessageModalTitle] = React.useState('');
+    const [messageModalMessage, setMessageModalMessage] = React.useState('');
+
+    const classes = useStyles();
+
+    const onChangeTab = (event, newValue) => {
+        props.history.push(`/categories/${tabValueToName(newValue)}`);
+    };
+
+    useEffect(() => {
+        (async function loadCategories() {
+            try {
+                const categories = await categoryService.getAllCategories();
+                setCategories(categories.data);
+                setLoadingModalOpen(false);
+            } catch (e) {
+                if (e.response && e.response.status === 401) {
+                    props.history.push('/')
+                }
+
+                setLoadingModalOpen(false);
+
+                setMessageModalTitle('Error');
+                setMessageModalMessage('An error occurred while processing your request, please try again.');
+                setMessageModalOpen(true);
+            }
+        })()
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+    return (
+        <>
+            <MessageModal
+                open={messageModalOpen}
+                title={messageModalTitle}
+                message={messageModalMessage}
+                handleClose={() => setMessageModalOpen(false)}
+            />
+            <LoadingModalV2 open={loadingModalOpen}/>
+            <AppBar position='sticky'>
+                <Toolbar>
+                    <Typography variant='h6' className={classes.appBarTitle}>Categories</Typography>
+                    <IconButton color='inherit' component={Link}
+                                to={`/categories/new/${tabValueToName(currentTab)}`}>
+                        <Add/>
+                    </IconButton>
+                </Toolbar>
+                <Tabs value={currentTab} onChange={onChangeTab} centered>
+                    <Tab icon={<ThumbDownIcon/>} label='Expenses'/>
+                    <Tab icon={<ThumbUpIcon/>} label='Incomes'/>
+                </Tabs>
+            </AppBar>
+            <Container maxWidth='sm' className={classes.container}>
+                {
+                    categories
+                        .filter(category => currentTab === 0 ?
+                            category.categorytype === 'Expense' :
+                            category.categorytype === 'Income')
+                        .sort((a, b) => a.name.localeCompare(b.name))
+                        .map(category =>
+                            <CategoryCard
+                                key={category.id}
+                                categoryId={category.id}
+                                categoryName={category.name}
+                            />
+                        )
+                }
+            </Container>
+        </>
+    );
+};
 
 export default CategoryList;
