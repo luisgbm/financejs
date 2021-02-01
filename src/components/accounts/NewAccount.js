@@ -19,7 +19,6 @@ const validationSchema = yup.object({
 
 const useStyles = makeStyles(theme => ({
     textField: {
-        width: '100%',
         marginBottom: theme.spacing(3)
     },
     container: {

@@ -74,6 +74,7 @@ const AccountList = (props) => {
                         .sort((a, b) => a.name.localeCompare(b.name))
                         .map(account =>
                             <AccountCard
+                                key={account.id}
                                 accountId={account.id}
                                 accountName={account.name}
                                 accountBalance={account.balance}

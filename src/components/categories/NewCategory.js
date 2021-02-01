@@ -3,64 +3,135 @@ import React from 'react';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import AppBar from '@material-ui/core/AppBar';
-import CategoryForm from './CategoryForm';
-import {Container, IconButton} from '@material-ui/core';
+import {
+    Container,
+    FormControl,
+    FormHelperText,
+    IconButton,
+    InputLabel,
+    makeStyles,
+    MenuItem,
+    Select
+} from '@material-ui/core';
 import {Done} from '@material-ui/icons';
 import CategoryTypes from './CategoryTypes';
-import LoadingModal from "../LoadingModal";
 import {categoryService} from "../../api/category.service";
+import MessageModal from "../MessageModal";
+import LoadingModalV2 from "../LoadingModalV2";
+import {useFormik} from "formik";
+import * as yup from "yup";
+import TextField from "@material-ui/core/TextField";
 
-function NewCategory(props) {
-    const [categoryName, setCategoryName] = React.useState('');
-    const [categoryType, setCategoryType] = React.useState(props.match.params.type === 'expense' ? CategoryTypes.EXPENSE : CategoryTypes.INCOME);
-    const [showLoadingModal, setShowLoadingModal] = React.useState(false);
+const validationSchema = yup.object({
+    categoryName: yup
+        .string('Enter the category name')
+        .required('Category name is required'),
+    categoryType: yup
+        .string('Select the category type')
+        .required('Category type is required')
+});
 
-    const onChange = (fieldName, fieldValue) => {
-        if (fieldName === 'categoryName') {
-            setCategoryName(fieldValue);
-        } else if (fieldName === 'categoryType') {
-            setCategoryType(fieldValue);
-        }
-    };
+const useStyles = makeStyles(theme => ({
+    textField: {
+        marginBottom: theme.spacing(3)
+    },
+    container: {
+        padding: theme.spacing(3)
+    },
+    appBarTitle: {
+        flexGrow: 1
+    }
+}));
 
-    const onNewCategory = async () => {
-        try {
-            setShowLoadingModal(true);
+const NewCategory = (props) => {
+    const [loadingModalOpen, setLoadingModalOpen] = React.useState(false);
+    const [messageModalOpen, setMessageModalOpen] = React.useState(false);
+    const [messageModalTitle, setMessageModalTitle] = React.useState('');
+    const [messageModalMessage, setMessageModalMessage] = React.useState('');
 
-            await categoryService.newCategory(categoryName, categoryType);
+    const classes = useStyles();
 
-            setShowLoadingModal(false);
+    const formik = useFormik({
+        initialValues: {
+            categoryName: '',
+            categoryType: props.match.params.type === 'expense' ? CategoryTypes.EXPENSE : CategoryTypes.INCOME
+        },
+        validationSchema: validationSchema,
+        onSubmit: async (values) => {
+            const {categoryName, categoryType} = values;
 
-            props.history.push(`/categories/${categoryType.toLowerCase()}`);
-        } catch (e) {
-            if (e.response.status === 401) {
-                this.props.history.push('/');
+            try {
+                setLoadingModalOpen(true);
+                await categoryService.newCategory(categoryName, categoryType);
+                setLoadingModalOpen(false);
+                props.history.push(`/categories/${categoryType.toLowerCase()}`);
+            } catch (e) {
+                if (e.response && e.response.status === 401) {
+                    props.history.push('/');
+                }
+
+                setLoadingModalOpen(false);
+
+                setMessageModalTitle('Error');
+                setMessageModalMessage('An error occurred while processing your request, please try again.');
+                setMessageModalOpen(true);
             }
-        }
-    };
+        },
+    });
 
     return (
-        <React.Fragment>
-            <LoadingModal
-                show={showLoadingModal}
+        <>
+            <MessageModal
+                open={messageModalOpen}
+                title={messageModalTitle}
+                message={messageModalMessage}
+                handleClose={() => setMessageModalOpen(false)}
             />
+            <LoadingModalV2 open={loadingModalOpen}/>
             <AppBar position='sticky'>
                 <Toolbar>
-                    <Typography variant='h6' className='appBarTitle'>New Category</Typography>
-                    <IconButton color='inherit' onClick={onNewCategory}>
+                    <Typography variant='h6' className={classes.appBarTitle}>New Category</Typography>
+                    <IconButton color='inherit' onClick={formik.handleSubmit}>
                         <Done/>
                     </IconButton>
                 </Toolbar>
             </AppBar>
-            <Container maxWidth='sm' style={{paddingTop: '16px'}}>
-                <CategoryForm
-                    categoryName={categoryName}
-                    categoryType={categoryType}
-                    onChange={onChange}
+            <Container maxWidth='sm' className={classes.container}>
+                <TextField
+                    fullWidth
+                    id='categoryName'
+                    name='categoryName'
+                    label='Category Name'
+                    variant='outlined'
+                    autoComplete='off'
+                    className={classes.textField}
+                    value={formik.values.categoryName}
+                    onChange={formik.handleChange}
+                    error={formik.touched.categoryName && Boolean(formik.errors.categoryName)}
+                    helperText={formik.touched.categoryName && formik.errors.categoryName}
                 />
+                <FormControl
+                    fullWidth
+                    variant='outlined'
+                    error={formik.touched.categoryType && Boolean(formik.errors.categoryType)}
+                >
+                    <InputLabel>Category Type</InputLabel>
+                    <Select
+                        id='categoryType'
+                        name='categoryType'
+                        label='Category Type'
+                        value={formik.values.categoryType}
+                        onChange={formik.handleChange}
+                    >
+                        <MenuItem value=''><em>Select...</em></MenuItem>
+                        <MenuItem value={CategoryTypes.EXPENSE}>Expense</MenuItem>
+                        <MenuItem value={CategoryTypes.INCOME}>Income</MenuItem>
+                    </Select>
+                    <FormHelperText>{formik.touched.categoryType && formik.errors.categoryType}</FormHelperText>
+                </FormControl>
             </Container>
-        </React.Fragment>
+        </>
     );
-}
+};
 
 export default NewCategory;
