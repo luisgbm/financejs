@@ -83,28 +83,6 @@ const NewTransactionForm = (props) => {
                 fullWidth
                 variant='outlined'
                 className={classes.formField}
-                error={formik.touched.accountId && Boolean(formik.errors.accountId)}
-            >
-                <InputLabel>Account</InputLabel>
-                <Select
-                    id='accountId'
-                    name='accountId'
-                    label='Account'
-                    value={formik.values.accountId}
-                    onChange={formik.handleChange}
-                >
-                    {
-                        accounts.map(account =>
-                            <MenuItem value={account.id} key={account.id}>{account.name}</MenuItem>
-                        )
-                    }
-                </Select>
-                <FormHelperText>{formik.touched.accountId && formik.errors.accountId}</FormHelperText>
-            </FormControl>
-            <FormControl
-                fullWidth
-                variant='outlined'
-                className={classes.formField}
                 error={formik.touched.categoryType && Boolean(formik.errors.categoryType)}
             >
                 <InputLabel>Type</InputLabel>
@@ -145,6 +123,28 @@ const NewTransactionForm = (props) => {
                     }
                 </Select>
                 <FormHelperText>{formik.touched.categoryId && formik.errors.categoryId}</FormHelperText>
+            </FormControl>
+            <FormControl
+                fullWidth
+                variant='outlined'
+                className={classes.formField}
+                error={formik.touched.accountId && Boolean(formik.errors.accountId)}
+            >
+                <InputLabel>Account</InputLabel>
+                <Select
+                    id='accountId'
+                    name='accountId'
+                    label='Account'
+                    value={formik.values.accountId}
+                    onChange={formik.handleChange}
+                >
+                    {
+                        accounts.map(account =>
+                            <MenuItem value={account.id} key={account.id}>{account.name}</MenuItem>
+                        )
+                    }
+                </Select>
+                <FormHelperText>{formik.touched.accountId && formik.errors.accountId}</FormHelperText>
             </FormControl>
             <MuiPickersUtilsProvider utils={MomentUtils}>
                 <FormControl
