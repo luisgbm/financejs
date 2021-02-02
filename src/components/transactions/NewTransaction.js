@@ -1,207 +1,223 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import AppBar from '@material-ui/core/AppBar';
-import {Container, IconButton, Tab, Tabs} from '@material-ui/core';
-import TransactionForm from './TransactionForm';
-import CategoryTypes from '../categories/CategoryTypes';
+import {Container, IconButton, makeStyles, Tab, Tabs} from '@material-ui/core';
 import DoneIcon from '@material-ui/icons/Done';
 import moment from 'moment';
-import LoadingModal from "../LoadingModal";
-import {accountService} from "../../api/account.service";
-import {categoryService} from "../../api/category.service";
 import {transactionService} from "../../api/transaction.service";
 import AutorenewIcon from '@material-ui/icons/Autorenew';
 import AttachMoneyIcon from '@material-ui/icons/AttachMoney';
-import TransferForm from "./TransferForm";
+import MessageModal from "../MessageModal";
+import LoadingModalV2 from "../LoadingModalV2";
+import {useFormik} from "formik";
+import * as yup from "yup";
+import NewTransactionForm from "./NewTransactionForm";
+import NewTransferForm from "./NewTransferForm";
 import {transferService} from "../../api/transfer.service";
+import {accountService} from "../../api/account.service";
 
-class NewTransaction extends React.Component {
-    constructor(props) {
-        super(props);
+const useStyles = makeStyles(theme => ({
+    formField: {
+        marginBottom: theme.spacing(3)
+    },
+    container: {
+        padding: theme.spacing(3)
+    },
+    appBarTitle: {
+        flexGrow: 1
+    }
+}));
 
-        this.state = {
-            value: 0,
+const NewTransaction = (props) => {
+    const tabNameToValue = (tabName) => {
+        let tabValue = 0;
+
+        if (tabName) {
+            if (tabName === 'transaction') {
+                tabValue = 0;
+            } else {
+                tabValue = 1;
+            }
+        }
+
+        return tabValue;
+    };
+
+    const tabValueToName = (tabValue) => {
+        return tabValue === 0 ? 'transaction' : 'transfer';
+    };
+
+    const currentTab = tabNameToValue(props.match.params.type);
+    const accountId = props.match.params.accountId;
+
+    const [accounts, setAccounts] = React.useState([]);
+    const [loadingModalOpen, setLoadingModalOpen] = React.useState(true);
+    const [messageModalOpen, setMessageModalOpen] = React.useState(false);
+    const [messageModalTitle, setMessageModalTitle] = React.useState('');
+    const [messageModalMessage, setMessageModalMessage] = React.useState('');
+
+    const classes = useStyles();
+
+    const formikTransaction = useFormik({
+        initialValues: {
+            value: '',
             description: '',
-            accounts: [],
-            accountId: '',
-            categoryType: CategoryTypes.EXPENSE,
-            categories: [],
+            accountId: accountId,
+            categoryType: '',
             categoryId: '',
-            categoryName: '',
-            date: moment(),
-            showLoadingModal: true,
-            currentTab: 0,
-            from: 0,
-            to: 0,
-            fromAccounts: [],
-            toAccounts: []
-        };
+            date: moment()
 
-        this.onChange = this.onChange.bind(this);
-        this.onNewTransaction = this.onNewTransaction.bind(this);
-        this.onNewTransfer = this.onNewTransfer.bind(this);
-        this.updateCategoriesAndSelectFirst = this.updateCategoriesAndSelectFirst.bind(this);
-        this.onChangeTab = this.onChangeTab.bind(this);
-    }
+        },
+        validationSchema: yup.object({
+            value: yup
+                .string('Enter the value')
+                .required('Value is required'),
+            categoryType: yup
+                .string('Select the category type')
+                .required('Type is required'),
+            categoryId: yup
+                .string('Select the category')
+                .required('Category is required')
+        }),
+        onSubmit: async (values) => {
+            const {value, description, accountId, categoryId, date} = values;
 
-    async onChange(fieldName, fieldValue) {
-        this.setState({[fieldName]: fieldValue});
+            try {
+                setLoadingModalOpen(true);
 
-        if (fieldName === 'categoryType') {
-            await this.updateCategoriesAndSelectFirst(fieldValue);
-        }
-    }
+                await transactionService.newTransaction(
+                    accountId,
+                    parseInt(value),
+                    description,
+                    date.format('yyyy-MM-DDTHH:mm:ss'),
+                    parseInt(categoryId)
+                );
 
-    async onNewTransfer() {
-        try {
-            this.setState({showLoadingModal: true});
+                setLoadingModalOpen(false);
+                props.history.push(`/transactions/account/${accountId}`);
+            } catch (e) {
+                if (e.response && e.response.status === 401) {
+                    props.history.push('/');
+                }
 
-            await transferService.newTransfer(
-                parseInt(this.state.value),
-                this.state.description,
-                this.state.from,
-                this.state.to,
-                this.state.date.format('yyyy-MM-DDTHH:mm:ss'),
-            );
+                setLoadingModalOpen(false);
 
-            this.setState({showLoadingModal: false});
-
-            this.props.history.push(`/transactions/account/${this.state.accountId}`);
-        } catch (e) {
-            if (e.response.status === 401) {
-                this.props.history.push('/');
+                setMessageModalTitle('Error');
+                setMessageModalMessage('An error occurred while processing your request, please try again.');
+                setMessageModalOpen(true);
             }
-        }
-    }
+        },
+    });
 
-    async onNewTransaction() {
-        try {
-            this.setState({showLoadingModal: true});
+    const formikTransfer = useFormik({
+        initialValues: {
+            value: '',
+            fromAccountId: accountId,
+            toAccountId: '',
+            description: '',
+            date: moment()
 
-            await transactionService.newTransaction(
-                this.state.accountId,
-                parseInt(this.state.value),
-                this.state.description,
-                this.state.date.format('yyyy-MM-DDTHH:mm:ss'),
-                parseInt(this.state.categoryId)
-            );
+        },
+        validationSchema: yup.object({
+            value: yup
+                .string('Enter the value')
+                .required('Value is required'),
+            fromAccountId: yup
+                .string('Select the From account')
+                .required('From account is required'),
+            toAccountId: yup
+                .string('Select the To account')
+                .test('differentFromAccountId', 'From and To must be different', function (value) {
+                    return value !== this.options.parent.fromAccountId;
+                })
+                .required('To account is required')
+        }),
+        onSubmit: async (values) => {
+            const {value, fromAccountId, toAccountId, description, date} = values;
 
-            this.setState({showLoadingModal: false});
+            try {
+                setLoadingModalOpen(true);
 
-            this.props.history.push(`/transactions/account/${this.state.accountId}`);
-        } catch (e) {
-            if (e.response.status === 401) {
-                this.props.history.push('/');
+                await transferService.newTransfer(
+                    parseInt(value),
+                    description,
+                    fromAccountId,
+                    toAccountId,
+                    date.format('yyyy-MM-DDTHH:mm:ss'),
+                );
+
+                setLoadingModalOpen(false);
+                props.history.push(`/transactions/account/${accountId}`);
+            } catch (e) {
+                if (e.response && e.response.status === 401) {
+                    props.history.push('/');
+                }
+
+                setLoadingModalOpen(false);
+
+                setMessageModalTitle('Error');
+                setMessageModalMessage('An error occurred while processing your request, please try again.');
+                setMessageModalOpen(true);
             }
-        }
-    }
+        },
+    });
 
-    async updateCategoriesAndSelectFirst(categoryType) {
-        try {
-            this.setState({showLoadingModal: true});
+    const onChangeTab = (event, newValue) => {
+        props.history.push(`/transactions/account/${accountId}/new/${tabValueToName(newValue)}`)
+    };
 
-            const categories = await categoryService.getAllCategoriesByType(categoryType.toLowerCase());
+    useEffect(() => {
+        (async function loadAccounts() {
+            try {
+                const accounts = await accountService.getAllAccounts();
+                setAccounts(accounts.data);
+                setLoadingModalOpen(false);
+            } catch (e) {
+                if (e.response && e.response.status === 401) {
+                    props.history.push('/')
+                }
 
-            this.setState({categories: categories.data, showLoadingModal: false});
+                setLoadingModalOpen(false);
 
-            if (categories.data && categories.data.length) {
-                this.setState({
-                    categoryId: categories.data[0].id,
-                    categoryName: categories.data[0].name
-                });
+                setMessageModalTitle('Error');
+                setMessageModalMessage('An error occurred while processing your request, please try again.');
+                setMessageModalOpen(true);
             }
-        } catch (e) {
-            if (e.response.status === 401) {
-                this.props.history.push('/');
-            }
-        }
-    }
+        })()
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-    async componentDidMount() {
-        try {
-            const accounts = await accountService.getAllAccounts();
-
-            this.setState({
-                accounts: accounts.data,
-                fromAccounts: accounts.data,
-                toAccounts: accounts.data,
-                from: this.props.match.params.accountId,
-                accountId: this.props.match.params.accountId,
-                showLoadingModal: false
-            });
-
-            await this.updateCategoriesAndSelectFirst(this.state.categoryType);
-        } catch (e) {
-            if (e.response.status === 401) {
-                this.props.history.push('/');
-            }
-        }
-    }
-
-    onChangeTab(event, newValue) {
-        this.setState({
-            currentTab: newValue
-        });
-    }
-
-    getContainerForTab() {
-        if (this.state.currentTab === 0) {
-            return (
-                <TransactionForm
-                    value={this.state.value}
-                    description={this.state.description}
-                    accounts={this.state.accounts}
-                    accountId={this.state.accountId}
-                    categoryType={this.state.categoryType}
-                    categories={this.state.categories}
-                    categoryId={this.state.categoryId}
-                    date={this.state.date}
-                    onChange={this.onChange}
-                />
-            );
-        } else {
-            return (
-                <TransferForm
-                    value={this.state.value}
-                    description={this.state.description}
-                    from={this.state.from}
-                    to={this.state.to}
-                    date={this.state.date}
-                    fromAccounts={this.state.fromAccounts}
-                    toAccounts={this.state.toAccounts}
-                    onChange={this.onChange}
-                />
-            );
-        }
-    }
-
-    render() {
-        return (
-            <React.Fragment>
-                <LoadingModal
-                    show={this.state.showLoadingModal}
-                />
-                <AppBar position='sticky'>
-                    <Toolbar>
-                        <Typography variant='h6' className='appBarTitle'>New Transaction</Typography>
-                        <IconButton color='inherit'
-                                    onClick={this.state.currentTab === 0 ? this.onNewTransaction : this.onNewTransfer}>
-                            <DoneIcon/>
-                        </IconButton>
-                    </Toolbar>
-                    <Tabs value={this.state.currentTab} onChange={this.onChangeTab} centered>
-                        <Tab icon={<AttachMoneyIcon/>} label='Regular'/>
-                        <Tab icon={<AutorenewIcon/>} label='Transfer'/>
-                    </Tabs>
-                </AppBar>
-                <Container maxWidth='sm' style={{paddingTop: '16px'}}>
-                    {this.getContainerForTab()}
-                </Container>
-            </React.Fragment>
-        );
-    }
-}
+    return (
+        <>
+            <MessageModal
+                open={messageModalOpen}
+                title={messageModalTitle}
+                message={messageModalMessage}
+                handleClose={() => setMessageModalOpen(false)}
+            />
+            <LoadingModalV2 open={loadingModalOpen}/>
+            <AppBar position='sticky'>
+                <Toolbar>
+                    <Typography variant='h6' className={classes.appBarTitle}>New Transaction</Typography>
+                    <IconButton color='inherit'
+                                onClick={currentTab === 0 ? formikTransaction.handleSubmit : formikTransfer.handleSubmit}>
+                        <DoneIcon/>
+                    </IconButton>
+                </Toolbar>
+                <Tabs value={currentTab} onChange={onChangeTab} centered>
+                    <Tab icon={<AttachMoneyIcon/>} label='Regular'/>
+                    <Tab icon={<AutorenewIcon/>} label='Transfer'/>
+                </Tabs>
+            </AppBar>
+            <Container maxWidth='sm' className={classes.container}>
+                {
+                    currentTab === 0 ? <NewTransactionForm accounts={accounts} formik={formikTransaction}/> :
+                        <NewTransferForm accounts={accounts} formik={formikTransfer}/>
+                }
+            </Container>
+        </>
+    );
+};
 
 export default NewTransaction;

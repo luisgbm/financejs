@@ -161,6 +161,7 @@ const EditCategory = (props) => {
                     fullWidth
                     variant='outlined'
                     error={formik.touched.categoryType && Boolean(formik.errors.categoryType)}
+                    helperText={formik.touched.categoryType && formik.errors.categoryType}
                 >
                     <InputLabel>Category Type</InputLabel>
                     <Select
@@ -170,7 +171,6 @@ const EditCategory = (props) => {
                         value={formik.values.categoryType}
                         onChange={formik.handleChange}
                     >
-                        <MenuItem value=''><em>Select...</em></MenuItem>
                         <MenuItem value={CategoryTypes.EXPENSE}>Expense</MenuItem>
                         <MenuItem value={CategoryTypes.INCOME}>Income</MenuItem>
                     </Select>

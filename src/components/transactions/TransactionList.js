@@ -81,7 +81,7 @@ class TransactionList extends React.Component {
                         <Typography variant='h6' className='appBarTitle'>{this.state.accountName} <Chip
                             label={this.state.accountBalance}/></Typography>
                         <IconButton color='inherit' component={Link}
-                                    to={`/transactions/account/${this.state.accountId}/new`}>
+                                    to={`/transactions/account/${this.state.accountId}/new/transaction`}>
                             <Add/>
                         </IconButton>
                     </Toolbar>
