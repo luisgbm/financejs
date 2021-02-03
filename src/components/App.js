@@ -29,6 +29,9 @@ const App = () => {
             <CssBaseline/>
             <Router>
                 <Switch>
+                    <Route exact path='/' component={Login}/>
+                    <Route exact path='/settings' component={Settings}/>
+                    <Route exact path='/users/new' component={NewUser}/>
                     <Route exact path='/accounts' component={AccountList}/>
                     <Route exact path='/accounts/new' component={NewAccount}/>
                     <Route exact path='/accounts/edit/:id' component={EditAccount}/>
@@ -40,9 +43,6 @@ const App = () => {
                     <Route exact path='/transactions/account/:accountId/new/:type' component={NewTransaction}/>
                     <Route exact path='/transactions/:transactionId' component={EditTransaction}/>
                     <Route exact path='/transfers/:transferId/from/:fromAccountId' component={EditTransfer}/>
-                    <Route exact path='/' component={Login}/>
-                    <Route exact path='/settings' component={Settings}/>
-                    <Route exact path='/users/new' component={NewUser}/>
                 </Switch>
                 <BottomNavBar/>
             </Router>

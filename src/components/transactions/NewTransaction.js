@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
@@ -13,15 +13,11 @@ import MessageModal from "../MessageModal";
 import LoadingModalV2 from "../LoadingModalV2";
 import {useFormik} from "formik";
 import * as yup from "yup";
-import NewTransactionForm from "./NewTransactionForm";
-import NewTransferForm from "./NewTransferForm";
+import TransactionForm from "./TransactionForm";
+import TransferForm from "./TransferForm";
 import {transferService} from "../../api/transfer.service";
-import {accountService} from "../../api/account.service";
 
 const useStyles = makeStyles(theme => ({
-    formField: {
-        marginBottom: theme.spacing(3)
-    },
     container: {
         padding: theme.spacing(3)
     },
@@ -52,8 +48,7 @@ const NewTransaction = (props) => {
     const currentTab = tabNameToValue(props.match.params.type);
     const accountId = props.match.params.accountId;
 
-    const [accounts, setAccounts] = React.useState([]);
-    const [loadingModalOpen, setLoadingModalOpen] = React.useState(true);
+    const [loadingModalOpen, setLoadingModalOpen] = React.useState(false);
     const [messageModalOpen, setMessageModalOpen] = React.useState(false);
     const [messageModalTitle, setMessageModalTitle] = React.useState('');
     const [messageModalMessage, setMessageModalMessage] = React.useState('');
@@ -129,7 +124,7 @@ const NewTransaction = (props) => {
                 .required('From account is required'),
             toAccountId: yup
                 .string('Select the To account')
-                .test('differentFromAccountId', 'From and To must be different', function (value) {
+                .test('differentFromAccountId', 'To and From must be different', function (value) {
                     return value !== this.options.parent.fromAccountId;
                 })
                 .required('To account is required')
@@ -168,26 +163,6 @@ const NewTransaction = (props) => {
         props.history.push(`/transactions/account/${accountId}/new/${tabValueToName(newValue)}`)
     };
 
-    useEffect(() => {
-        (async function loadAccounts() {
-            try {
-                const accounts = await accountService.getAllAccounts();
-                setAccounts(accounts.data);
-                setLoadingModalOpen(false);
-            } catch (e) {
-                if (e.response && e.response.status === 401) {
-                    props.history.push('/')
-                }
-
-                setLoadingModalOpen(false);
-
-                setMessageModalTitle('Error');
-                setMessageModalMessage('An error occurred while processing your request, please try again.');
-                setMessageModalOpen(true);
-            }
-        })()
-    }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
     return (
         <>
             <MessageModal
@@ -212,8 +187,8 @@ const NewTransaction = (props) => {
             </AppBar>
             <Container maxWidth='sm' className={classes.container}>
                 {
-                    currentTab === 0 ? <NewTransactionForm accounts={accounts} formik={formikTransaction}/> :
-                        <NewTransferForm accounts={accounts} formik={formikTransfer}/>
+                    currentTab === 0 ? <TransactionForm history={props.history} formik={formikTransaction}/> :
+                        <TransferForm history={props.history} formik={formikTransfer}/>
                 }
             </Container>
         </>

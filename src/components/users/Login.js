@@ -85,7 +85,7 @@ const Login = (props) => {
 
             setLoadingModalOpen(false);
         })();
-    }, [props.history]);
+    }, []);  // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
         <>

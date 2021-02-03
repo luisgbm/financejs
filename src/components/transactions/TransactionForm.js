@@ -1,93 +1,264 @@
-import React from 'react';
-import {FormControl, InputLabel, makeStyles, MenuItem, Select, TextField} from '@material-ui/core';
-import CategoryTypes from '../categories/CategoryTypes';
-import {DateTimePicker, MuiPickersUtilsProvider} from '@material-ui/pickers';
-import MomentUtils from '@date-io/moment';
+import {
+    Button,
+    FormControl,
+    FormHelperText,
+    InputLabel,
+    makeStyles,
+    MenuItem,
+    Select,
+    TextField
+} from "@material-ui/core";
+import CategoryTypes from "../categories/CategoryTypes";
+import {DateTimePicker, MuiPickersUtilsProvider} from "@material-ui/pickers";
+import MomentUtils from "@date-io/moment";
+import React, {useEffect} from "react";
+import MessageModal from "../MessageModal";
+import LoadingModalV2 from "../LoadingModalV2";
+import {categoryService} from "../../api/category.service";
+import {accountService} from "../../api/account.service";
+import {transactionService} from "../../api/transaction.service";
+import moment from "moment";
+import DeleteIcon from "@material-ui/icons/Delete";
 
 const useStyles = makeStyles(theme => ({
-    textField: {
-        width: '100%',
-        marginBottom: theme.spacing(2)
-    },
-    formControl: {
-        width: '100%',
-        marginBottom: theme.spacing(2)
+    formField: {
+        marginBottom: theme.spacing(3)
     }
 }));
 
-function TransactionForm(props) {
+const TransactionForm = (props) => {
+    const {formik, history, mode, transactionId} = props;
+
+    const [accounts, setAccounts] = React.useState([]);
+    const [categories, setCategories] = React.useState([]);
+    const [loadingModalOpen, setLoadingModalOpen] = React.useState(true);
+    const [messageModalOpen, setMessageModalOpen] = React.useState(false);
+    const [messageModalTitle, setMessageModalTitle] = React.useState('');
+    const [messageModalMessage, setMessageModalMessage] = React.useState('');
+
     const classes = useStyles();
 
+    const updateCategories = async (categoryType) => {
+        try {
+            await formik.setFieldValue('categoryType', categoryType, true);
+
+            if (categoryType !== '') {
+                setLoadingModalOpen(true);
+
+                const categories = await categoryService.getAllCategoriesByType(categoryType.toLowerCase());
+
+                if (categories.data && categories.data.length) {
+                    setCategories(categories.data);
+                }
+
+                setLoadingModalOpen(false);
+            } else {
+                await formik.setFieldValue('categoryId', '', true);
+            }
+        } catch (e) {
+            if (e.response && e.response.status === 401) {
+                history.push('/');
+            }
+
+            setLoadingModalOpen(false);
+
+            setMessageModalTitle('Error');
+            setMessageModalMessage('An error occurred while processing your request, please try again.');
+            setMessageModalOpen(true);
+        }
+    };
+
+    const onDeleteTransaction = async () => {
+        try {
+            setLoadingModalOpen(true);
+            await transactionService.deleteTransactionById(transactionId);
+            setLoadingModalOpen(false);
+            history.push(`/transactions/account/${formik.values.accountId}`);
+        } catch (e) {
+            if (e.response && e.response.status === 401) {
+                history.push('/');
+            }
+
+            setLoadingModalOpen(false);
+
+            setMessageModalTitle('Error');
+            setMessageModalMessage('An error occurred while processing your request, please try again.');
+            setMessageModalOpen(true);
+        }
+    };
+
+    useEffect(() => {
+        (async function loadInitialData() {
+            try {
+                const accounts = await accountService.getAllAccounts();
+                setAccounts(accounts.data);
+
+                if (mode === 'edit') {
+                    const transaction = await transactionService.getTransactionById(transactionId);
+                    const categories = await categoryService.getAllCategoriesByType(transaction.data.category_type.toLowerCase());
+
+                    if (categories.data && categories.data.length) {
+                        setCategories(categories.data);
+                    }
+
+                    await formik.setFieldValue('value', transaction.data.value);
+                    await formik.setFieldValue('description', transaction.data.description);
+                    await formik.setFieldValue('accountId', transaction.data.account_id);
+                    await formik.setFieldValue('categoryType', transaction.data.category_type);
+                    await formik.setFieldValue('categoryId', transaction.data.category_id);
+                    await formik.setFieldValue('date', moment(transaction.data.date));
+                }
+
+                setLoadingModalOpen(false);
+            } catch (e) {
+                if (e.response && e.response.status === 401) {
+                    history.push('/')
+                }
+
+                setLoadingModalOpen(false);
+
+                setMessageModalTitle('Error');
+                setMessageModalMessage('An error occurred while processing your request, please try again.');
+                setMessageModalOpen(true);
+            }
+        })()
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
     return (
-        <React.Fragment>
+        <>
+            <MessageModal
+                open={messageModalOpen}
+                title={messageModalTitle}
+                message={messageModalMessage}
+                handleClose={() => setMessageModalOpen(false)}
+            />
+            <LoadingModalV2 open={loadingModalOpen}/>
             <TextField
+                id='value'
+                name='value'
+                fullWidth
                 type='number'
                 label='Value'
                 variant='outlined'
-                className={classes.textField}
-                value={props.value}
-                onChange={event => props.onChange('value', event.target.value)}
+                autoComplete='off'
+                className={classes.formField}
+                value={formik.values.value}
+                onChange={formik.handleChange}
+                error={formik.touched.value && Boolean(formik.errors.value)}
+                helperText={formik.touched.value && formik.errors.value}
             />
-            <TextField
-                label='Description'
+            <FormControl
+                fullWidth
                 variant='outlined'
-                className={classes.textField}
-                value={props.description}
-                onChange={event => props.onChange('description', event.target.value)}
-            />
-            <FormControl variant='outlined' className={classes.formControl}>
-                <InputLabel>Account</InputLabel>
-                <Select
-                    value={props.accountId}
-                    onChange={event => props.onChange('accountId', event.target.value)}
-                    label='Account'
-                    className={classes.select}
-                >
-                    {
-                        props.accounts.map(account =>
-                            <MenuItem value={account.id} key={account.id}>{account.name}</MenuItem>
-                        )
-                    }
-                </Select>
-            </FormControl>
-            <FormControl variant='outlined' className={classes.formControl}>
+                className={classes.formField}
+                error={formik.touched.categoryType && Boolean(formik.errors.categoryType)}
+            >
                 <InputLabel>Type</InputLabel>
                 <Select
-                    value={props.categoryType}
-                    onChange={event => props.onChange('categoryType', event.target.value)}
+                    id='categoryType'
+                    name='categoryType'
                     label='Type'
+                    value={formik.values.categoryType}
+                    onChange={e => updateCategories(e.target.value)}
                 >
+                    <MenuItem value=''><em>Select...</em></MenuItem>
                     <MenuItem value={CategoryTypes.EXPENSE}>Expense</MenuItem>
                     <MenuItem value={CategoryTypes.INCOME}>Income</MenuItem>
                 </Select>
+                <FormHelperText>{formik.touched.categoryType && formik.errors.categoryType}</FormHelperText>
             </FormControl>
-            <FormControl variant='outlined' className={classes.formControl}>
+            <FormControl
+                disabled={formik.values.categoryType === ''}
+                fullWidth
+                variant='outlined'
+                className={classes.formField}
+                error={formik.touched.categoryId && Boolean(formik.errors.categoryId)}
+            >
                 <InputLabel>Category</InputLabel>
                 <Select
-                    value={props.categoryId}
-                    onChange={event => props.onChange('categoryId', event.target.value)}
+                    id='categoryId'
+                    name='categoryId'
                     label='Category'
+                    className={classes.select}
+                    value={formik.values.categoryId}
+                    onChange={formik.handleChange}
                 >
+                    <MenuItem value=''><em>Select...</em></MenuItem>
                     {
-                        props.categories.map(category =>
+                        categories.map(category =>
                             <MenuItem value={category.id} key={category.id}>{category.name}</MenuItem>
                         )
                     }
                 </Select>
+                <FormHelperText>{formik.touched.categoryId && formik.errors.categoryId}</FormHelperText>
+            </FormControl>
+            <FormControl
+                fullWidth
+                variant='outlined'
+                className={classes.formField}
+                error={formik.touched.accountId && Boolean(formik.errors.accountId)}
+            >
+                <InputLabel>Account</InputLabel>
+                <Select
+                    id='accountId'
+                    name='accountId'
+                    label='Account'
+                    value={formik.values.accountId}
+                    onChange={formik.handleChange}
+                >
+                    {
+                        accounts.map(account =>
+                            <MenuItem value={account.id} key={account.id}>{account.name}</MenuItem>
+                        )
+                    }
+                </Select>
+                <FormHelperText>{formik.touched.accountId && formik.errors.accountId}</FormHelperText>
             </FormControl>
             <MuiPickersUtilsProvider utils={MomentUtils}>
-                <FormControl className={classes.formControl}>
+                <FormControl
+                    fullWidth
+                    className={classes.formField}
+                >
                     <DateTimePicker
                         label='Date/Time'
                         inputVariant='outlined'
-                        value={props.date}
+                        value={formik.values.date}
+                        onChange={e => {
+                            formik.setFieldValue('date', e.format('yyyy-MM-DDTHH:mm:ss'))
+                        }}
+                        error={formik.touched.date && Boolean(formik.errors.date)}
+                        helperText={formik.touched.date && formik.errors.date}
                         format='DD/MM/yyyy HH:mm'
-                        onChange={date => props.onChange('date', date)}
                     />
                 </FormControl>
             </MuiPickersUtilsProvider>
-        </React.Fragment>
+            <TextField
+                id='description'
+                name='description'
+                fullWidth
+                label='Description'
+                variant='outlined'
+                autoComplete='off'
+                className={classes.formField}
+                value={formik.values.description}
+                onChange={formik.handleChange}
+                error={formik.touched.description && Boolean(formik.errors.description)}
+                helperText={formik.touched.description && formik.errors.description}
+            />
+            {
+                mode === 'edit' ? <Button
+                    fullWidth
+                    variant='contained'
+                    color='secondary'
+                    startIcon={<DeleteIcon/>}
+                    size='large'
+                    onClick={onDeleteTransaction}
+                >
+                    Delete
+                </Button> : <></>
+            }
+        </>
     );
-}
+};
 
 export default TransactionForm;
