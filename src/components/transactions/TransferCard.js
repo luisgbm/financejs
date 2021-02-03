@@ -30,6 +30,14 @@ const TransferCard = (props) => {
         }
     };
 
+    const getTransferCaption = (transaction) => {
+        if (transaction.category_type === 'TransferExpense') {
+            return `Transfer to ${transaction.account_name}`;
+        } else {
+            return `Transfer from ${transaction.from_account_name}`;
+        }
+    };
+
     return (
         <Card key={transaction.id} variant='outlined' className={classes.card}>
             <CardHeader
@@ -55,7 +63,7 @@ const TransferCard = (props) => {
                             transaction.description !== '' ? <>
                                 <b>Description:</b> {transaction.description}<br/></> : <></>
                         }
-                        <b>Transfer</b>
+                        <b>{getTransferCaption(transaction)}</b>
                         <br/>
                         <b>Date:</b> {moment(transaction.date).format('DD/MM/YYYY HH:mm')}
                     </>
