@@ -1,6 +1,6 @@
 import React from "react";
 import MessageModal from "../MessageModal";
-import LoadingModalV2 from "../LoadingModalV2";
+import LoadingModal from "../LoadingModal";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import {Container, IconButton, makeStyles} from "@material-ui/core";
@@ -72,7 +72,7 @@ const NewAccount = (props) => {
                 message={messageModalMessage}
                 handleClose={() => setMessageModalOpen(false)}
             />
-            <LoadingModalV2 open={loadingModalOpen}/>
+            <LoadingModal open={loadingModalOpen}/>
             <AppBar position='sticky'>
                 <Toolbar>
                     <Typography variant='h6' className={classes.appBarTitle}>New Account</Typography>

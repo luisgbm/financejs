@@ -5,7 +5,7 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import {Button, Container, makeStyles} from '@material-ui/core';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
-import LoadingModalV2 from "./LoadingModalV2";
+import LoadingModal from "./LoadingModal";
 
 const useStyles = makeStyles(theme => ({
     appBarTitle: {
@@ -30,7 +30,7 @@ const Settings = (props) => {
 
     return (
         <>
-            <LoadingModalV2
+            <LoadingModal
                 open={loadingModalOpen}
             />
             <AppBar position='sticky'>

@@ -4,7 +4,7 @@ import * as yup from "yup";
 import {useFormik} from "formik";
 import {authenticationService} from "../../api/authentication.service";
 import MessageModal from "../MessageModal";
-import LoadingModalV2 from "../LoadingModalV2";
+import LoadingModal from "../LoadingModal";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import AppBar from "@material-ui/core/AppBar";
@@ -95,7 +95,7 @@ const Login = (props) => {
                 message={messageModalMessage}
                 handleClose={() => setMessageModalOpen(false)}
             />
-            <LoadingModalV2 open={loadingModalOpen}/>
+            <LoadingModal open={loadingModalOpen}/>
             <AppBar position='sticky'>
                 <Toolbar>
                     <Typography variant='h6' className={classes.appBarTitle}>Login</Typography>

@@ -8,7 +8,7 @@ import {Container, IconButton, makeStyles} from '@material-ui/core';
 import moment from 'moment';
 import {transferService} from "../../api/transfer.service";
 import MessageModal from "../MessageModal";
-import LoadingModalV2 from "../LoadingModalV2";
+import LoadingModal from "../LoadingModal";
 import {useFormik} from "formik";
 import * as yup from "yup";
 import TransferForm from "./TransferForm";
@@ -94,7 +94,7 @@ const EditTransfer = (props) => {
                 message={messageModalMessage}
                 handleClose={() => setMessageModalOpen(false)}
             />
-            <LoadingModalV2 open={loadingModalOpen}/>
+            <LoadingModal open={loadingModalOpen}/>
             <AppBar position='sticky'>
                 <Toolbar>
                     <Typography variant='h6' className={classes.appBarTitle}>Edit Transfer</Typography>

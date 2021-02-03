@@ -17,7 +17,7 @@ import {Done} from '@material-ui/icons';
 import CategoryTypes from './CategoryTypes';
 import {categoryService} from "../../api/category.service";
 import MessageModal from "../MessageModal";
-import LoadingModalV2 from "../LoadingModalV2";
+import LoadingModal from "../LoadingModal";
 import {useFormik} from "formik";
 import * as yup from "yup";
 import TextField from "@material-ui/core/TextField";
@@ -87,7 +87,7 @@ const NewCategory = (props) => {
                 message={messageModalMessage}
                 handleClose={() => setMessageModalOpen(false)}
             />
-            <LoadingModalV2 open={loadingModalOpen}/>
+            <LoadingModal open={loadingModalOpen}/>
             <AppBar position='sticky'>
                 <Toolbar>
                     <Typography variant='h6' className={classes.appBarTitle}>New Category</Typography>

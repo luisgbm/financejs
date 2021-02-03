@@ -18,7 +18,7 @@ import {
 import DeleteIcon from '@material-ui/icons/Delete';
 import {categoryService} from "../../api/category.service";
 import MessageModal from "../MessageModal";
-import LoadingModalV2 from "../LoadingModalV2";
+import LoadingModal from "../LoadingModal";
 import * as yup from "yup";
 import {useFormik} from "formik";
 import CategoryTypes from "./CategoryTypes";
@@ -134,7 +134,7 @@ const EditCategory = (props) => {
                 message={messageModalMessage}
                 handleClose={() => setMessageModalOpen(false)}
             />
-            <LoadingModalV2 open={loadingModalOpen}/>
+            <LoadingModal open={loadingModalOpen}/>
             <AppBar position='sticky'>
                 <Toolbar>
                     <Typography variant='h6' className={classes.appBarTitle}>Edit Category</Typography>

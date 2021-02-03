@@ -10,7 +10,7 @@ import {transactionService} from "../../api/transaction.service";
 import AutorenewIcon from '@material-ui/icons/Autorenew';
 import AttachMoneyIcon from '@material-ui/icons/AttachMoney';
 import MessageModal from "../MessageModal";
-import LoadingModalV2 from "../LoadingModalV2";
+import LoadingModal from "../LoadingModal";
 import {useFormik} from "formik";
 import * as yup from "yup";
 import TransactionForm from "./TransactionForm";
@@ -171,7 +171,7 @@ const NewTransaction = (props) => {
                 message={messageModalMessage}
                 handleClose={() => setMessageModalOpen(false)}
             />
-            <LoadingModalV2 open={loadingModalOpen}/>
+            <LoadingModal open={loadingModalOpen}/>
             <AppBar position='sticky'>
                 <Toolbar>
                     <Typography variant='h6' className={classes.appBarTitle}>New Transaction</Typography>

@@ -13,7 +13,7 @@ import MomentUtils from "@date-io/moment";
 import React, {useEffect} from "react";
 import {accountService} from "../../api/account.service";
 import MessageModal from "../MessageModal";
-import LoadingModalV2 from "../LoadingModalV2";
+import LoadingModal from "../LoadingModal";
 import DeleteIcon from "@material-ui/icons/Delete";
 import {transferService} from "../../api/transfer.service";
 import moment from "moment";
@@ -93,7 +93,7 @@ const TransferForm = (props) => {
                 message={messageModalMessage}
                 handleClose={() => setMessageModalOpen(false)}
             />
-            <LoadingModalV2 open={loadingModalOpen}/>
+            <LoadingModal open={loadingModalOpen}/>
             <TextField
                 id='value'
                 name='value'

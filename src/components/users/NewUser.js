@@ -7,7 +7,7 @@ import Typography from "@material-ui/core/Typography";
 import {Container, IconButton, makeStyles} from "@material-ui/core";
 import SaveIcon from "@material-ui/icons/Save";
 import AppBar from "@material-ui/core/AppBar";
-import LoadingModalV2 from "../LoadingModalV2";
+import LoadingModal from "../LoadingModal";
 import {authenticationService} from "../../api/authentication.service";
 import MessageModal from "../MessageModal";
 
@@ -79,7 +79,7 @@ const NewUser = (props) => {
                 message={messageModalMessage}
                 handleClose={() => setMessageModalOpen(false)}
             />
-            <LoadingModalV2 open={loadingModalOpen}/>
+            <LoadingModal open={loadingModalOpen}/>
             <AppBar position='sticky'>
                 <Toolbar>
                     <Typography variant='h6' className={classes.appBarTitle}>New User</Typography>

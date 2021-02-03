@@ -1,125 +1,112 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 
 import {Link} from 'react-router-dom'
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import AppBar from '@material-ui/core/AppBar';
 import {Add} from '@material-ui/icons';
-import {Card, CardHeader, Chip, Container, IconButton} from '@material-ui/core';
-import CreateIcon from "@material-ui/icons/Create";
-import {withStyles} from "@material-ui/core/styles";
-import moment from 'moment';
-import LoadingModal from "../LoadingModal";
+import {Chip, Container, IconButton, makeStyles} from '@material-ui/core';
 import {transactionService} from "../../api/transaction.service";
 import {accountService} from "../../api/account.service";
+import MessageModal from "../MessageModal";
+import LoadingModal from "../LoadingModal";
+import TransferCard from "./TransferCard";
+import TransactionCard from "./TransactionCard";
 
-const styles = () => ({
-    green: {
-        color: 'green'
+const useStyles = makeStyles(theme => ({
+    container: {
+        padding: theme.spacing(3)
     },
-    red: {
-        color: 'red'
+    appBarTitle: {
+        flexGrow: 1
     }
-});
+}));
 
-class TransactionList extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            accountId: props.match.params.accountId,
-            accountName: 'Loading...',
-            transactions: [],
-            accountBalance: 0,
-            showLoadingModal: true
-        };
-    }
+const TransactionList = (props) => {
+    const {accountId} = props.match.params;
 
-    async componentDidMount() {
-        try {
-            const transactions = await transactionService.getAllTransactionsForAccountId(this.state.accountId);
-            const account = await accountService.getAccountById(this.state.accountId);
+    const [transactions, setTransactions] = React.useState([]);
+    const [accountName, setAccountName] = React.useState('');
+    const [accountBalance, setAccountBalance] = React.useState(0);
+    const [loadingModalOpen, setLoadingModalOpen] = React.useState(true);
+    const [messageModalOpen, setMessageModalOpen] = React.useState(false);
+    const [messageModalTitle, setMessageModalTitle] = React.useState('');
+    const [messageModalMessage, setMessageModalMessage] = React.useState('');
 
-            this.setState({
-                transactions: transactions.data,
-                accountName: account.data.name,
-                accountBalance: account.data.balance,
-                showLoadingModal: false
-            });
-        } catch (e) {
-            if (e.response.status === 401) {
-                this.props.history.push('/');
+    const classes = useStyles();
+
+    useEffect(() => {
+        (async function loadTransactionData() {
+            try {
+                const transactions = await transactionService.getAllTransactionsForAccountId(accountId);
+                const account = await accountService.getAccountById(accountId);
+
+                setTransactions(transactions.data);
+                setAccountName(account.data.name);
+                setAccountBalance(account.data.balance);
+                setLoadingModalOpen(false);
+            } catch (e) {
+                if (e.response && e.response.status === 401) {
+                    props.history.push('/')
+                }
+
+                setLoadingModalOpen(false);
+
+                setMessageModalTitle('Error');
+                setMessageModalMessage('An error occurred while processing your request, please try again.');
+                setMessageModalOpen(true);
             }
-        }
-    }
+        })()
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-    render() {
-        const {classes} = this.props;
-
-        const getValueClass = (categoryType) => {
-            if (categoryType === 'Expense' || categoryType === 'TransferExpense') {
-                return classes.red;
-            } else if (categoryType === 'Income' || categoryType === 'TransferIncome') {
-                return classes.green;
-            }
-        };
-
-        const getEditLink = (categoryType, id) => {
-            if (categoryType === 'Expense' || categoryType === 'Income') {
-                return `/transactions/${id}`;
-            } else if (categoryType === 'TransferExpense' || categoryType === 'TransferIncome') {
-                return `/transfers/${id}/from/${this.state.accountId}`;
-            }
-        };
-
-        return (
-            <React.Fragment>
-                <LoadingModal
-                    show={this.state.showLoadingModal}
+    const getCard = (transaction) => {
+        if (transaction.category_type === 'TransferIncome' || transaction.category_type === 'TransferExpense') {
+            return (
+                <TransferCard
+                    transaction={transaction}
+                    fromAccountId={accountId}
                 />
-                <AppBar position='sticky'>
-                    <Toolbar>
-                        <Typography variant='h6' className='appBarTitle'>{this.state.accountName} <Chip
-                            label={this.state.accountBalance}/></Typography>
-                        <IconButton color='inherit' component={Link}
-                                    to={`/transactions/account/${this.state.accountId}/new/transaction`}>
-                            <Add/>
-                        </IconButton>
-                    </Toolbar>
-                </AppBar>
-                <Container maxWidth='sm' style={{paddingTop: '16px'}}>
-                    {
-                        this.state.transactions.map(transaction =>
-                            <Card key={transaction.id} variant='outlined' style={{'marginBottom': '16px'}}>
-                                <CardHeader
-                                    action={
-                                        <IconButton component={Link}
-                                                    to={getEditLink(transaction.category_type, transaction.id)}>
-                                            <CreateIcon/>
-                                        </IconButton>
-                                    }
-                                    title={
-                                        <Typography variant='h6'
-                                                    className={getValueClass(transaction.category_type)}>
-                                            {transaction.value}
-                                        </Typography>
-                                    }
-                                    subheader={
-                                        <React.Fragment>
-                                            <b>Description:</b> {transaction.description}
-                                            <br/>
-                                            <b>Category:</b> {transaction.category_name} ({transaction.category_type})
-                                            <br/>
-                                            <b>Date:</b> {moment(transaction.date).format('DD/MM/YYYY HH:mm')}
-                                        </React.Fragment>
-                                    }
-                                />
-                            </Card>
-                        )
-                    }
-                </Container>
-            </React.Fragment>
-        );
-    }
-}
+            );
+        } else {
+            return (
+                <TransactionCard
+                    transaction={transaction}
+                />
+            );
+        }
+    };
 
-export default withStyles(styles, {withTheme: true})(TransactionList);
+    return (
+        <>
+            <MessageModal
+                open={messageModalOpen}
+                title={messageModalTitle}
+                message={messageModalMessage}
+                handleClose={() => setMessageModalOpen(false)}
+            />
+            <LoadingModal open={loadingModalOpen}/>
+            <AppBar position='sticky'>
+                <Toolbar>
+                    <Typography variant='h6' className={classes.appBarTitle}>{accountName} <Chip
+                        label={accountBalance}/></Typography>
+                    <IconButton
+                        color='inherit'
+                        component={Link}
+                        to={`/transactions/account/${accountId}/new/transaction`}
+                    >
+                        <Add/>
+                    </IconButton>
+                </Toolbar>
+            </AppBar>
+            <Container maxWidth='sm' className={classes.container}>
+                {
+                    transactions.map(transaction =>
+                        getCard(transaction)
+                    )
+                }
+            </Container>
+        </>
+    );
+};
+
+export default TransactionList;

@@ -11,7 +11,7 @@ import {Container, IconButton, makeStyles, Tab, Tabs} from '@material-ui/core';
 import {categoryService} from "../../api/category.service";
 import CategoryCard from "./CategoryCard";
 import MessageModal from "../MessageModal";
-import LoadingModalV2 from "../LoadingModalV2";
+import LoadingModal from "../LoadingModal";
 
 const useStyles = makeStyles(theme => ({
     container: {
@@ -83,7 +83,7 @@ const CategoryList = (props) => {
                 message={messageModalMessage}
                 handleClose={() => setMessageModalOpen(false)}
             />
-            <LoadingModalV2 open={loadingModalOpen}/>
+            <LoadingModal open={loadingModalOpen}/>
             <AppBar position='sticky'>
                 <Toolbar>
                     <Typography variant='h6' className={classes.appBarTitle}>Categories</Typography>

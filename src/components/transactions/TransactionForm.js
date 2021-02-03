@@ -13,7 +13,7 @@ import {DateTimePicker, MuiPickersUtilsProvider} from "@material-ui/pickers";
 import MomentUtils from "@date-io/moment";
 import React, {useEffect} from "react";
 import MessageModal from "../MessageModal";
-import LoadingModalV2 from "../LoadingModalV2";
+import LoadingModal from "../LoadingModal";
 import {categoryService} from "../../api/category.service";
 import {accountService} from "../../api/account.service";
 import {transactionService} from "../../api/transaction.service";
@@ -132,7 +132,7 @@ const TransactionForm = (props) => {
                 message={messageModalMessage}
                 handleClose={() => setMessageModalOpen(false)}
             />
-            <LoadingModalV2 open={loadingModalOpen}/>
+            <LoadingModal open={loadingModalOpen}/>
             <TextField
                 id='value'
                 name='value'

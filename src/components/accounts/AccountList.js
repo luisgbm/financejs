@@ -6,7 +6,7 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import {Container, IconButton, makeStyles} from '@material-ui/core';
 import {Add} from '@material-ui/icons';
-import LoadingModalV2 from "../LoadingModalV2";
+import LoadingModal from "../LoadingModal";
 import AccountCard from "./AccountCard";
 import MessageModal from "../MessageModal";
 
@@ -57,7 +57,7 @@ const AccountList = (props) => {
                 message={messageModalMessage}
                 handleClose={() => setMessageModalOpen(false)}
             />
-            <LoadingModalV2
+            <LoadingModal
                 open={loadingModalOpen}
             />
             <AppBar position='sticky'>
