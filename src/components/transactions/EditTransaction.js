@@ -61,7 +61,7 @@ const EditTransaction = (props) => {
 
                 await transactionService.editTransactionById(
                     transactionId,
-                    parseInt(value),
+                    parseInt(value.replaceAll('.', '').replaceAll(',', '')),
                     description,
                     moment(date).format('YYYY-MM-DDTHH:mm:ss'),
                     parseInt(accountId),

@@ -17,6 +17,8 @@ import LoadingModal from "../LoadingModal";
 import DeleteIcon from "@material-ui/icons/Delete";
 import {transferService} from "../../api/transfer.service";
 import moment from "moment";
+import {moneyFormat} from "../../utils/utils";
+import CurrencyTextField from "../CurrencyTextField";
 
 const useStyles = makeStyles(theme => ({
     formField: {
@@ -44,7 +46,7 @@ const TransferForm = (props) => {
                 if (mode === 'edit') {
                     const transfer = await transferService.getTransferById(transferId);
 
-                    formik.setFieldValue('value', transfer.data.value);
+                    formik.setFieldValue('value', moneyFormat(transfer.data.value, true));
                     formik.setFieldValue('description', transfer.data.description);
                     formik.setFieldValue('date', moment(transfer.data.date));
                     formik.setFieldValue('fromAccountId', transfer.data.origin_account);
@@ -94,20 +96,25 @@ const TransferForm = (props) => {
                 handleClose={() => setMessageModalOpen(false)}
             />
             <LoadingModal open={loadingModalOpen}/>
-            <TextField
-                id='value'
-                name='value'
+            <FormControl
                 fullWidth
-                type='number'
-                label='Value'
-                variant='outlined'
-                autoComplete='off'
                 className={classes.formField}
-                value={formik.values.value}
-                onChange={formik.handleChange}
-                error={formik.touched.value && Boolean(formik.errors.value)}
-                helperText={formik.touched.value && formik.errors.value}
-            />
+            >
+                <CurrencyTextField
+                    id='value'
+                    name='value'
+                    textAlign='left'
+                    label='Value'
+                    variant='outlined'
+                    currencySymbol="$"
+                    outputFormat='number'
+                    autoComplete='off'
+                    value={formik.values.value}
+                    onChange={formik.handleChange}
+                    helperText={formik.touched.value && formik.errors.value}
+                    error={formik.touched.value && Boolean(formik.errors.value)}
+                />
+            </FormControl>
             <FormControl
                 fullWidth
                 variant='outlined'

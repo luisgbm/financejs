@@ -84,7 +84,7 @@ const NewTransaction = (props) => {
 
                 await transactionService.newTransaction(
                     accountId,
-                    parseInt(value),
+                    parseInt(value.replaceAll('.', '').replaceAll(',', '')),
                     description,
                     date.format('yyyy-MM-DDTHH:mm:ss'),
                     parseInt(categoryId)
@@ -136,7 +136,7 @@ const NewTransaction = (props) => {
                 setLoadingModalOpen(true);
 
                 await transferService.newTransfer(
-                    parseInt(value),
+                    parseInt(value.replaceAll('.', '').replaceAll(',', '')),
                     description,
                     fromAccountId,
                     toAccountId,

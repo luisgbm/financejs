@@ -3,6 +3,7 @@ import {Card, CardHeader, IconButton, makeStyles} from "@material-ui/core";
 import {Link} from "react-router-dom";
 import CreateIcon from "@material-ui/icons/Create";
 import Typography from "@material-ui/core/Typography";
+import {moneyFormat} from "../../utils/utils";
 
 const useStyles = makeStyles(theme => ({
     card: {
@@ -42,7 +43,7 @@ const AccountCard = (props) => {
                 subheader={
                     <>
                         Balance: <span className={props.accountBalance >= 0 ? classes.green : classes.red}>
-                            {props.accountBalance}
+                            {moneyFormat(props.accountBalance)}
                         </span>
                     </>
                 }

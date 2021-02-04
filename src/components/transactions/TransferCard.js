@@ -4,6 +4,7 @@ import CreateIcon from "@material-ui/icons/Create";
 import Typography from "@material-ui/core/Typography";
 import React from "react";
 import moment from "moment";
+import {moneyFormat} from "../../utils/utils";
 
 const useStyles = makeStyles(theme => ({
     card: {
@@ -54,7 +55,7 @@ const TransferCard = (props) => {
                         variant='h6'
                         className={getValueClass(transaction.category_type)}
                     >
-                        {transaction.value}
+                        {moneyFormat(transaction.value)}
                     </Typography>
                 }
                 subheader={

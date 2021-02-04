@@ -1,65 +1,29 @@
-# Getting Started with Create React App
+# How to use the app
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Finance is a personal finance manager that lets you keep track of your transactions. But before we get there, we need to
+setup a few things first.
 
-## Available Scripts
+## Categories
 
-In the project directory, you can run:
+The first thing to do when you log into Finance is to create a few categories.
 
-### `npm start`
+Categories can be of two types: Expenses and Incomes. Expenses are things you spend money on, like Food, or your Car.
+Incomes are things from which you earn money, like the Salary from your job, or Earnings from the stock market.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## Accounts
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+Transactions belong into accounts, so the next thing to do is to create a few accounts. These can be your Bank account,
+your Credit Card, or even your Wallet for cash transactions.
 
-### `npm run build`
+## Transactions
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+With categories and accounts, you can now create a transaction. A transaction has a value, a category, a date, and
+optionally a description. If you create an Expense transaction, it will subtract money from your account. If you create
+an Income transaction, it will add money to your account. The account keeps track of all your transactions and
+calculates the balance.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Transfers
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Transfers are a special kind of transactions. They don't have a category, but they have an origin account (From) and a
+destination account (To), and also optionally a description. When you create a transfer, it will subtract money from the
+origin account, and add money to the destination account.

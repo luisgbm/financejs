@@ -12,6 +12,7 @@ import MessageModal from "../MessageModal";
 import LoadingModal from "../LoadingModal";
 import TransferCard from "./TransferCard";
 import TransactionCard from "./TransactionCard";
+import {moneyFormat} from "../../utils/utils";
 
 const useStyles = makeStyles(theme => ({
     container: {
@@ -43,7 +44,7 @@ const TransactionList = (props) => {
 
                 setTransactions(transactions.data);
                 setAccountName(account.data.name);
-                setAccountBalance(account.data.balance);
+                setAccountBalance(moneyFormat(account.data.balance));
                 setLoadingModalOpen(false);
             } catch (e) {
                 if (e.response && e.response.status === 401) {

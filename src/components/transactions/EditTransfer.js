@@ -63,7 +63,7 @@ const EditTransfer = (props) => {
 
                 await transferService.editTransferById(
                     transferId,
-                    parseInt(value),
+                    parseInt(value.replaceAll('.', '').replaceAll(',', '')),
                     description,
                     moment(date).format('YYYY-MM-DDTHH:mm:ss'),
                     fromAccountId,
