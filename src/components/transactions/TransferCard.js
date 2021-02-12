@@ -40,7 +40,7 @@ const TransferCard = (props) => {
     };
 
     return (
-        <Card key={transaction.id} variant='outlined' className={classes.card}>
+        <Card variant='outlined' className={classes.card}>
             <CardHeader
                 action={
                     <IconButton

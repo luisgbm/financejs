@@ -16,6 +16,8 @@ import NewUser from './users/NewUser';
 import EditTransfer from "./transactions/EditTransfer";
 import Login from "./users/Login";
 import BottomNavBar from "./BottomNavBar";
+import ScheduledTransactionsList from "./scheduled-transactions/ScheduledTransactionsList";
+import NewScheduledTransaction from "./scheduled-transactions/NewScheduledTransaction";
 
 const theme = createMuiTheme({
     palette: {
@@ -43,6 +45,8 @@ const App = () => {
                     <Route exact path='/transactions/account/:accountId/new/:type' component={NewTransaction}/>
                     <Route exact path='/transactions/:transactionId' component={EditTransaction}/>
                     <Route exact path='/transfers/:transferId/from/:fromAccountId' component={EditTransfer}/>
+                    <Route exact path='/scheduled-transactions' component={ScheduledTransactionsList}/>
+                    <Route exact path='/scheduled-transactions/new' component={NewScheduledTransaction}/>
                 </Switch>
                 <BottomNavBar/>
             </Router>

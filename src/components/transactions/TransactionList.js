@@ -64,6 +64,7 @@ const TransactionList = (props) => {
         if (transaction.category_type === 'TransferIncome' || transaction.category_type === 'TransferExpense') {
             return (
                 <TransferCard
+                    key={transaction.id}
                     transaction={transaction}
                     fromAccountId={accountId}
                 />
@@ -71,6 +72,7 @@ const TransactionList = (props) => {
         } else {
             return (
                 <TransactionCard
+                    key={transaction.id}
                     transaction={transaction}
                 />
             );

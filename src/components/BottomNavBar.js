@@ -5,6 +5,7 @@ import BottomNavigationAction from "@material-ui/core/BottomNavigationAction";
 import HomeIcon from "@material-ui/icons/Home";
 import ImportExportIcon from "@material-ui/icons/ImportExport";
 import SettingsIcon from "@material-ui/icons/Settings";
+import EventIcon from "@material-ui/icons/Event";
 
 const BottomNavBar = () => {
     const [value, setValue] = React.useState('home');
@@ -31,6 +32,8 @@ const BottomNavBar = () => {
             setValue('home');
         } else if (location.pathname.startsWith('/transfers')) {
             setValue('home');
+        } else if (location.pathname.startsWith('/scheduled-transactions')) {
+            setValue('scheduled-transactions');
         }
     }, [location]);
 
@@ -50,6 +53,13 @@ const BottomNavBar = () => {
                     component={Link}
                     to={'/accounts'}
                     value={'home'}
+                />
+                <BottomNavigationAction
+                    label='Schedule'
+                    icon={<EventIcon/>}
+                    component={Link}
+                    to={'/scheduled-transactions'}
+                    value={'scheduled-transactions'}
                 />
                 <BottomNavigationAction
                     label='Categories'
