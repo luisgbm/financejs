@@ -1,0 +1,280 @@
+import CurrencyTextField from "../CurrencyTextField";
+import {
+    FormControl,
+    FormControlLabel,
+    FormHelperText,
+    InputLabel,
+    makeStyles,
+    MenuItem,
+    Select,
+    Switch,
+    TextField
+} from "@material-ui/core";
+import React, {useContext, useEffect} from "react";
+import LoadingModalContext from "../../context/LoadingModalContext";
+import MessageModalContext from "../../context/MessageModalContext";
+import {categoryService} from "../../api/category.service";
+import {accountService} from "../../api/account.service";
+import CategoryTypes from "../categories/CategoryTypes";
+import {DateTimePicker, MuiPickersUtilsProvider} from "@material-ui/pickers";
+import MomentUtils from "@date-io/moment";
+import RepeatFrequencies from "./RepeatFrequencies";
+
+const useStyles = makeStyles(theme => ({
+    formField: {
+        marginBottom: theme.spacing(3)
+    }
+}));
+
+const ScheduledTransactionForm = (props) => {
+    const {formik, history} = props;
+
+    const toggleLoadingModalOpen = useContext(LoadingModalContext);
+    const {showMessageModal} = useContext(MessageModalContext);
+
+    const [accounts, setAccounts] = React.useState([]);
+    const [categories, setCategories] = React.useState([]);
+
+    const classes = useStyles();
+
+    const updateCategories = async (categoryType) => {
+        try {
+            await formik.setFieldValue('categoryType', categoryType, true);
+
+            if (categoryType !== '') {
+                toggleLoadingModalOpen();
+
+                const categories = await categoryService.getAllCategoriesByType(categoryType.toLowerCase());
+
+                if (categories.data && categories.data.length) {
+                    setCategories(categories.data);
+                }
+
+                toggleLoadingModalOpen();
+            } else {
+                await formik.setFieldValue('categoryId', '', true);
+            }
+        } catch (e) {
+            if (e.response && e.response.status === 401) {
+                history.push('/');
+            }
+
+            toggleLoadingModalOpen();
+            showMessageModal('Error', 'An error occurred while processing your request, please try again.');
+        }
+    };
+
+    useEffect(() => {
+        (async function loadInitialData() {
+            try {
+                toggleLoadingModalOpen();
+                const accounts = await accountService.getAllAccounts();
+                setAccounts(accounts.data);
+                toggleLoadingModalOpen();
+            } catch (e) {
+                if (e.response && e.response.status === 401) {
+                    history.push('/')
+                }
+
+                toggleLoadingModalOpen();
+                showMessageModal('Error', 'An error occurred while processing your request, please try again.');
+            }
+        })()
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+    return (
+        <>
+            <FormControl
+                fullWidth
+                className={classes.formField}
+            >
+                <CurrencyTextField
+                    id='value'
+                    name='value'
+                    textAlign='left'
+                    label='Value'
+                    variant='outlined'
+                    currencySymbol="$"
+                    outputFormat='number'
+                    autoComplete='off'
+                    value={formik.values.value}
+                    onChange={formik.handleChange}
+                    helperText={formik.touched.value && formik.errors.value}
+                    error={formik.touched.value && Boolean(formik.errors.value)}
+                />
+            </FormControl>
+            <FormControl
+                fullWidth
+                variant='outlined'
+                className={classes.formField}
+                error={formik.touched.categoryType && Boolean(formik.errors.categoryType)}
+            >
+                <InputLabel>Type</InputLabel>
+                <Select
+                    id='categoryType'
+                    name='categoryType'
+                    label='Type'
+                    value={formik.values.categoryType}
+                    onChange={e => updateCategories(e.target.value)}
+                >
+                    <MenuItem value=''><em>Select...</em></MenuItem>
+                    <MenuItem value={CategoryTypes.EXPENSE}>Expense</MenuItem>
+                    <MenuItem value={CategoryTypes.INCOME}>Income</MenuItem>
+                </Select>
+                <FormHelperText>{formik.touched.categoryType && formik.errors.categoryType}</FormHelperText>
+            </FormControl>
+            <FormControl
+                disabled={formik.values.categoryType === ''}
+                fullWidth
+                variant='outlined'
+                className={classes.formField}
+                error={formik.touched.categoryId && Boolean(formik.errors.categoryId)}
+            >
+                <InputLabel>Category</InputLabel>
+                <Select
+                    id='categoryId'
+                    name='categoryId'
+                    label='Category'
+                    className={classes.select}
+                    value={formik.values.categoryId}
+                    onChange={formik.handleChange}
+                >
+                    <MenuItem value=''><em>Select...</em></MenuItem>
+                    {
+                        categories.map(category =>
+                            <MenuItem value={category.id} key={category.id}>{category.name}</MenuItem>
+                        )
+                    }
+                </Select>
+                <FormHelperText>{formik.touched.categoryId && formik.errors.categoryId}</FormHelperText>
+            </FormControl>
+            <FormControl
+                fullWidth
+                variant='outlined'
+                className={classes.formField}
+                error={formik.touched.accountId && Boolean(formik.errors.accountId)}
+            >
+                <InputLabel>Account</InputLabel>
+                <Select
+                    id='accountId'
+                    name='accountId'
+                    label='Account'
+                    value={formik.values.accountId}
+                    onChange={formik.handleChange}
+                >
+                    {
+                        accounts.map(account =>
+                            <MenuItem value={account.id} key={account.id}>{account.name}</MenuItem>
+                        )
+                    }
+                </Select>
+                <FormHelperText>{formik.touched.accountId && formik.errors.accountId}</FormHelperText>
+            </FormControl>
+            <MuiPickersUtilsProvider utils={MomentUtils}>
+                <FormControl
+                    fullWidth
+                    className={classes.formField}
+                >
+                    <DateTimePicker
+                        label='Date/Time'
+                        inputVariant='outlined'
+                        value={formik.values.createdDate}
+                        onChange={e => {
+                            formik.setFieldValue('createdDate', e.format('yyyy-MM-DDTHH:mm:ss'))
+                        }}
+                        error={formik.touched.createdDate && Boolean(formik.errors.createdDate)}
+                        helperText={formik.touched.createdDate && formik.errors.createdDate}
+                        format='DD/MM/yyyy HH:mm'
+                    />
+                </FormControl>
+            </MuiPickersUtilsProvider>
+            <TextField
+                id='description'
+                name='description'
+                fullWidth
+                label='Description'
+                variant='outlined'
+                autoComplete='off'
+                className={classes.formField}
+                value={formik.values.description}
+                onChange={formik.handleChange}
+                error={formik.touched.description && Boolean(formik.errors.description)}
+                helperText={formik.touched.description && formik.errors.description}
+            />
+            <FormControl
+                fullWidth
+                variant='outlined'
+                className={classes.formField}
+                error={formik.touched.repeat && Boolean(formik.errors.repeat)}
+            >
+                <FormControlLabel
+                    control={
+                        <Switch
+                            checked={formik.values.repeat}
+                            onChange={formik.handleChange}
+                            name='repeat'
+                            id='repeat'
+                            color='primary'
+                        />
+                    }
+                    label="Repeat"
+                />
+            </FormControl>
+            <FormControl
+                fullWidth
+                variant='outlined'
+                className={classes.formField}
+                error={formik.touched.repeatFreq && Boolean(formik.errors.repeatFreq)}
+                disabled={formik.values.repeat === false}
+            >
+                <InputLabel>Frequency</InputLabel>
+                <Select
+                    id='repeatFreq'
+                    name='repeatFreq'
+                    label='Frequency'
+                    value={formik.values.repeatFreq}
+                    onChange={formik.handleChange}
+                >
+                    <MenuItem value=''><em>Select...</em></MenuItem>
+                    <MenuItem value={RepeatFrequencies.DAYS}>Days</MenuItem>
+                    <MenuItem value={RepeatFrequencies.WEEKS}>Weeks</MenuItem>
+                    <MenuItem value={RepeatFrequencies.MONTHS}>Months</MenuItem>
+                    <MenuItem value={RepeatFrequencies.YEARS}>Years</MenuItem>
+                </Select>
+                <FormHelperText>{formik.touched.repeatFreq && formik.errors.repeatFreq}</FormHelperText>
+            </FormControl>
+            <TextField
+                id='repeatInterval'
+                name='repeatInterval'
+                fullWidth
+                label='Interval'
+                variant='outlined'
+                autoComplete='off'
+                className={classes.formField}
+                value={formik.values.repeatInterval}
+                onChange={formik.handleChange}
+                error={formik.touched.repeatInterval && Boolean(formik.errors.repeatInterval)}
+                helperText={formik.touched.repeatInterval && formik.errors.repeatInterval}
+                type='number'
+                disabled={formik.values.repeat === false}
+            />
+            <TextField
+                id='endAfterRepeats'
+                name='endAfterRepeats'
+                fullWidth
+                label='End After Repetitions'
+                variant='outlined'
+                autoComplete='off'
+                className={classes.formField}
+                value={formik.values.endAfterRepeats}
+                onChange={formik.handleChange}
+                error={formik.touched.endAfterRepeats && Boolean(formik.errors.endAfterRepeats)}
+                helperText={formik.touched.endAfterRepeats && formik.errors.endAfterRepeats}
+                type='number'
+                disabled={formik.values.repeat === false}
+            />
+        </>
+    );
+};
+
+export default ScheduledTransactionForm;

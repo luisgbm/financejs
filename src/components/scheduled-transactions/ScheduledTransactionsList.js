@@ -1,14 +1,14 @@
-import MessageModal from "../MessageModal";
-import LoadingModal from "../LoadingModal";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import {Container, IconButton, makeStyles} from "@material-ui/core";
 import {Link} from "react-router-dom";
 import {Add} from "@material-ui/icons";
-import React, {useEffect} from "react";
+import React, {useContext, useEffect} from "react";
 import {scheduledTransactionService} from "../../api/scheduled.transactions.service";
 import ScheduledTransactionCard from "./ScheduledTransactionCard";
+import LoadingModalContext from "../../context/LoadingModalContext";
+import MessageModalContext from "../../context/MessageModalContext";
 
 const useStyles = makeStyles(theme => ({
     appBarTitle: {
@@ -20,30 +20,27 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const ScheduledTransactionsList = (props) => {
+    const toggleLoadingModalOpen = useContext(LoadingModalContext);
+    const {showMessageModal} = useContext(MessageModalContext);
+
     const [scheduledTransactions, setScheduledTransactions] = React.useState([])
-    const [loadingModalOpen, setLoadingModalOpen] = React.useState(true);
-    const [messageModalOpen, setMessageModalOpen] = React.useState(false);
-    const [messageModalTitle, setMessageModalTitle] = React.useState('');
-    const [messageModalMessage, setMessageModalMessage] = React.useState('');
 
     const classes = useStyles();
 
     useEffect(() => {
         (async function loadScheduledTransactions() {
             try {
+                toggleLoadingModalOpen();
                 const scheduledTransactions = await scheduledTransactionService.getAllScheduledTransactions();
                 setScheduledTransactions(scheduledTransactions.data);
-                setLoadingModalOpen(false);
+                toggleLoadingModalOpen();
             } catch (e) {
                 if (e.response && e.response.status === 401) {
                     props.history.push('/')
                 }
 
-                setLoadingModalOpen(false);
-
-                setMessageModalTitle('Error');
-                setMessageModalMessage('An error occurred while processing your request, please try again.');
-                setMessageModalOpen(true);
+                toggleLoadingModalOpen();
+                showMessageModal('Error', 'An error occurred while processing your request, please try again.');
             }
         })();
         // eslint-disable-next-line
@@ -51,15 +48,6 @@ const ScheduledTransactionsList = (props) => {
 
     return (
         <>
-            <MessageModal
-                open={messageModalOpen}
-                title={messageModalTitle}
-                message={messageModalMessage}
-                handleClose={() => setMessageModalOpen(false)}
-            />
-            <LoadingModal
-                open={loadingModalOpen}
-            />
             <AppBar position='sticky'>
                 <Toolbar>
                     <Typography variant='h6' className={classes.appBarTitle}>Scheduled Transactions</Typography>

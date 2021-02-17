@@ -20,14 +20,15 @@ const getScheduledTransactionById = async (scheduledTransactionId) => {
 const newScheduledTransaction = async (accountId, value, description, categoryId, createdDate, repeat, repeatFreq, repeatInterval, endAfterRepeats) => {
     try {
         return await authenticationService.postWithAuth(`/scheduled-transactions`, {
+            account_id: accountId,
             value,
             description,
             category_id: categoryId,
             created_date: createdDate,
             repeat,
-            repeat_freq: repeatFreq,
-            repeat_interval: repeatInterval,
-            end_after_repeats: endAfterRepeats
+            repeat_freq: repeat ? repeatFreq : null,
+            repeat_interval: repeat ? repeatInterval : null,
+            end_after_repeats: repeat ? endAfterRepeats : null
         });
     } catch (e) {
         throw(e);
