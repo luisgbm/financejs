@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useContext, useEffect} from 'react';
 
 import {Link} from 'react-router-dom'
 import Toolbar from '@material-ui/core/Toolbar';
@@ -11,7 +11,7 @@ import {Container, IconButton, makeStyles, Tab, Tabs} from '@material-ui/core';
 import {categoryService} from "../../api/category.service";
 import CategoryCard from "./CategoryCard";
 import MessageModal from "../MessageModal";
-import LoadingModal from "../LoadingModal";
+import LoadingModalContext from "../../context/LoadingModalContext";
 
 const useStyles = makeStyles(theme => ({
     container: {
@@ -43,8 +43,9 @@ const CategoryList = (props) => {
 
     const currentTab = tabNameToValue(props.match.params.type);
 
+    const toggleLoadingModalOpen = useContext(LoadingModalContext);
+
     const [categories, setCategories] = React.useState([]);
-    const [loadingModalOpen, setLoadingModalOpen] = React.useState(true);
     const [messageModalOpen, setMessageModalOpen] = React.useState(false);
     const [messageModalTitle, setMessageModalTitle] = React.useState('');
     const [messageModalMessage, setMessageModalMessage] = React.useState('');
@@ -58,15 +59,16 @@ const CategoryList = (props) => {
     useEffect(() => {
         (async function loadCategories() {
             try {
+                toggleLoadingModalOpen();
                 const categories = await categoryService.getAllCategories();
                 setCategories(categories.data);
-                setLoadingModalOpen(false);
+                toggleLoadingModalOpen();
             } catch (e) {
                 if (e.response && e.response.status === 401) {
                     props.history.push('/')
                 }
 
-                setLoadingModalOpen(false);
+                toggleLoadingModalOpen();
 
                 setMessageModalTitle('Error');
                 setMessageModalMessage('An error occurred while processing your request, please try again.');
@@ -83,7 +85,6 @@ const CategoryList = (props) => {
                 message={messageModalMessage}
                 handleClose={() => setMessageModalOpen(false)}
             />
-            <LoadingModal open={loadingModalOpen}/>
             <AppBar position='sticky'>
                 <Toolbar>
                     <Typography variant='h6' className={classes.appBarTitle}>Categories</Typography>

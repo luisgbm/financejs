@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useContext} from 'react';
 
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
@@ -17,10 +17,10 @@ import {Done} from '@material-ui/icons';
 import CategoryTypes from './CategoryTypes';
 import {categoryService} from "../../api/category.service";
 import MessageModal from "../MessageModal";
-import LoadingModal from "../LoadingModal";
 import {useFormik} from "formik";
 import * as yup from "yup";
 import TextField from "@material-ui/core/TextField";
+import LoadingModalContext from "../../context/LoadingModalContext";
 
 const validationSchema = yup.object({
     categoryName: yup
@@ -44,7 +44,8 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const NewCategory = (props) => {
-    const [loadingModalOpen, setLoadingModalOpen] = React.useState(false);
+    const toggleLoadingModalOpen = useContext(LoadingModalContext);
+
     const [messageModalOpen, setMessageModalOpen] = React.useState(false);
     const [messageModalTitle, setMessageModalTitle] = React.useState('');
     const [messageModalMessage, setMessageModalMessage] = React.useState('');
@@ -61,16 +62,16 @@ const NewCategory = (props) => {
             const {categoryName, categoryType} = values;
 
             try {
-                setLoadingModalOpen(true);
+                toggleLoadingModalOpen();
                 await categoryService.newCategory(categoryName, categoryType);
-                setLoadingModalOpen(false);
+                toggleLoadingModalOpen();
                 props.history.push(`/categories/${categoryType.toLowerCase()}`);
             } catch (e) {
                 if (e.response && e.response.status === 401) {
                     props.history.push('/');
                 }
 
-                setLoadingModalOpen(false);
+                toggleLoadingModalOpen();
 
                 setMessageModalTitle('Error');
                 setMessageModalMessage('An error occurred while processing your request, please try again.');
@@ -87,7 +88,6 @@ const NewCategory = (props) => {
                 message={messageModalMessage}
                 handleClose={() => setMessageModalOpen(false)}
             />
-            <LoadingModal open={loadingModalOpen}/>
             <AppBar position='sticky'>
                 <Toolbar>
                     <Typography variant='h6' className={classes.appBarTitle}>New Category</Typography>

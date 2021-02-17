@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useContext, useEffect} from 'react';
 
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
@@ -18,11 +18,11 @@ import {
 import DeleteIcon from '@material-ui/icons/Delete';
 import {categoryService} from "../../api/category.service";
 import MessageModal from "../MessageModal";
-import LoadingModal from "../LoadingModal";
 import * as yup from "yup";
 import {useFormik} from "formik";
 import CategoryTypes from "./CategoryTypes";
 import TextField from "@material-ui/core/TextField";
+import LoadingModalContext from "../../context/LoadingModalContext";
 
 const validationSchema = yup.object({
     categoryName: yup
@@ -51,7 +51,8 @@ const useStyles = makeStyles(theme => ({
 const EditCategory = (props) => {
     const categoryId = props.match.params.id;
 
-    const [loadingModalOpen, setLoadingModalOpen] = React.useState(true);
+    const toggleLoadingModalOpen = useContext(LoadingModalContext);
+
     const [messageModalOpen, setMessageModalOpen] = React.useState(false);
     const [messageModalTitle, setMessageModalTitle] = React.useState('');
     const [messageModalMessage, setMessageModalMessage] = React.useState('');
@@ -68,16 +69,16 @@ const EditCategory = (props) => {
             const {categoryName, categoryType} = values;
 
             try {
-                setLoadingModalOpen(true);
+                toggleLoadingModalOpen();
                 await categoryService.editCategoryById(categoryId, categoryName, categoryType);
-                setLoadingModalOpen(false);
+                toggleLoadingModalOpen();
                 props.history.push(`/categories/${categoryType.toLowerCase()}`);
             } catch (e) {
                 if (e.response && e.response.status === 401) {
                     props.history.push('/');
                 }
 
-                setLoadingModalOpen(false);
+                toggleLoadingModalOpen();
 
                 setMessageModalTitle('Error');
                 setMessageModalMessage('An error occurred while processing your request, please try again.');
@@ -88,16 +89,16 @@ const EditCategory = (props) => {
 
     const onDeleteCategory = async () => {
         try {
-            setLoadingModalOpen(true);
+            toggleLoadingModalOpen();
             await categoryService.deleteCategoryById(categoryId);
-            setLoadingModalOpen(false);
+            toggleLoadingModalOpen();
             props.history.push('/categories');
         } catch (e) {
             if (e.response && e.response.status === 401) {
                 props.history.push('/')
             }
 
-            setLoadingModalOpen(false);
+            toggleLoadingModalOpen();
 
             setMessageModalTitle('Error');
             setMessageModalMessage('An error occurred while processing your request, please try again.');
@@ -108,16 +109,17 @@ const EditCategory = (props) => {
     useEffect(() => {
         (async function loadCategoryData() {
             try {
+                toggleLoadingModalOpen();
                 const category = await categoryService.getCategoryById(categoryId);
                 formik.values.categoryName = category.data.name;
                 formik.values.categoryType = category.data.categorytype;
-                setLoadingModalOpen(false);
+                toggleLoadingModalOpen();
             } catch (e) {
                 if (e.response && e.response.status === 401) {
                     props.history.push('/')
                 }
 
-                setLoadingModalOpen(false);
+                toggleLoadingModalOpen();
 
                 setMessageModalTitle('Error');
                 setMessageModalMessage('An error occurred while processing your request, please try again.');
@@ -134,7 +136,6 @@ const EditCategory = (props) => {
                 message={messageModalMessage}
                 handleClose={() => setMessageModalOpen(false)}
             />
-            <LoadingModal open={loadingModalOpen}/>
             <AppBar position='sticky'>
                 <Toolbar>
                     <Typography variant='h6' className={classes.appBarTitle}>Edit Category</Typography>
