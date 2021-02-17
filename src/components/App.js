@@ -20,6 +20,8 @@ import ScheduledTransactionsList from "./scheduled-transactions/ScheduledTransac
 import NewScheduledTransaction from "./scheduled-transactions/NewScheduledTransaction";
 import LoadingModal from "./LoadingModal";
 import LoadingModalContext from "../context/LoadingModalContext";
+import MessageModalContext from "../context/MessageModalContext";
+import MessageModal from "./MessageModal";
 
 const theme = createMuiTheme({
     palette: {
@@ -29,40 +31,61 @@ const theme = createMuiTheme({
 
 const App = () => {
     const [loadingModalOpen, setLoadingModalOpen] = React.useState(false);
+    const [messageModalOpen, setMessageModalOpen] = React.useState(false);
+    const [messageModalTitle, setMessageModalTitle] = React.useState('');
+    const [messageModalMessage, setMessageModalMessage] = React.useState('');
 
     const toggleLoadingModalOpen = () => {
         setLoadingModalOpen(prevLoadingModalOpen => !prevLoadingModalOpen);
     };
 
+    const showMessageModal = (title, message) => {
+        setMessageModalTitle(title);
+        setMessageModalMessage(message);
+        setMessageModalOpen(true);
+    };
+
+    const closeMessageModal = () => {
+        setMessageModalOpen(false);
+    };
+
     return (
         <ThemeProvider theme={theme}>
-            <LoadingModalContext.Provider value={toggleLoadingModalOpen}>
-                <CssBaseline/>
-                <LoadingModal
-                    open={loadingModalOpen}
-                />
-                <Router>
-                    <Switch>
-                        <Route exact path='/' component={Login}/>
-                        <Route exact path='/settings' component={Settings}/>
-                        <Route exact path='/users/new' component={NewUser}/>
-                        <Route exact path='/accounts' component={AccountList}/>
-                        <Route exact path='/accounts/new' component={NewAccount}/>
-                        <Route exact path='/accounts/edit/:id' component={EditAccount}/>
-                        <Route exact path='/categories/new/:type' component={NewCategory}/>
-                        <Route exact path='/categories/edit/:id' component={EditCategory}/>
-                        <Route exact path='/categories/' component={CategoryList}/>
-                        <Route exact path='/categories/:type' component={CategoryList}/>
-                        <Route exact path='/transactions/account/:accountId' component={TransactionList}/>
-                        <Route exact path='/transactions/account/:accountId/new/:type' component={NewTransaction}/>
-                        <Route exact path='/transactions/:transactionId' component={EditTransaction}/>
-                        <Route exact path='/transfers/:transferId/from/:fromAccountId' component={EditTransfer}/>
-                        <Route exact path='/scheduled-transactions' component={ScheduledTransactionsList}/>
-                        <Route exact path='/scheduled-transactions/new' component={NewScheduledTransaction}/>
-                    </Switch>
-                    <BottomNavBar/>
-                </Router>
-            </LoadingModalContext.Provider>
+            <MessageModalContext.Provider value={{showMessageModal, closeMessageModal}}>
+                <LoadingModalContext.Provider value={toggleLoadingModalOpen}>
+                    <CssBaseline/>
+                    <LoadingModal
+                        open={loadingModalOpen}
+                    />
+                    <MessageModal
+                        open={messageModalOpen}
+                        title={messageModalTitle}
+                        message={messageModalMessage}
+                        handleClose={() => setMessageModalOpen(false)}
+                    />
+                    <Router>
+                        <Switch>
+                            <Route exact path='/' component={Login}/>
+                            <Route exact path='/settings' component={Settings}/>
+                            <Route exact path='/users/new' component={NewUser}/>
+                            <Route exact path='/accounts' component={AccountList}/>
+                            <Route exact path='/accounts/new' component={NewAccount}/>
+                            <Route exact path='/accounts/edit/:id' component={EditAccount}/>
+                            <Route exact path='/categories/new/:type' component={NewCategory}/>
+                            <Route exact path='/categories/edit/:id' component={EditCategory}/>
+                            <Route exact path='/categories/' component={CategoryList}/>
+                            <Route exact path='/categories/:type' component={CategoryList}/>
+                            <Route exact path='/transactions/account/:accountId' component={TransactionList}/>
+                            <Route exact path='/transactions/account/:accountId/new/:type' component={NewTransaction}/>
+                            <Route exact path='/transactions/:transactionId' component={EditTransaction}/>
+                            <Route exact path='/transfers/:transferId/from/:fromAccountId' component={EditTransfer}/>
+                            <Route exact path='/scheduled-transactions' component={ScheduledTransactionsList}/>
+                            <Route exact path='/scheduled-transactions/new' component={NewScheduledTransaction}/>
+                        </Switch>
+                        <BottomNavBar/>
+                    </Router>
+                </LoadingModalContext.Provider>
+            </MessageModalContext.Provider>
         </ThemeProvider>
     );
 }

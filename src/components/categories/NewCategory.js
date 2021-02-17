@@ -16,11 +16,11 @@ import {
 import {Done} from '@material-ui/icons';
 import CategoryTypes from './CategoryTypes';
 import {categoryService} from "../../api/category.service";
-import MessageModal from "../MessageModal";
 import {useFormik} from "formik";
 import * as yup from "yup";
 import TextField from "@material-ui/core/TextField";
 import LoadingModalContext from "../../context/LoadingModalContext";
+import MessageModalContext from "../../context/MessageModalContext";
 
 const validationSchema = yup.object({
     categoryName: yup
@@ -45,10 +45,7 @@ const useStyles = makeStyles(theme => ({
 
 const NewCategory = (props) => {
     const toggleLoadingModalOpen = useContext(LoadingModalContext);
-
-    const [messageModalOpen, setMessageModalOpen] = React.useState(false);
-    const [messageModalTitle, setMessageModalTitle] = React.useState('');
-    const [messageModalMessage, setMessageModalMessage] = React.useState('');
+    const {showMessageModal} = useContext(MessageModalContext);
 
     const classes = useStyles();
 
@@ -72,22 +69,13 @@ const NewCategory = (props) => {
                 }
 
                 toggleLoadingModalOpen();
-
-                setMessageModalTitle('Error');
-                setMessageModalMessage('An error occurred while processing your request, please try again.');
-                setMessageModalOpen(true);
+                showMessageModal('Error', 'An error occurred while processing your request, please try again.');
             }
         },
     });
 
     return (
         <>
-            <MessageModal
-                open={messageModalOpen}
-                title={messageModalTitle}
-                message={messageModalMessage}
-                handleClose={() => setMessageModalOpen(false)}
-            />
             <AppBar position='sticky'>
                 <Toolbar>
                     <Typography variant='h6' className={classes.appBarTitle}>New Category</Typography>

@@ -10,8 +10,8 @@ import ThumbDownIcon from '@material-ui/icons/ThumbDown';
 import {Container, IconButton, makeStyles, Tab, Tabs} from '@material-ui/core';
 import {categoryService} from "../../api/category.service";
 import CategoryCard from "./CategoryCard";
-import MessageModal from "../MessageModal";
 import LoadingModalContext from "../../context/LoadingModalContext";
+import MessageModalContext from "../../context/MessageModalContext";
 
 const useStyles = makeStyles(theme => ({
     container: {
@@ -44,11 +44,9 @@ const CategoryList = (props) => {
     const currentTab = tabNameToValue(props.match.params.type);
 
     const toggleLoadingModalOpen = useContext(LoadingModalContext);
+    const {showMessageModal} = useContext(MessageModalContext);
 
     const [categories, setCategories] = React.useState([]);
-    const [messageModalOpen, setMessageModalOpen] = React.useState(false);
-    const [messageModalTitle, setMessageModalTitle] = React.useState('');
-    const [messageModalMessage, setMessageModalMessage] = React.useState('');
 
     const classes = useStyles();
 
@@ -69,22 +67,13 @@ const CategoryList = (props) => {
                 }
 
                 toggleLoadingModalOpen();
-
-                setMessageModalTitle('Error');
-                setMessageModalMessage('An error occurred while processing your request, please try again.');
-                setMessageModalOpen(true);
+                showMessageModal('Error', 'An error occurred while processing your request, please try again.');
             }
         })()
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
         <>
-            <MessageModal
-                open={messageModalOpen}
-                title={messageModalTitle}
-                message={messageModalMessage}
-                handleClose={() => setMessageModalOpen(false)}
-            />
             <AppBar position='sticky'>
                 <Toolbar>
                     <Typography variant='h6' className={classes.appBarTitle}>Categories</Typography>
