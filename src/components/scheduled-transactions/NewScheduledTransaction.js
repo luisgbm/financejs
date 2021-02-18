@@ -38,6 +38,7 @@ const NewScheduledTransaction = (props) => {
             repeat: false,
             repeatFreq: '',
             repeatInterval: '',
+            infiniteRepeat: false,
             endAfterRepeats: ''
 
         },
@@ -68,11 +69,16 @@ const NewScheduledTransaction = (props) => {
                     is: true,
                     then: yup.string().required('Interval is required')
                 }),
+            infiniteRepeat: yup
+                .boolean(),
             endAfterRepeats: yup
                 .string()
                 .when('repeat', {
                     is: true,
-                    then: yup.string().required('End After Repetitions is required')
+                    then: yup.string().when('infiniteRepeat', {
+                        is: false,
+                        then: yup.string().required('End After Repetitions is required')
+                    })
                 })
         }),
         onSubmit: async (values) => {
@@ -85,6 +91,7 @@ const NewScheduledTransaction = (props) => {
                 repeat,
                 repeatFreq,
                 repeatInterval,
+                infiniteRepeat,
                 endAfterRepeats
             } = values;
 
@@ -100,6 +107,7 @@ const NewScheduledTransaction = (props) => {
                     repeat,
                     repeatFreq,
                     parseInt(repeatInterval),
+                    infiniteRepeat,
                     parseInt(endAfterRepeats)
                 );
 

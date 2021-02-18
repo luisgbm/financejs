@@ -258,6 +258,26 @@ const ScheduledTransactionForm = (props) => {
                 type='number'
                 disabled={formik.values.repeat === false}
             />
+            <FormControl
+                fullWidth
+                variant='outlined'
+                className={classes.formField}
+                error={formik.touched.infiniteRepeat && Boolean(formik.errors.infiniteRepeat)}
+                disabled={formik.values.repeat === false}
+            >
+                <FormControlLabel
+                    control={
+                        <Switch
+                            checked={formik.values.infiniteRepeat}
+                            onChange={formik.handleChange}
+                            name='infiniteRepeat'
+                            id='infiniteRepeat'
+                            color='primary'
+                        />
+                    }
+                    label="Infinite Repeat"
+                />
+            </FormControl>
             <TextField
                 id='endAfterRepeats'
                 name='endAfterRepeats'
@@ -271,7 +291,7 @@ const ScheduledTransactionForm = (props) => {
                 error={formik.touched.endAfterRepeats && Boolean(formik.errors.endAfterRepeats)}
                 helperText={formik.touched.endAfterRepeats && formik.errors.endAfterRepeats}
                 type='number'
-                disabled={formik.values.repeat === false}
+                disabled={formik.values.repeat === false || formik.values.infiniteRepeat === true}
             />
         </>
     );
