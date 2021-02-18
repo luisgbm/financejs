@@ -1,5 +1,6 @@
 import CurrencyTextField from "../CurrencyTextField";
 import {
+    Button,
     FormControl,
     FormControlLabel,
     FormHelperText,
@@ -19,6 +20,10 @@ import CategoryTypes from "../categories/CategoryTypes";
 import {DateTimePicker, MuiPickersUtilsProvider} from "@material-ui/pickers";
 import MomentUtils from "@date-io/moment";
 import RepeatFrequencies from "./RepeatFrequencies";
+import {scheduledTransactionService} from "../../api/scheduled.transactions.service";
+import {moneyFormat} from "../../utils/utils";
+import moment from "moment";
+import DeleteIcon from "@material-ui/icons/Delete";
 
 const useStyles = makeStyles(theme => ({
     formField: {
@@ -27,7 +32,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const ScheduledTransactionForm = (props) => {
-    const {formik, history} = props;
+    const {formik, history, mode, scheduledTransactionId} = props;
 
     const toggleLoadingModalOpen = useContext(LoadingModalContext);
     const {showMessageModal} = useContext(MessageModalContext);
@@ -64,12 +69,56 @@ const ScheduledTransactionForm = (props) => {
         }
     };
 
+    const onDeleteScheduledTransaction = async () => {
+        try {
+            toggleLoadingModalOpen();
+            await scheduledTransactionService.deleteScheduledTransactionById(scheduledTransactionId);
+            toggleLoadingModalOpen();
+            history.push(`/scheduled-transactions`);
+        } catch (e) {
+            if (e.response && e.response.status === 401) {
+                history.push('/');
+            }
+
+            toggleLoadingModalOpen();
+            showMessageModal('Error', 'An error occurred while processing your request, please try again.');
+        }
+    };
+
     useEffect(() => {
         (async function loadInitialData() {
             try {
                 toggleLoadingModalOpen();
                 const accounts = await accountService.getAllAccounts();
                 setAccounts(accounts.data);
+
+                if (mode === 'edit') {
+                    const scheduledTransaction = scheduledTransactionService.getScheduledTransactionById(scheduledTransactionId);
+                    const categories = await categoryService.getAllCategoriesByType(scheduledTransaction.data.category_type.toLowerCase());
+
+                    if (categories.data && categories.data.length) {
+                        setCategories(categories.data);
+                    }
+
+                    await formik.setFieldValue('value', moneyFormat(scheduledTransaction.data.value, true));
+                    await formik.setFieldValue('description', scheduledTransaction.data.description);
+                    await formik.setFieldValue('accountId', scheduledTransaction.data.account_id);
+                    await formik.setFieldValue('categoryType', scheduledTransaction.data.category_type);
+                    await formik.setFieldValue('categoryId', scheduledTransaction.data.category_id);
+                    await formik.setFieldValue('createdDate', moment(scheduledTransaction.data.created_date));
+                    await formik.setFieldValue('repeat', scheduledTransaction.data.repeat);
+
+                    if (scheduledTransaction.data.repeat === true) {
+                        await formik.setFieldValue('repeatFreq', scheduledTransaction.data.repeat_freq);
+                        await formik.setFieldValue('repeatInterval', scheduledTransaction.data.repeat_interval);
+                        await formik.setFieldValue('infiniteRepeat', scheduledTransaction.data.infinite_repeat);
+
+                        if (scheduledTransaction.data.infinite_repeat === false) {
+                            await formik.setFieldValue('endAfterRepeats', scheduledTransaction.data.end_after_repeats);
+                        }
+                    }
+                }
+
                 toggleLoadingModalOpen();
             } catch (e) {
                 if (e.response && e.response.status === 401) {
@@ -293,6 +342,18 @@ const ScheduledTransactionForm = (props) => {
                 type='number'
                 disabled={formik.values.repeat === false || formik.values.infiniteRepeat === true}
             />
+            {
+                mode === 'edit' ? <Button
+                    fullWidth
+                    variant='contained'
+                    color='secondary'
+                    startIcon={<DeleteIcon/>}
+                    size='large'
+                    onClick={onDeleteScheduledTransaction}
+                >
+                    Delete
+                </Button> : <></>
+            }
         </>
     );
 };
