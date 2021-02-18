@@ -93,7 +93,7 @@ const ScheduledTransactionForm = (props) => {
                 setAccounts(accounts.data);
 
                 if (mode === 'edit') {
-                    const scheduledTransaction = scheduledTransactionService.getScheduledTransactionById(scheduledTransactionId);
+                    const scheduledTransaction = await scheduledTransactionService.getScheduledTransactionById(scheduledTransactionId);
                     const categories = await categoryService.getAllCategoriesByType(scheduledTransaction.data.category_type.toLowerCase());
 
                     if (categories.data && categories.data.length) {

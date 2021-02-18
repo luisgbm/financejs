@@ -53,6 +53,7 @@ const payScheduledTransaction = async (scheduledTransactionId, value, descriptio
 const editScheduledTransactionById = async (scheduledTransactionId, accountId, value, description, categoryId, createdDate, repeat, repeatFreq, repeatInterval, infiniteRepeat, endAfterRepeats) => {
     try {
         return await authenticationService.patchWithAuth(`/scheduled-transactions/${scheduledTransactionId}`, {
+            account_id: accountId,
             value,
             description,
             category_id: categoryId,

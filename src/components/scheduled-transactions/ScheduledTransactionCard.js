@@ -8,6 +8,7 @@ import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import AttachMoneyIcon from '@material-ui/icons/AttachMoney';
+import {Link} from "react-router-dom";
 
 const useStyles = makeStyles(theme => ({
     card: {
@@ -59,7 +60,7 @@ const ScheduledTransactionCard = (props) => {
                             open={open}
                             onClose={handleClose}
                         >
-                            <MenuItem onClick={handleClose}>
+                            <MenuItem component={Link} to={`/scheduled-transactions/edit/${scheduledTransaction.id}`}>
                                 <ListItemIcon>
                                     <CreateIcon/>
                                 </ListItemIcon>
