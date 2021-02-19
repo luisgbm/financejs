@@ -66,7 +66,7 @@ const ScheduledTransactionCard = (props) => {
                                 </ListItemIcon>
                                 Edit
                             </MenuItem>
-                            <MenuItem onClick={handleClose}>
+                            <MenuItem component={Link} to={`/scheduled-transactions/pay/${scheduledTransaction.id}`}>
                                 <ListItemIcon>
                                     <AttachMoneyIcon/>
                                 </ListItemIcon>
