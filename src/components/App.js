@@ -25,6 +25,7 @@ import MessageModal from "./MessageModal";
 import EditScheduledTransaction from "./scheduled-transactions/EditScheduledTransaction";
 import PayScheduledTransaction from "./scheduled-transactions/PayScheduledTransaction";
 import EditScheduledTransfer from "./scheduled-transactions/EditScheduledTransfer";
+import PayScheduledTransfer from "./scheduled-transactions/PayScheduledTransfer";
 
 const theme = createMuiTheme({
     palette: {
@@ -90,6 +91,8 @@ const App = () => {
                                    component={EditScheduledTransfer}/>
                             <Route exact path='/scheduled-transactions/pay/:scheduledTransactionId'
                                    component={PayScheduledTransaction}/>
+                            <Route exact path='/scheduled-transfers/pay/:scheduledTransferId'
+                                   component={PayScheduledTransfer}/>
                         </Switch>
                         <BottomNavBar/>
                     </Router>
