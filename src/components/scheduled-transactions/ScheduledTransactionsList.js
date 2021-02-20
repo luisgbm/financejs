@@ -9,6 +9,7 @@ import {scheduledTransactionService} from "../../api/scheduled.transactions.serv
 import ScheduledTransactionCard from "./ScheduledTransactionCard";
 import LoadingModalContext from "../../context/LoadingModalContext";
 import MessageModalContext from "../../context/MessageModalContext";
+import moment from "moment";
 
 const useStyles = makeStyles(theme => ({
     appBarTitle: {
@@ -16,6 +17,11 @@ const useStyles = makeStyles(theme => ({
     },
     container: {
         padding: theme.spacing(3)
+    },
+    date: {
+        textAlign: 'center',
+        color: 'grey',
+        marginBottom: theme.spacing(1)
     }
 }));
 
@@ -23,9 +29,24 @@ const ScheduledTransactionsList = (props) => {
     const toggleLoadingModalOpen = useContext(LoadingModalContext);
     const {showMessageModal} = useContext(MessageModalContext);
 
-    const [scheduledTransactions, setScheduledTransactions] = React.useState([])
+    const [scheduledTransactions, setScheduledTransactions] = React.useState([]);
+    const [grouped, setGrouped] = React.useState({});
 
     const classes = useStyles();
+
+    const groupScheduledTransactionsByDate = () => {
+        for (let t of scheduledTransactions) {
+            let nextDate = moment(t.next_date).format("DD/MM/yyyy");
+
+            if (!grouped[nextDate]) {
+                grouped[nextDate] = [];
+            }
+
+            grouped[nextDate].push(t);
+        }
+
+        setGrouped(grouped);
+    };
 
     useEffect(() => {
         (async function loadScheduledTransactions() {
@@ -33,6 +54,7 @@ const ScheduledTransactionsList = (props) => {
                 toggleLoadingModalOpen();
                 const scheduledTransactions = await scheduledTransactionService.getAllScheduledTransactions();
                 setScheduledTransactions(scheduledTransactions.data);
+                groupScheduledTransactionsByDate();
                 toggleLoadingModalOpen();
             } catch (e) {
                 if (e.response && e.response.status === 401) {
@@ -58,11 +80,18 @@ const ScheduledTransactionsList = (props) => {
             </AppBar>
             <Container maxWidth='sm' className={classes.container}>
                 {
-                    scheduledTransactions.map(scheduledTransaction =>
-                        <ScheduledTransactionCard
-                            key={scheduledTransaction.id}
-                            scheduledTransaction={scheduledTransaction}
-                        />
+                    Object.keys(grouped).sort().map(g =>
+                        <>
+                            <Typography variant='h6' className={classes.date}>{g}</Typography>
+                            {
+                                grouped[g].map(t =>
+                                    <ScheduledTransactionCard
+                                        key={t.id}
+                                        scheduledTransaction={t}
+                                    />
+                                )
+                            }
+                        </>
                     )
                 }
             </Container>

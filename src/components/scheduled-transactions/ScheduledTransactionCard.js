@@ -2,7 +2,6 @@ import {Card, CardHeader, IconButton, ListItemIcon, makeStyles} from "@material-
 import CreateIcon from "@material-ui/icons/Create";
 import Typography from "@material-ui/core/Typography";
 import {moneyFormat} from "../../utils/utils";
-import moment from "moment";
 import React from "react";
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -107,7 +106,6 @@ const ScheduledTransactionCard = (props) => {
                             scheduledTransaction.scheduled_type === 'Transfer' ? <>
                                 <b>From:</b> {scheduledTransaction.origin_account_name}<br/></> : <></>
                         }
-                        <b>Next Date:</b> {moment(scheduledTransaction.next_date).format('DD/MM/YYYY HH:mm')}
                     </>
                 }
             />

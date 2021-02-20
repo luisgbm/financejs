@@ -18,6 +18,7 @@ import {scheduledTransferInitialValues, scheduledTransferValidationSchema} from 
 import AttachMoneyIcon from "@material-ui/icons/AttachMoney";
 import AutorenewIcon from "@material-ui/icons/Autorenew";
 import ScheduledTransferForm from "./ScheduledTransferForm";
+import moment from "moment";
 
 const useStyles = makeStyles(theme => ({
     appBarTitle: {
@@ -83,7 +84,7 @@ const NewScheduledTransaction = (props) => {
                     parseInt(destinationAccountId),
                     parseInt(value.replaceAll('.', '').replaceAll(',', '')),
                     description,
-                    createdDate.format('yyyy-MM-DDTHH:mm:ss'),
+                    moment(createdDate).format('yyyy-MM-DDTHH:mm:ss'),
                     repeat,
                     repeatFreq,
                     parseInt(repeatInterval),
@@ -129,7 +130,7 @@ const NewScheduledTransaction = (props) => {
                     parseInt(value.replaceAll('.', '').replaceAll(',', '')),
                     description,
                     parseInt(categoryId),
-                    createdDate.format('yyyy-MM-DDTHH:mm:ss'),
+                    moment(createdDate).format('yyyy-MM-DDTHH:mm:ss'),
                     repeat,
                     repeatFreq,
                     parseInt(repeatInterval),
