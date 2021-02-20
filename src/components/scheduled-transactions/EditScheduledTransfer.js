@@ -6,13 +6,10 @@ import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import DoneIcon from "@material-ui/icons/Done";
-import ScheduledTransactionForm from "./ScheduledTransactionForm";
+import ScheduledTransferForm from "./ScheduledTransferForm";
 import {useFormik} from "formik";
-import {
-    scheduledTransactionInitialValues,
-    scheduledTransactionValidationSchema
-} from "./ScheduledTransactionFormParams";
-import {scheduledTransactionService} from "../../api/scheduled.transactions.service";
+import {scheduledTransferInitialValues, scheduledTransferValidationSchema} from "./ScheduledTransferFormParams";
+import {scheduledTransferService} from "../../api/scheduled.transfers.service";
 import moment from "moment";
 
 const useStyles = makeStyles(theme => ({
@@ -24,23 +21,23 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const EditScheduledTransaction = (props) => {
-    const {scheduledTransactionId} = props.match.params;
+const EditScheduledTransfer = (props) => {
+    const {scheduledTransferId} = props.match.params;
 
     const toggleLoadingModalOpen = useContext(LoadingModalContext);
     const {showMessageModal} = useContext(MessageModalContext);
 
     const classes = useStyles();
 
-    const formikScheduledTransaction = useFormik({
-        initialValues: scheduledTransactionInitialValues,
-        validationSchema: scheduledTransactionValidationSchema,
+    const formikScheduledTransfer = useFormik({
+        initialValues: scheduledTransferInitialValues,
+        validationSchema: scheduledTransferValidationSchema,
         onSubmit: async (values) => {
             const {
-                accountId,
+                originAccountId,
+                destinationAccountId,
                 value,
                 description,
-                categoryId,
                 createdDate,
                 repeat,
                 repeatFreq,
@@ -52,12 +49,12 @@ const EditScheduledTransaction = (props) => {
             try {
                 toggleLoadingModalOpen();
 
-                await scheduledTransactionService.editScheduledTransactionById(
-                    scheduledTransactionId,
-                    parseInt(accountId),
+                await scheduledTransferService.editScheduledTransferById(
+                    scheduledTransferId,
+                    parseInt(originAccountId),
+                    parseInt(destinationAccountId),
                     parseInt(value.replaceAll('.', '').replaceAll(',', '')),
                     description,
-                    parseInt(categoryId),
                     moment(createdDate).format('yyyy-MM-DDTHH:mm:ss'),
                     repeat,
                     repeatFreq,
@@ -83,23 +80,23 @@ const EditScheduledTransaction = (props) => {
         <>
             <AppBar position='sticky'>
                 <Toolbar>
-                    <Typography variant='h6' className={classes.appBarTitle}>Edit Scheduled Transaction</Typography>
+                    <Typography variant='h6' className={classes.appBarTitle}>Edit Scheduled Transfer</Typography>
                     <IconButton color='inherit'
-                                onClick={formikScheduledTransaction.handleSubmit}>
+                                onClick={formikScheduledTransfer.handleSubmit}>
                         <DoneIcon/>
                     </IconButton>
                 </Toolbar>
             </AppBar>
             <Container maxWidth='sm' className={classes.container}>
-                <ScheduledTransactionForm
+                <ScheduledTransferForm
                     history={props.history}
-                    formik={formikScheduledTransaction}
+                    formik={formikScheduledTransfer}
                     mode='edit'
-                    scheduledTransactionId={scheduledTransactionId}
+                    scheduledTransferId={scheduledTransferId}
                 />
             </Container>
         </>
     );
 };
 
-export default EditScheduledTransaction;
+export default EditScheduledTransfer;

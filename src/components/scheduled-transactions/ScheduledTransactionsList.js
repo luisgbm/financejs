@@ -51,7 +51,7 @@ const ScheduledTransactionsList = (props) => {
             <AppBar position='sticky'>
                 <Toolbar>
                     <Typography variant='h6' className={classes.appBarTitle}>Scheduled Transactions</Typography>
-                    <IconButton color='inherit' component={Link} to={'/scheduled-transactions/new'}>
+                    <IconButton color='inherit' component={Link} to={'/scheduled-transactions/new/transaction'}>
                         <Add/>
                     </IconButton>
                 </Toolbar>
