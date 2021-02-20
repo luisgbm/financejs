@@ -29,12 +29,11 @@ const ScheduledTransactionsList = (props) => {
     const toggleLoadingModalOpen = useContext(LoadingModalContext);
     const {showMessageModal} = useContext(MessageModalContext);
 
-    const [scheduledTransactions, setScheduledTransactions] = React.useState([]);
     const [grouped, setGrouped] = React.useState({});
 
     const classes = useStyles();
 
-    const groupScheduledTransactionsByDate = () => {
+    const groupScheduledTransactionsByDate = (scheduledTransactions) => {
         for (let t of scheduledTransactions) {
             let nextDate = moment(t.next_date).format("DD/MM/yyyy");
 
@@ -53,8 +52,7 @@ const ScheduledTransactionsList = (props) => {
             try {
                 toggleLoadingModalOpen();
                 const scheduledTransactions = await scheduledTransactionService.getAllScheduledTransactions();
-                setScheduledTransactions(scheduledTransactions.data);
-                groupScheduledTransactionsByDate();
+                groupScheduledTransactionsByDate(scheduledTransactions.data);
                 toggleLoadingModalOpen();
             } catch (e) {
                 if (e.response && e.response.status === 401) {
@@ -82,7 +80,7 @@ const ScheduledTransactionsList = (props) => {
                 {
                     Object.keys(grouped).sort().map(g =>
                         <>
-                            <Typography variant='h6' className={classes.date}>{g}</Typography>
+                            <Typography key={g} variant='h6' className={classes.date}>{g}</Typography>
                             {
                                 grouped[g].map(t =>
                                     <ScheduledTransactionCard
