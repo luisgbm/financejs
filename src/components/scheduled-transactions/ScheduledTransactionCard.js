@@ -101,11 +101,11 @@ const ScheduledTransactionCard = (props) => {
                         }
                         {
                             scheduledTransaction.scheduled_type === 'Transfer' ? <>
-                                <b>From:</b> {scheduledTransaction.origin_account_name}<br/></> : <></>
+                                <b>To:</b> {scheduledTransaction.destination_account_name}<br/></> : <></>
                         }
                         {
                             scheduledTransaction.scheduled_type === 'Transfer' ? <>
-                                <b>To:</b> {scheduledTransaction.destination_account_name}<br/></> : <></>
+                                <b>From:</b> {scheduledTransaction.origin_account_name}<br/></> : <></>
                         }
                         <b>Next Date:</b> {moment(scheduledTransaction.next_date).format('DD/MM/YYYY HH:mm')}
                     </>
