@@ -39,7 +39,6 @@ const EditAccount = (props) => {
     const {showMessageModal} = useContext(MessageModalContext);
 
     const classes = useStyles();
-
     const dispatch = useDispatch();
 
     const formik = useFormik({

@@ -1,10 +1,8 @@
-import React, {useEffect} from 'react';
+import React, {useContext, useEffect} from 'react';
 import {Button, Container, IconButton, makeStyles} from "@material-ui/core";
 import * as yup from "yup";
 import {useFormik} from "formik";
 import {authenticationService} from "../../api/authentication.service";
-import MessageModal from "../MessageModal";
-import LoadingModal from "../LoadingModal";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import AppBar from "@material-ui/core/AppBar";
@@ -12,6 +10,8 @@ import {Add} from "@material-ui/icons";
 import TextField from "@material-ui/core/TextField";
 import VpnKeyIcon from "@material-ui/icons/VpnKey";
 import {useDispatch} from "react-redux";
+import LoadingModalContext from "../../context/LoadingModalContext";
+import MessageModalContext from "../../context/MessageModalContext";
 
 const validationSchema = yup.object({
     userName: yup
@@ -38,13 +38,10 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const Login = (props) => {
-    const [loadingModalOpen, setLoadingModalOpen] = React.useState(true);
-    const [messageModalOpen, setMessageModalOpen] = React.useState(false);
-    const [messageModalTitle, setMessageModalTitle] = React.useState('');
-    const [messageModalMessage, setMessageModalMessage] = React.useState('');
+    const toggleLoadingModalOpen = useContext(LoadingModalContext);
+    const {showMessageModal} = useContext(MessageModalContext);
 
     const classes = useStyles();
-
     const dispatch = useDispatch();
 
     const formik = useFormik({
@@ -57,25 +54,24 @@ const Login = (props) => {
             const {userName, password} = values;
 
             try {
-                setLoadingModalOpen(true);
+                toggleLoadingModalOpen();
                 const login = await authenticationService.login(userName, password);
                 dispatch({type: 'setAccounts', payload: login.accounts});
-                setLoadingModalOpen(false);
+                dispatch({type: 'setCategories', payload: login.categories});
+                toggleLoadingModalOpen();
                 props.history.push('/accounts');
             } catch (e) {
                 resetForm();
 
-                setLoadingModalOpen(false);
-
-                setMessageModalTitle('Error');
-                setMessageModalMessage('An error occurred while processing your request, please try again.');
+                toggleLoadingModalOpen();
 
                 if (e.response && e.response.status === 401) {
-                    setMessageModalTitle('Login failed');
-                    setMessageModalMessage('Wrong user name or password, please try again.');
+                    showMessageModal('Login failed', 'Wrong user name or password, please try again.');
+                } else {
+                    showMessageModal('Error', 'An error occurred while processing your request, please try again.');
                 }
 
-                setMessageModalOpen(true);
+                toggleLoadingModalOpen();
             }
         },
     });
@@ -86,26 +82,22 @@ const Login = (props) => {
 
     useEffect(() => {
         (async function checkToken() {
+            toggleLoadingModalOpen();
+
             const token = await authenticationService.validateToken();
 
             if (token && token.data) {
                 dispatch({type: 'setAccounts', payload: token.data.accounts});
+                dispatch({type: 'setCategories', payload: token.data.categories});
                 props.history.push('/accounts');
             }
 
-            setLoadingModalOpen(false);
+            toggleLoadingModalOpen();
         })();
     }, []);  // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
         <>
-            <MessageModal
-                open={messageModalOpen}
-                title={messageModalTitle}
-                message={messageModalMessage}
-                handleClose={() => setMessageModalOpen(false)}
-            />
-            <LoadingModal open={loadingModalOpen}/>
             <AppBar position='sticky'>
                 <Toolbar>
                     <Typography variant='h6' className={classes.appBarTitle}>Login</Typography>

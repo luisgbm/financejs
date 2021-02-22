@@ -3,14 +3,13 @@ import CategoryTypes from "../categories/CategoryTypes";
 import {DateTimePicker, MuiPickersUtilsProvider} from "@material-ui/pickers";
 import MomentUtils from "@date-io/moment";
 import React, {useContext, useEffect} from "react";
-import {categoryService} from "../../api/category.service";
-import {accountService} from "../../api/account.service";
 import moment from "moment";
 import CurrencyTextField from "../CurrencyTextField";
 import {moneyFormat} from "../../utils/utils";
 import LoadingModalContext from "../../context/LoadingModalContext";
 import MessageModalContext from "../../context/MessageModalContext";
 import {scheduledTransactionService} from "../../api/scheduled.transactions.service";
+import {useSelector} from "react-redux";
 
 const useStyles = makeStyles(theme => ({
     formField: {
@@ -24,35 +23,20 @@ const PayScheduledTransactionForm = (props) => {
     const toggleLoadingModalOpen = useContext(LoadingModalContext);
     const {showMessageModal} = useContext(MessageModalContext);
 
-    const [accounts, setAccounts] = React.useState([]);
+    const accounts = useSelector(state => state.accounts);
+    const allCategories = useSelector(state => state.categories);
+
     const [categories, setCategories] = React.useState([]);
 
     const classes = useStyles();
 
     const updateCategories = async (categoryType) => {
-        try {
-            await formik.setFieldValue('categoryType', categoryType, true);
+        await formik.setFieldValue('categoryType', categoryType, true);
 
-            if (categoryType !== '') {
-                toggleLoadingModalOpen();
-
-                const categories = await categoryService.getAllCategoriesByType(categoryType.toLowerCase());
-
-                if (categories.data && categories.data.length) {
-                    setCategories(categories.data);
-                }
-
-                toggleLoadingModalOpen();
-            } else {
-                await formik.setFieldValue('categoryId', '', true);
-            }
-        } catch (e) {
-            if (e.response && e.response.status === 401) {
-                history.push('/');
-            }
-
-            toggleLoadingModalOpen();
-            showMessageModal('Error', 'An error occurred while processing your request, please try again.');
+        if (categoryType !== '') {
+            setCategories(allCategories.filter(category => category.categorytype === categoryType));
+        } else {
+            await formik.setFieldValue('categoryId', '', true);
         }
     };
 
@@ -61,13 +45,9 @@ const PayScheduledTransactionForm = (props) => {
             try {
                 toggleLoadingModalOpen();
 
-                const accounts = await accountService.getAllAccounts();
-                setAccounts(accounts.data);
-
                 const scheduledTransaction = await scheduledTransactionService.getScheduledTransactionById(scheduledTransactionId);
 
-                const categories = await categoryService.getAllCategoriesByType(scheduledTransaction.data.category_type.toLowerCase());
-                setCategories(categories.data);
+                setCategories(allCategories.filter(category => category.categorytype === scheduledTransaction.data.category_type));
 
                 await formik.setFieldValue('value', moneyFormat(scheduledTransaction.data.value, true));
                 await formik.setFieldValue('description', scheduledTransaction.data.description);

@@ -6,12 +6,24 @@ import HomeIcon from "@material-ui/icons/Home";
 import ImportExportIcon from "@material-ui/icons/ImportExport";
 import SettingsIcon from "@material-ui/icons/Settings";
 import EventIcon from "@material-ui/icons/Event";
+import {makeStyles} from "@material-ui/core/styles";
+
+const useStyles = makeStyles(theme => ({
+    bottomNav: {
+        zIndex: theme.zIndex.drawer + 1,
+        width: '100%',
+        position: 'fixed',
+        bottom: '0'
+    }
+}));
 
 const BottomNavBar = () => {
     const [value, setValue] = React.useState('home');
     const [hide, setHide] = React.useState(false);
 
     let location = useLocation();
+
+    const classes = useStyles();
 
     React.useEffect(() => {
         const hideForPaths = ['/', '/users/new'];
@@ -45,7 +57,7 @@ const BottomNavBar = () => {
                     setValue(newValue);
                 }}
                 showLabels
-                className='bottomNav'
+                className={classes.bottomNav}
             >
                 <BottomNavigationAction
                     label='Home'

@@ -1,4 +1,4 @@
-import React, {useContext, useEffect} from 'react';
+import React from 'react';
 
 import {Link} from 'react-router-dom'
 import Toolbar from '@material-ui/core/Toolbar';
@@ -8,10 +8,8 @@ import {Add} from '@material-ui/icons';
 import ThumbUpIcon from '@material-ui/icons/ThumbUp';
 import ThumbDownIcon from '@material-ui/icons/ThumbDown';
 import {Container, IconButton, makeStyles, Tab, Tabs} from '@material-ui/core';
-import {categoryService} from "../../api/category.service";
 import CategoryCard from "./CategoryCard";
-import LoadingModalContext from "../../context/LoadingModalContext";
-import MessageModalContext from "../../context/MessageModalContext";
+import {useSelector} from "react-redux";
 
 const useStyles = makeStyles(theme => ({
     container: {
@@ -43,34 +41,13 @@ const CategoryList = (props) => {
 
     const currentTab = tabNameToValue(props.match.params.type);
 
-    const toggleLoadingModalOpen = useContext(LoadingModalContext);
-    const {showMessageModal} = useContext(MessageModalContext);
-
-    const [categories, setCategories] = React.useState([]);
+    const categories = useSelector(state => state.categories);
 
     const classes = useStyles();
 
     const onChangeTab = (event, newValue) => {
         props.history.push(`/categories/${tabValueToName(newValue)}`);
     };
-
-    useEffect(() => {
-        (async function loadCategories() {
-            try {
-                toggleLoadingModalOpen();
-                const categories = await categoryService.getAllCategories();
-                setCategories(categories.data);
-                toggleLoadingModalOpen();
-            } catch (e) {
-                if (e.response && e.response.status === 401) {
-                    props.history.push('/')
-                }
-
-                toggleLoadingModalOpen();
-                showMessageModal('Error', 'An error occurred while processing your request, please try again.');
-            }
-        })()
-    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
         <>

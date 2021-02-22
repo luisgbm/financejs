@@ -2,13 +2,13 @@ import {FormControl, FormHelperText, InputLabel, makeStyles, MenuItem, Select, T
 import {DateTimePicker, MuiPickersUtilsProvider} from "@material-ui/pickers";
 import MomentUtils from "@date-io/moment";
 import React, {useContext, useEffect} from "react";
-import {accountService} from "../../api/account.service";
 import moment from "moment";
 import CurrencyTextField from "../CurrencyTextField";
 import {moneyFormat} from "../../utils/utils";
 import LoadingModalContext from "../../context/LoadingModalContext";
 import MessageModalContext from "../../context/MessageModalContext";
 import {scheduledTransferService} from "../../api/scheduled.transfers.service";
+import {useSelector} from "react-redux";
 
 const useStyles = makeStyles(theme => ({
     formField: {
@@ -22,7 +22,7 @@ const PayScheduledTransferForm = (props) => {
     const toggleLoadingModalOpen = useContext(LoadingModalContext);
     const {showMessageModal} = useContext(MessageModalContext);
 
-    const [accounts, setAccounts] = React.useState([]);
+    const accounts = useSelector(state => state.accounts);
 
     const classes = useStyles();
 
@@ -30,9 +30,6 @@ const PayScheduledTransferForm = (props) => {
         (async function loadInitialData() {
             try {
                 toggleLoadingModalOpen();
-
-                const accounts = await accountService.getAllAccounts();
-                setAccounts(accounts.data);
 
                 const scheduledTransfer = await scheduledTransferService.getScheduledTransferById(scheduledTransferId);
 

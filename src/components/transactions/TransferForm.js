@@ -18,7 +18,8 @@ import {moneyFormat} from "../../utils/utils";
 import CurrencyTextField from "../CurrencyTextField";
 import LoadingModalContext from "../../context/LoadingModalContext";
 import MessageModalContext from "../../context/MessageModalContext";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
+import {accountService} from "../../api/account.service";
 
 const useStyles = makeStyles(theme => ({
     formField: {
@@ -33,6 +34,7 @@ const TransferForm = (props) => {
     const {showMessageModal} = useContext(MessageModalContext);
 
     const classes = useStyles();
+    const dispatch = useDispatch();
 
     const {formik, history, mode, transferId, fromAccountId} = props;
 
@@ -66,8 +68,14 @@ const TransferForm = (props) => {
     const onDeleteTransfer = async () => {
         try {
             toggleLoadingModalOpen();
+
             await transferService.deleteTransferById(transferId);
+
+            const accounts = await accountService.getAllAccounts();
+            dispatch({type: 'setAccounts', payload: accounts});
+
             toggleLoadingModalOpen();
+
             history.push(`/transactions/account/${fromAccountId}`);
         } catch (e) {
             if (e.response && e.response.status === 401) {

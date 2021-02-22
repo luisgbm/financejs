@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import {useFormik} from 'formik';
 import * as yup from 'yup';
 import TextField from '@material-ui/core/TextField';
@@ -7,9 +7,10 @@ import Typography from "@material-ui/core/Typography";
 import {Container, IconButton, makeStyles} from "@material-ui/core";
 import SaveIcon from "@material-ui/icons/Save";
 import AppBar from "@material-ui/core/AppBar";
-import LoadingModal from "../LoadingModal";
 import {authenticationService} from "../../api/authentication.service";
-import MessageModal from "../MessageModal";
+import LoadingModalContext from "../../context/LoadingModalContext";
+import MessageModalContext from "../../context/MessageModalContext";
+import {useDispatch} from "react-redux";
 
 const validationSchema = yup.object({
     userName: yup
@@ -34,12 +35,11 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const NewUser = (props) => {
-    const [loadingModalOpen, setLoadingModalOpen] = React.useState(false);
-    const [messageModalOpen, setMessageModalOpen] = React.useState(false);
-    const [messageModalTitle, setMessageModalTitle] = React.useState('');
-    const [messageModalMessage, setMessageModalMessage] = React.useState('');
+    const toggleLoadingModalOpen = useContext(LoadingModalContext);
+    const {showMessageModal} = useContext(MessageModalContext);
 
     const classes = useStyles();
+    const dispatch = useDispatch();
 
     const formik = useFormik({
         initialValues: {
@@ -51,35 +51,30 @@ const NewUser = (props) => {
             const {userName, password} = values;
 
             try {
-                setLoadingModalOpen(true);
-                await authenticationService.newUser(userName, password);
-                setLoadingModalOpen(false);
+                toggleLoadingModalOpen();
+                const initialData = await authenticationService.newUser(userName, password);
+                dispatch({type: 'setAccounts', payload: initialData.accounts});
+                dispatch({type: 'setCategories', payload: initialData.categories});
+                toggleLoadingModalOpen();
                 props.history.push('/accounts');
             } catch (e) {
-                setLoadingModalOpen(false);
+                toggleLoadingModalOpen();
 
-                setMessageModalTitle('Error');
-                setMessageModalMessage('An error occurred while processing your request, please try again.');
 
                 if (e.response && e.response.status === 409) {
-                    setMessageModalTitle('User already exists');
-                    setMessageModalMessage(`A user with the name "${userName}" already exists, please choose a different user name.`);
+                    showMessageModal('User already exists',
+                        `A user with the name "${userName}" already exists, please choose a different user name.`);
+                } else {
+                    showMessageModal('Error', 'An error occurred while processing your request, please try again.');
                 }
 
-                setMessageModalOpen(true);
+                toggleLoadingModalOpen();
             }
         },
     });
 
     return (
         <>
-            <MessageModal
-                open={messageModalOpen}
-                title={messageModalTitle}
-                message={messageModalMessage}
-                handleClose={() => setMessageModalOpen(false)}
-            />
-            <LoadingModal open={loadingModalOpen}/>
             <AppBar position='sticky'>
                 <Toolbar>
                     <Typography variant='h6' className={classes.appBarTitle}>New User</Typography>

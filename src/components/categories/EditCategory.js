@@ -23,6 +23,7 @@ import CategoryTypes from "./CategoryTypes";
 import TextField from "@material-ui/core/TextField";
 import LoadingModalContext from "../../context/LoadingModalContext";
 import MessageModalContext from "../../context/MessageModalContext";
+import {useDispatch} from "react-redux";
 
 const validationSchema = yup.object({
     categoryName: yup
@@ -49,12 +50,13 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const EditCategory = (props) => {
-    const categoryId = props.match.params.id;
+    const categoryId = parseInt(props.match.params.id);
 
     const toggleLoadingModalOpen = useContext(LoadingModalContext);
     const {showMessageModal} = useContext(MessageModalContext);
 
     const classes = useStyles();
+    const dispatch = useDispatch();
 
     const formik = useFormik({
         initialValues: {
@@ -67,7 +69,8 @@ const EditCategory = (props) => {
 
             try {
                 toggleLoadingModalOpen();
-                await categoryService.editCategoryById(categoryId, categoryName, categoryType);
+                const category = await categoryService.editCategoryById(categoryId, categoryName, categoryType);
+                dispatch({type: 'editCategory', payload: category});
                 toggleLoadingModalOpen();
                 props.history.push(`/categories/${categoryType.toLowerCase()}`);
             } catch (e) {
@@ -85,6 +88,7 @@ const EditCategory = (props) => {
         try {
             toggleLoadingModalOpen();
             await categoryService.deleteCategoryById(categoryId);
+            dispatch({type: 'deleteCategory', payload: categoryId});
             toggleLoadingModalOpen();
             props.history.push('/categories');
         } catch (e) {

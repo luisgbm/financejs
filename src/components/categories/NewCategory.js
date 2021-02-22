@@ -21,6 +21,7 @@ import * as yup from "yup";
 import TextField from "@material-ui/core/TextField";
 import LoadingModalContext from "../../context/LoadingModalContext";
 import MessageModalContext from "../../context/MessageModalContext";
+import {useDispatch} from "react-redux";
 
 const validationSchema = yup.object({
     categoryName: yup
@@ -48,6 +49,7 @@ const NewCategory = (props) => {
     const {showMessageModal} = useContext(MessageModalContext);
 
     const classes = useStyles();
+    const dispatch = useDispatch();
 
     const formik = useFormik({
         initialValues: {
@@ -60,7 +62,8 @@ const NewCategory = (props) => {
 
             try {
                 toggleLoadingModalOpen();
-                await categoryService.newCategory(categoryName, categoryType);
+                const newCategory = await categoryService.newCategory(categoryName, categoryType);
+                dispatch({type: 'addCategory', payload: newCategory});
                 toggleLoadingModalOpen();
                 props.history.push(`/categories/${categoryType.toLowerCase()}`);
             } catch (e) {

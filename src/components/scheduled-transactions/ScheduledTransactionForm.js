@@ -14,7 +14,6 @@ import {
 import React, {useContext, useEffect} from "react";
 import LoadingModalContext from "../../context/LoadingModalContext";
 import MessageModalContext from "../../context/MessageModalContext";
-import {categoryService} from "../../api/category.service";
 import CategoryTypes from "../categories/CategoryTypes";
 import {DateTimePicker, MuiPickersUtilsProvider} from "@material-ui/pickers";
 import MomentUtils from "@date-io/moment";
@@ -38,35 +37,19 @@ const ScheduledTransactionForm = (props) => {
     const {showMessageModal} = useContext(MessageModalContext);
 
     const accounts = useSelector(state => state.accounts);
+    const allCategories = useSelector(state => state.categories);
 
     const [categories, setCategories] = React.useState([]);
 
     const classes = useStyles();
 
     const updateCategories = async (categoryType) => {
-        try {
-            await formik.setFieldValue('categoryType', categoryType, true);
+        await formik.setFieldValue('categoryType', categoryType, true);
 
-            if (categoryType !== '') {
-                toggleLoadingModalOpen();
-
-                const categories = await categoryService.getAllCategoriesByType(categoryType.toLowerCase());
-
-                if (categories.data && categories.data.length) {
-                    setCategories(categories.data);
-                }
-
-                toggleLoadingModalOpen();
-            } else {
-                await formik.setFieldValue('categoryId', '', true);
-            }
-        } catch (e) {
-            if (e.response && e.response.status === 401) {
-                history.push('/');
-            }
-
-            toggleLoadingModalOpen();
-            showMessageModal('Error', 'An error occurred while processing your request, please try again.');
+        if (categoryType !== '') {
+            setCategories(allCategories.filter(category => category.categorytype === categoryType));
+        } else {
+            await formik.setFieldValue('categoryId', '', true);
         }
     };
 
@@ -93,11 +76,6 @@ const ScheduledTransactionForm = (props) => {
 
                 if (mode === 'edit') {
                     const scheduledTransaction = await scheduledTransactionService.getScheduledTransactionById(scheduledTransactionId);
-                    const categories = await categoryService.getAllCategoriesByType(scheduledTransaction.data.category_type.toLowerCase());
-
-                    if (categories.data && categories.data.length) {
-                        setCategories(categories.data);
-                    }
 
                     await formik.setFieldValue('value', moneyFormat(scheduledTransaction.data.value, true));
                     await formik.setFieldValue('description', scheduledTransaction.data.description);

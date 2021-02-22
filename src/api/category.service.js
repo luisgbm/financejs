@@ -27,25 +27,21 @@ const getCategoryById = async (categoryId) => {
 };
 
 const newCategory = async (name, categorytype) => {
-    try {
-        return await authenticationService.postWithAuth('/categories', {
-            name,
-            categorytype
-        });
-    } catch (e) {
-        throw(e);
-    }
+    const category = await authenticationService.postWithAuth('/categories', {
+        name,
+        categorytype
+    });
+
+    return category.data;
 };
 
 const editCategoryById = async (categoryId, name, categorytype) => {
-    try {
-        return await authenticationService.patchWithAuth(`/categories/${categoryId}`, {
-            name,
-            categorytype
-        });
-    } catch (e) {
-        throw(e);
-    }
+    const category = await authenticationService.patchWithAuth(`/categories/${categoryId}`, {
+        name,
+        categorytype
+    });
+
+    return category.data;
 };
 
 const deleteCategoryById = async (categoryId) => {
