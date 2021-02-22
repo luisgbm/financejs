@@ -11,6 +11,8 @@ import Typography from "@material-ui/core/Typography";
 import SaveIcon from "@material-ui/icons/Save";
 import AppBar from "@material-ui/core/AppBar";
 import PayScheduledTransactionForm from "./PayScheduledTransactionForm";
+import {accountService} from "../../api/account.service";
+import {useDispatch} from "react-redux";
 
 const useStyles = makeStyles(theme => ({
     container: {
@@ -28,6 +30,7 @@ const PayScheduledTransaction = (props) => {
     const {showMessageModal} = useContext(MessageModalContext);
 
     const classes = useStyles();
+    const dispatch = useDispatch();
 
     const formik = useFormik({
         initialValues: {
@@ -64,6 +67,9 @@ const PayScheduledTransaction = (props) => {
                     parseInt(categoryId),
                     parseInt(accountId)
                 );
+
+                const accounts = await accountService.getAllAccounts();
+                dispatch({type: 'setAccounts', payload: accounts});
 
                 toggleLoadingModalOpen();
                 props.history.push(`/transactions/account/${accountId}`);

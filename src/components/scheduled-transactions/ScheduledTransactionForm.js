@@ -15,7 +15,6 @@ import React, {useContext, useEffect} from "react";
 import LoadingModalContext from "../../context/LoadingModalContext";
 import MessageModalContext from "../../context/MessageModalContext";
 import {categoryService} from "../../api/category.service";
-import {accountService} from "../../api/account.service";
 import CategoryTypes from "../categories/CategoryTypes";
 import {DateTimePicker, MuiPickersUtilsProvider} from "@material-ui/pickers";
 import MomentUtils from "@date-io/moment";
@@ -24,6 +23,7 @@ import {scheduledTransactionService} from "../../api/scheduled.transactions.serv
 import {moneyFormat} from "../../utils/utils";
 import moment from "moment";
 import DeleteIcon from "@material-ui/icons/Delete";
+import {useSelector} from "react-redux";
 
 const useStyles = makeStyles(theme => ({
     formField: {
@@ -37,7 +37,8 @@ const ScheduledTransactionForm = (props) => {
     const toggleLoadingModalOpen = useContext(LoadingModalContext);
     const {showMessageModal} = useContext(MessageModalContext);
 
-    const [accounts, setAccounts] = React.useState([]);
+    const accounts = useSelector(state => state.accounts);
+
     const [categories, setCategories] = React.useState([]);
 
     const classes = useStyles();
@@ -89,8 +90,6 @@ const ScheduledTransactionForm = (props) => {
         (async function loadInitialData() {
             try {
                 toggleLoadingModalOpen();
-                const accounts = await accountService.getAllAccounts();
-                setAccounts(accounts.data);
 
                 if (mode === 'edit') {
                     const scheduledTransaction = await scheduledTransactionService.getScheduledTransactionById(scheduledTransactionId);

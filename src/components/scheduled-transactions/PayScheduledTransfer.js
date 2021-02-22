@@ -11,6 +11,8 @@ import Typography from "@material-ui/core/Typography";
 import SaveIcon from "@material-ui/icons/Save";
 import AppBar from "@material-ui/core/AppBar";
 import PayScheduledTransferForm from "./PayScheduledTransferForm";
+import {useDispatch} from "react-redux";
+import {accountService} from "../../api/account.service";
 
 const useStyles = makeStyles(theme => ({
     container: {
@@ -28,6 +30,7 @@ const PayScheduledTransfer = (props) => {
     const {showMessageModal} = useContext(MessageModalContext);
 
     const classes = useStyles();
+    const dispatch = useDispatch();
 
     const formik = useFormik({
         initialValues: {
@@ -66,6 +69,9 @@ const PayScheduledTransfer = (props) => {
                     description,
                     moment(date).format('YYYY-MM-DDTHH:mm:ss')
                 );
+
+                const accounts = await accountService.getAllAccounts();
+                dispatch({type: 'setAccounts', payload: accounts});
 
                 toggleLoadingModalOpen();
                 props.history.push(`/transactions/account/${destinationAccountId}`);

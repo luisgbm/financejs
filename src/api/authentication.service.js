@@ -44,6 +44,8 @@ const newUser = async (name, password) => {
         });
 
         localStorage.setItem('token', result.data);
+
+        return result.data;
     } catch (e) {
         logout();
         throw(e);
@@ -57,7 +59,9 @@ const login = async (name, password) => {
             password
         });
 
-        localStorage.setItem('token', result.data);
+        localStorage.setItem('token', result.data.token);
+
+        return result.data;
     } catch (e) {
         logout();
         throw(e);
@@ -68,16 +72,15 @@ const logout = () => {
     localStorage.removeItem('token');
 };
 
-const isTokenValid = async () => {
+const validateToken = async () => {
     try {
         if (localStorage.getItem('token') == null) {
-            return false;
+            return null;
         }
 
-        await getWithAuth('/token');
-        return true;
+        return await getWithAuth('/token');
     } catch {
-        return false;
+        return null;
     }
 };
 
@@ -97,6 +100,6 @@ export const authenticationService = {
     postWithAuth,
     patchWithAuth,
     deleteWithAuth,
-    isTokenValid,
+    validateToken,
     getAuthHeader
 };

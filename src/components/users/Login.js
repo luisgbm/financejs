@@ -11,6 +11,7 @@ import AppBar from "@material-ui/core/AppBar";
 import {Add} from "@material-ui/icons";
 import TextField from "@material-ui/core/TextField";
 import VpnKeyIcon from "@material-ui/icons/VpnKey";
+import {useDispatch} from "react-redux";
 
 const validationSchema = yup.object({
     userName: yup
@@ -44,6 +45,8 @@ const Login = (props) => {
 
     const classes = useStyles();
 
+    const dispatch = useDispatch();
+
     const formik = useFormik({
         initialValues: {
             userName: '',
@@ -55,7 +58,8 @@ const Login = (props) => {
 
             try {
                 setLoadingModalOpen(true);
-                await authenticationService.login(userName, password);
+                const login = await authenticationService.login(userName, password);
+                dispatch({type: 'setAccounts', payload: login.accounts});
                 setLoadingModalOpen(false);
                 props.history.push('/accounts');
             } catch (e) {
@@ -82,7 +86,10 @@ const Login = (props) => {
 
     useEffect(() => {
         (async function checkToken() {
-            if (await authenticationService.isTokenValid()) {
+            const token = await authenticationService.validateToken();
+
+            if (token && token.data) {
+                dispatch({type: 'setAccounts', payload: token.data.accounts});
                 props.history.push('/accounts');
             }
 

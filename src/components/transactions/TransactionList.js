@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useContext, useEffect} from 'react';
 
 import {Link} from 'react-router-dom'
 import Toolbar from '@material-ui/core/Toolbar';
@@ -7,12 +7,12 @@ import AppBar from '@material-ui/core/AppBar';
 import {Add} from '@material-ui/icons';
 import {Chip, Container, IconButton, makeStyles} from '@material-ui/core';
 import {transactionService} from "../../api/transaction.service";
-import {accountService} from "../../api/account.service";
-import MessageModal from "../MessageModal";
-import LoadingModal from "../LoadingModal";
 import TransferCard from "./TransferCard";
 import TransactionCard from "./TransactionCard";
 import {moneyFormat} from "../../utils/utils";
+import LoadingModalContext from "../../context/LoadingModalContext";
+import MessageModalContext from "../../context/MessageModalContext";
+import {useSelector} from "react-redux";
 
 const useStyles = makeStyles(theme => ({
     container: {
@@ -24,38 +24,38 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const TransactionList = (props) => {
-    const {accountId} = props.match.params;
+    const accountId = parseInt(props.match.params.accountId);
+
+    const accounts = useSelector(state => state.accounts);
+
+    const toggleLoadingModalOpen = useContext(LoadingModalContext);
+    const {showMessageModal} = useContext(MessageModalContext);
 
     const [transactions, setTransactions] = React.useState([]);
     const [accountName, setAccountName] = React.useState('');
     const [accountBalance, setAccountBalance] = React.useState(0);
-    const [loadingModalOpen, setLoadingModalOpen] = React.useState(true);
-    const [messageModalOpen, setMessageModalOpen] = React.useState(false);
-    const [messageModalTitle, setMessageModalTitle] = React.useState('');
-    const [messageModalMessage, setMessageModalMessage] = React.useState('');
 
     const classes = useStyles();
 
     useEffect(() => {
         (async function loadTransactionData() {
             try {
+                toggleLoadingModalOpen();
                 const transactions = await transactionService.getAllTransactionsForAccountId(accountId);
-                const account = await accountService.getAccountById(accountId);
+
+                const account = accounts.find(a => a.id === parseInt(accountId));
 
                 setTransactions(transactions.data);
-                setAccountName(account.data.name);
-                setAccountBalance(moneyFormat(account.data.balance));
-                setLoadingModalOpen(false);
+                setAccountName(account.name);
+                setAccountBalance(moneyFormat(account.balance));
+                toggleLoadingModalOpen();
             } catch (e) {
                 if (e.response && e.response.status === 401) {
                     props.history.push('/')
                 }
 
-                setLoadingModalOpen(false);
-
-                setMessageModalTitle('Error');
-                setMessageModalMessage('An error occurred while processing your request, please try again.');
-                setMessageModalOpen(true);
+                toggleLoadingModalOpen();
+                showMessageModal('Error', 'An error occurred while processing your request, please try again.');
             }
         })()
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -81,13 +81,6 @@ const TransactionList = (props) => {
 
     return (
         <>
-            <MessageModal
-                open={messageModalOpen}
-                title={messageModalTitle}
-                message={messageModalMessage}
-                handleClose={() => setMessageModalOpen(false)}
-            />
-            <LoadingModal open={loadingModalOpen}/>
             <AppBar position='sticky'>
                 <Toolbar>
                     <Typography variant='h6' className={classes.appBarTitle}>{accountName} <Chip

@@ -12,6 +12,8 @@ import LoadingModal from "../LoadingModal";
 import {useFormik} from "formik";
 import * as yup from "yup";
 import TransferForm from "./TransferForm";
+import {accountService} from "../../api/account.service";
+import {useDispatch} from "react-redux";
 
 const useStyles = makeStyles(theme => ({
     container: {
@@ -31,6 +33,7 @@ const EditTransfer = (props) => {
     const [messageModalMessage, setMessageModalMessage] = React.useState('');
 
     const classes = useStyles();
+    const dispatch = useDispatch();
 
     const formik = useFormik({
         initialValues: {
@@ -69,6 +72,9 @@ const EditTransfer = (props) => {
                     fromAccountId,
                     toAccountId
                 );
+
+                const accounts = await accountService.getAllAccounts();
+                dispatch({type: 'setAccounts', payload: accounts});
 
                 setLoadingModalOpen(false);
                 props.history.push(`/transactions/account/${fromAccountId}`);

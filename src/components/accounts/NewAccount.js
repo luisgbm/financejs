@@ -1,6 +1,4 @@
-import React from "react";
-import MessageModal from "../MessageModal";
-import LoadingModal from "../LoadingModal";
+import React, {useContext} from "react";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import {Container, IconButton, makeStyles} from "@material-ui/core";
@@ -10,6 +8,9 @@ import {useFormik} from "formik";
 import * as yup from "yup";
 import {accountService} from "../../api/account.service";
 import TextField from "@material-ui/core/TextField";
+import LoadingModalContext from "../../context/LoadingModalContext";
+import MessageModalContext from "../../context/MessageModalContext";
+import {useDispatch} from "react-redux";
 
 const validationSchema = yup.object({
     accountName: yup
@@ -30,12 +31,11 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const NewAccount = (props) => {
-    const [loadingModalOpen, setLoadingModalOpen] = React.useState(false);
-    const [messageModalOpen, setMessageModalOpen] = React.useState(false);
-    const [messageModalTitle, setMessageModalTitle] = React.useState('');
-    const [messageModalMessage, setMessageModalMessage] = React.useState('');
+    const toggleLoadingModalOpen = useContext(LoadingModalContext);
+    const {showMessageModal} = useContext(MessageModalContext);
 
     const classes = useStyles();
+    const dispatch = useDispatch();
 
     const formik = useFormik({
         initialValues: {
@@ -46,33 +46,24 @@ const NewAccount = (props) => {
             const {accountName} = values;
 
             try {
-                setLoadingModalOpen(true);
-                await accountService.newAccount(accountName);
-                setLoadingModalOpen(false);
+                toggleLoadingModalOpen();
+                const newAccount = await accountService.newAccount(accountName);
+                dispatch({type: 'addAccount', payload: newAccount});
+                toggleLoadingModalOpen();
                 props.history.push('/accounts');
             } catch (e) {
                 if (e.response && e.response.status === 401) {
                     props.history.push('/');
                 }
 
-                setLoadingModalOpen(false);
-
-                setMessageModalTitle('Error');
-                setMessageModalMessage('An error occurred while processing your request, please try again.');
-                setMessageModalOpen(true);
+                toggleLoadingModalOpen();
+                showMessageModal('Error', 'An error occurred while processing your request, please try again.');
             }
         },
     });
 
     return (
         <>
-            <MessageModal
-                open={messageModalOpen}
-                title={messageModalTitle}
-                message={messageModalMessage}
-                handleClose={() => setMessageModalOpen(false)}
-            />
-            <LoadingModal open={loadingModalOpen}/>
             <AppBar position='sticky'>
                 <Toolbar>
                     <Typography variant='h6' className={classes.appBarTitle}>New Account</Typography>

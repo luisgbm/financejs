@@ -14,7 +14,6 @@ import {
 import React, {useContext, useEffect} from "react";
 import LoadingModalContext from "../../context/LoadingModalContext";
 import MessageModalContext from "../../context/MessageModalContext";
-import {accountService} from "../../api/account.service";
 import {DateTimePicker, MuiPickersUtilsProvider} from "@material-ui/pickers";
 import MomentUtils from "@date-io/moment";
 import RepeatFrequencies from "./RepeatFrequencies";
@@ -22,6 +21,7 @@ import {moneyFormat} from "../../utils/utils";
 import moment from "moment";
 import DeleteIcon from "@material-ui/icons/Delete";
 import {scheduledTransferService} from "../../api/scheduled.transfers.service";
+import {useSelector} from "react-redux";
 
 const useStyles = makeStyles(theme => ({
     formField: {
@@ -35,7 +35,7 @@ const ScheduledTransferForm = (props) => {
     const toggleLoadingModalOpen = useContext(LoadingModalContext);
     const {showMessageModal} = useContext(MessageModalContext);
 
-    const [accounts, setAccounts] = React.useState([]);
+    const accounts = useSelector(state => state.accounts);
 
     const classes = useStyles();
 
@@ -59,8 +59,6 @@ const ScheduledTransferForm = (props) => {
         (async function loadInitialData() {
             try {
                 toggleLoadingModalOpen();
-                const accounts = await accountService.getAllAccounts();
-                setAccounts(accounts.data);
 
                 if (mode === 'edit') {
                     const scheduledTransfer = await scheduledTransferService.getScheduledTransferById(scheduledTransferId);

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useContext} from 'react';
 
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
@@ -9,13 +9,15 @@ import moment from 'moment';
 import {transactionService} from "../../api/transaction.service";
 import AutorenewIcon from '@material-ui/icons/Autorenew';
 import AttachMoneyIcon from '@material-ui/icons/AttachMoney';
-import MessageModal from "../MessageModal";
-import LoadingModal from "../LoadingModal";
 import {useFormik} from "formik";
 import * as yup from "yup";
 import TransactionForm from "./TransactionForm";
 import TransferForm from "./TransferForm";
 import {transferService} from "../../api/transfer.service";
+import LoadingModalContext from "../../context/LoadingModalContext";
+import MessageModalContext from "../../context/MessageModalContext";
+import {useDispatch} from "react-redux";
+import {accountService} from "../../api/account.service";
 
 const useStyles = makeStyles(theme => ({
     container: {
@@ -46,14 +48,13 @@ const NewTransaction = (props) => {
     };
 
     const currentTab = tabNameToValue(props.match.params.type);
-    const accountId = props.match.params.accountId;
+    const accountId = parseInt(props.match.params.accountId);
 
-    const [loadingModalOpen, setLoadingModalOpen] = React.useState(false);
-    const [messageModalOpen, setMessageModalOpen] = React.useState(false);
-    const [messageModalTitle, setMessageModalTitle] = React.useState('');
-    const [messageModalMessage, setMessageModalMessage] = React.useState('');
+    const toggleLoadingModalOpen = useContext(LoadingModalContext);
+    const {showMessageModal} = useContext(MessageModalContext);
 
     const classes = useStyles();
+    const dispatch = useDispatch();
 
     const formikTransaction = useFormik({
         initialValues: {
@@ -80,7 +81,7 @@ const NewTransaction = (props) => {
             const {value, description, accountId, categoryId, date} = values;
 
             try {
-                setLoadingModalOpen(true);
+                toggleLoadingModalOpen();
 
                 await transactionService.newTransaction(
                     accountId,
@@ -90,18 +91,18 @@ const NewTransaction = (props) => {
                     parseInt(categoryId)
                 );
 
-                setLoadingModalOpen(false);
+                const accounts = await accountService.getAllAccounts();
+                dispatch({type: 'setAccounts', payload: accounts});
+
+                toggleLoadingModalOpen();
                 props.history.push(`/transactions/account/${accountId}`);
             } catch (e) {
                 if (e.response && e.response.status === 401) {
                     props.history.push('/');
                 }
 
-                setLoadingModalOpen(false);
-
-                setMessageModalTitle('Error');
-                setMessageModalMessage('An error occurred while processing your request, please try again.');
-                setMessageModalOpen(true);
+                toggleLoadingModalOpen();
+                showMessageModal('Error', 'An error occurred while processing your request, please try again.');
             }
         },
     });
@@ -133,7 +134,7 @@ const NewTransaction = (props) => {
             const {value, fromAccountId, toAccountId, description, date} = values;
 
             try {
-                setLoadingModalOpen(true);
+                toggleLoadingModalOpen();
 
                 await transferService.newTransfer(
                     parseInt(value.replaceAll('.', '').replaceAll(',', '')),
@@ -143,18 +144,18 @@ const NewTransaction = (props) => {
                     date.format('yyyy-MM-DDTHH:mm:ss'),
                 );
 
-                setLoadingModalOpen(false);
+                const accounts = await accountService.getAllAccounts();
+                dispatch({type: 'setAccounts', payload: accounts});
+
+                toggleLoadingModalOpen();
                 props.history.push(`/transactions/account/${accountId}`);
             } catch (e) {
                 if (e.response && e.response.status === 401) {
                     props.history.push('/');
                 }
 
-                setLoadingModalOpen(false);
-
-                setMessageModalTitle('Error');
-                setMessageModalMessage('An error occurred while processing your request, please try again.');
-                setMessageModalOpen(true);
+                toggleLoadingModalOpen();
+                showMessageModal('Error', 'An error occurred while processing your request, please try again.');
             }
         },
     });
@@ -165,13 +166,6 @@ const NewTransaction = (props) => {
 
     return (
         <>
-            <MessageModal
-                open={messageModalOpen}
-                title={messageModalTitle}
-                message={messageModalMessage}
-                handleClose={() => setMessageModalOpen(false)}
-            />
-            <LoadingModal open={loadingModalOpen}/>
             <AppBar position='sticky'>
                 <Toolbar>
                     <Typography variant='h6' className={classes.appBarTitle}>New Transaction</Typography>

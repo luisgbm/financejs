@@ -10,15 +10,15 @@ import {
 } from "@material-ui/core";
 import {DateTimePicker, MuiPickersUtilsProvider} from "@material-ui/pickers";
 import MomentUtils from "@date-io/moment";
-import React, {useEffect} from "react";
-import {accountService} from "../../api/account.service";
-import MessageModal from "../MessageModal";
-import LoadingModal from "../LoadingModal";
+import React, {useContext, useEffect} from "react";
 import DeleteIcon from "@material-ui/icons/Delete";
 import {transferService} from "../../api/transfer.service";
 import moment from "moment";
 import {moneyFormat} from "../../utils/utils";
 import CurrencyTextField from "../CurrencyTextField";
+import LoadingModalContext from "../../context/LoadingModalContext";
+import MessageModalContext from "../../context/MessageModalContext";
+import {useSelector} from "react-redux";
 
 const useStyles = makeStyles(theme => ({
     formField: {
@@ -27,21 +27,19 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const TransferForm = (props) => {
-    const [accounts, setAccounts] = React.useState([]);
-    const [loadingModalOpen, setLoadingModalOpen] = React.useState(true);
-    const [messageModalOpen, setMessageModalOpen] = React.useState(false);
-    const [messageModalTitle, setMessageModalTitle] = React.useState('');
-    const [messageModalMessage, setMessageModalMessage] = React.useState('');
+    const accounts = useSelector(state => state.accounts);
+
+    const toggleLoadingModalOpen = useContext(LoadingModalContext);
+    const {showMessageModal} = useContext(MessageModalContext);
 
     const classes = useStyles();
 
     const {formik, history, mode, transferId, fromAccountId} = props;
 
     useEffect(() => {
-        (async function loadAccounts() {
+        (async function loadInitialData() {
             try {
-                const accounts = await accountService.getAllAccounts();
-                setAccounts(accounts.data);
+                toggleLoadingModalOpen();
 
                 if (mode === 'edit') {
                     const transfer = await transferService.getTransferById(transferId);
@@ -53,49 +51,36 @@ const TransferForm = (props) => {
                     formik.setFieldValue('toAccountId', transfer.data.destination_account);
                 }
 
-                setLoadingModalOpen(false);
+                toggleLoadingModalOpen();
             } catch (e) {
                 if (e.response && e.response.status === 401) {
                     history.push('/')
                 }
 
-                setLoadingModalOpen(false);
-
-                setMessageModalTitle('Error');
-                setMessageModalMessage('An error occurred while processing your request, please try again.');
-                setMessageModalOpen(true);
+                toggleLoadingModalOpen();
+                showMessageModal('Error', 'An error occurred while processing your request, please try again.');
             }
         })()
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     const onDeleteTransfer = async () => {
         try {
-            setLoadingModalOpen(true);
+            toggleLoadingModalOpen();
             await transferService.deleteTransferById(transferId);
-            setLoadingModalOpen(false);
+            toggleLoadingModalOpen();
             history.push(`/transactions/account/${fromAccountId}`);
         } catch (e) {
             if (e.response && e.response.status === 401) {
                 history.push('/');
             }
 
-            setLoadingModalOpen(false);
-
-            setMessageModalTitle('Error');
-            setMessageModalMessage('An error occurred while processing your request, please try again.');
-            setMessageModalOpen(true);
+            toggleLoadingModalOpen();
+            showMessageModal('Error', 'An error occurred while processing your request, please try again.');
         }
     };
 
     return (
         <>
-            <MessageModal
-                open={messageModalOpen}
-                title={messageModalTitle}
-                message={messageModalMessage}
-                handleClose={() => setMessageModalOpen(false)}
-            />
-            <LoadingModal open={loadingModalOpen}/>
             <FormControl
                 fullWidth
                 className={classes.formField}

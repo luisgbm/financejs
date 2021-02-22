@@ -11,16 +11,16 @@ import {
 import CategoryTypes from "../categories/CategoryTypes";
 import {DateTimePicker, MuiPickersUtilsProvider} from "@material-ui/pickers";
 import MomentUtils from "@date-io/moment";
-import React, {useEffect} from "react";
-import MessageModal from "../MessageModal";
-import LoadingModal from "../LoadingModal";
+import React, {useContext, useEffect} from "react";
 import {categoryService} from "../../api/category.service";
-import {accountService} from "../../api/account.service";
 import {transactionService} from "../../api/transaction.service";
 import moment from "moment";
 import DeleteIcon from "@material-ui/icons/Delete";
 import CurrencyTextField from "../CurrencyTextField";
 import {moneyFormat} from "../../utils/utils";
+import {useSelector} from "react-redux";
+import LoadingModalContext from "../../context/LoadingModalContext";
+import MessageModalContext from "../../context/MessageModalContext";
 
 const useStyles = makeStyles(theme => ({
     formField: {
@@ -31,12 +31,12 @@ const useStyles = makeStyles(theme => ({
 const TransactionForm = (props) => {
     const {formik, history, mode, transactionId} = props;
 
-    const [accounts, setAccounts] = React.useState([]);
+    const toggleLoadingModalOpen = useContext(LoadingModalContext);
+    const {showMessageModal} = useContext(MessageModalContext);
+
+    const accounts = useSelector(state => state.accounts);
+
     const [categories, setCategories] = React.useState([]);
-    const [loadingModalOpen, setLoadingModalOpen] = React.useState(true);
-    const [messageModalOpen, setMessageModalOpen] = React.useState(false);
-    const [messageModalTitle, setMessageModalTitle] = React.useState('');
-    const [messageModalMessage, setMessageModalMessage] = React.useState('');
 
     const classes = useStyles();
 
@@ -45,7 +45,7 @@ const TransactionForm = (props) => {
             await formik.setFieldValue('categoryType', categoryType, true);
 
             if (categoryType !== '') {
-                setLoadingModalOpen(true);
+                toggleLoadingModalOpen();
 
                 const categories = await categoryService.getAllCategoriesByType(categoryType.toLowerCase());
 
@@ -53,7 +53,7 @@ const TransactionForm = (props) => {
                     setCategories(categories.data);
                 }
 
-                setLoadingModalOpen(false);
+                toggleLoadingModalOpen();
             } else {
                 await formik.setFieldValue('categoryId', '', true);
             }
@@ -62,38 +62,31 @@ const TransactionForm = (props) => {
                 history.push('/');
             }
 
-            setLoadingModalOpen(false);
-
-            setMessageModalTitle('Error');
-            setMessageModalMessage('An error occurred while processing your request, please try again.');
-            setMessageModalOpen(true);
+            toggleLoadingModalOpen();
+            showMessageModal('Error', 'An error occurred while processing your request, please try again.');
         }
     };
 
     const onDeleteTransaction = async () => {
         try {
-            setLoadingModalOpen(true);
+            toggleLoadingModalOpen();
             await transactionService.deleteTransactionById(transactionId);
-            setLoadingModalOpen(false);
+            toggleLoadingModalOpen();
             history.push(`/transactions/account/${formik.values.accountId}`);
         } catch (e) {
             if (e.response && e.response.status === 401) {
                 history.push('/');
             }
 
-            setLoadingModalOpen(false);
-
-            setMessageModalTitle('Error');
-            setMessageModalMessage('An error occurred while processing your request, please try again.');
-            setMessageModalOpen(true);
+            toggleLoadingModalOpen();
+            showMessageModal('Error', 'An error occurred while processing your request, please try again.');
         }
     };
 
     useEffect(() => {
         (async function loadInitialData() {
             try {
-                const accounts = await accountService.getAllAccounts();
-                setAccounts(accounts.data);
+                toggleLoadingModalOpen();
 
                 if (mode === 'edit') {
                     const transaction = await transactionService.getTransactionById(transactionId);
@@ -111,30 +104,20 @@ const TransactionForm = (props) => {
                     await formik.setFieldValue('date', moment(transaction.data.date));
                 }
 
-                setLoadingModalOpen(false);
+                toggleLoadingModalOpen();
             } catch (e) {
                 if (e.response && e.response.status === 401) {
                     history.push('/')
                 }
 
-                setLoadingModalOpen(false);
-
-                setMessageModalTitle('Error');
-                setMessageModalMessage('An error occurred while processing your request, please try again.');
-                setMessageModalOpen(true);
+                toggleLoadingModalOpen();
+                showMessageModal('Error', 'An error occurred while processing your request, please try again.');
             }
         })()
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
         <>
-            <MessageModal
-                open={messageModalOpen}
-                title={messageModalTitle}
-                message={messageModalMessage}
-                handleClose={() => setMessageModalOpen(false)}
-            />
-            <LoadingModal open={loadingModalOpen}/>
             <FormControl
                 fullWidth
                 className={classes.formField}
