@@ -43,7 +43,7 @@ const newUser = async (name, password) => {
             password
         });
 
-        localStorage.setItem('token', result.data);
+        localStorage.setItem('token', result.data.token);
 
         return result.data;
     } catch (e) {
