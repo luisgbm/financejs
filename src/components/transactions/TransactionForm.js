@@ -82,6 +82,8 @@ const TransactionForm = (props) => {
                 if (mode === 'edit') {
                     const transaction = await transactionService.getTransactionById(transactionId);
 
+                    setCategories(allCategories.filter(category => category.categorytype === transaction.data.category_type));
+
                     await formik.setFieldValue('value', moneyFormat(transaction.data.value, true));
                     await formik.setFieldValue('description', transaction.data.description);
                     await formik.setFieldValue('accountId', transaction.data.account_id);

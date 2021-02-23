@@ -11,6 +11,7 @@ import {useFormik} from "formik";
 import {scheduledTransferInitialValues, scheduledTransferValidationSchema} from "./ScheduledTransferFormParams";
 import {scheduledTransferService} from "../../api/scheduled.transfers.service";
 import moment from "moment";
+import {useDispatch} from "react-redux";
 
 const useStyles = makeStyles(theme => ({
     appBarTitle: {
@@ -28,6 +29,7 @@ const EditScheduledTransfer = (props) => {
     const {showMessageModal} = useContext(MessageModalContext);
 
     const classes = useStyles();
+    const dispatch = useDispatch();
 
     const formikScheduledTransfer = useFormik({
         initialValues: scheduledTransferInitialValues,
@@ -49,7 +51,7 @@ const EditScheduledTransfer = (props) => {
             try {
                 toggleLoadingModalOpen();
 
-                await scheduledTransferService.editScheduledTransferById(
+                const scheduledTransfer = await scheduledTransferService.editScheduledTransferById(
                     scheduledTransferId,
                     parseInt(originAccountId),
                     parseInt(destinationAccountId),
@@ -62,6 +64,8 @@ const EditScheduledTransfer = (props) => {
                     infiniteRepeat,
                     parseInt(endAfterRepeats)
                 );
+
+                dispatch({type: 'editScheduledTransaction', payload: scheduledTransfer});
 
                 toggleLoadingModalOpen();
                 props.history.push(`/scheduled-transactions`);

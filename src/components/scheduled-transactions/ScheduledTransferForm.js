@@ -21,7 +21,7 @@ import {moneyFormat} from "../../utils/utils";
 import moment from "moment";
 import DeleteIcon from "@material-ui/icons/Delete";
 import {scheduledTransferService} from "../../api/scheduled.transfers.service";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 
 const useStyles = makeStyles(theme => ({
     formField: {
@@ -38,11 +38,13 @@ const ScheduledTransferForm = (props) => {
     const accounts = useSelector(state => state.accounts);
 
     const classes = useStyles();
+    const dispatch = useDispatch();
 
     const onDeleteScheduledTransfer = async () => {
         try {
             toggleLoadingModalOpen();
             await scheduledTransferService.deleteScheduledTransferById(scheduledTransferId);
+            dispatch({type: 'deleteScheduledTransaction', payload: parseInt(scheduledTransferId)});
             toggleLoadingModalOpen();
             history.push(`/scheduled-transactions`);
         } catch (e) {
@@ -63,20 +65,20 @@ const ScheduledTransferForm = (props) => {
                 if (mode === 'edit') {
                     const scheduledTransfer = await scheduledTransferService.getScheduledTransferById(scheduledTransferId);
 
-                    await formik.setFieldValue('originAccountId', scheduledTransfer.data.origin_account_id);
-                    await formik.setFieldValue('destinationAccountId', scheduledTransfer.data.destination_account_id);
-                    await formik.setFieldValue('value', moneyFormat(scheduledTransfer.data.value, true));
-                    await formik.setFieldValue('description', scheduledTransfer.data.description);
-                    await formik.setFieldValue('createdDate', moment(scheduledTransfer.data.created_date));
-                    await formik.setFieldValue('repeat', scheduledTransfer.data.repeat);
+                    await formik.setFieldValue('originAccountId', scheduledTransfer.origin_account_id);
+                    await formik.setFieldValue('destinationAccountId', scheduledTransfer.destination_account_id);
+                    await formik.setFieldValue('value', moneyFormat(scheduledTransfer.value, true));
+                    await formik.setFieldValue('description', scheduledTransfer.description);
+                    await formik.setFieldValue('createdDate', moment(scheduledTransfer.created_date));
+                    await formik.setFieldValue('repeat', scheduledTransfer.repeat);
 
-                    if (scheduledTransfer.data.repeat === true) {
-                        await formik.setFieldValue('repeatFreq', scheduledTransfer.data.repeat_freq);
-                        await formik.setFieldValue('repeatInterval', scheduledTransfer.data.repeat_interval);
-                        await formik.setFieldValue('infiniteRepeat', scheduledTransfer.data.infinite_repeat);
+                    if (scheduledTransfer.repeat === true) {
+                        await formik.setFieldValue('repeatFreq', scheduledTransfer.repeat_freq);
+                        await formik.setFieldValue('repeatInterval', scheduledTransfer.repeat_interval);
+                        await formik.setFieldValue('infiniteRepeat', scheduledTransfer.infinite_repeat);
 
-                        if (scheduledTransfer.data.infinite_repeat === false) {
-                            await formik.setFieldValue('endAfterRepeats', scheduledTransfer.data.end_after_repeats);
+                        if (scheduledTransfer.infinite_repeat === false) {
+                            await formik.setFieldValue('endAfterRepeats', scheduledTransfer.end_after_repeats);
                         }
                     }
                 }

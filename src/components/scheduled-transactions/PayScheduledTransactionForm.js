@@ -47,14 +47,14 @@ const PayScheduledTransactionForm = (props) => {
 
                 const scheduledTransaction = await scheduledTransactionService.getScheduledTransactionById(scheduledTransactionId);
 
-                setCategories(allCategories.filter(category => category.categorytype === scheduledTransaction.data.category_type));
+                setCategories(allCategories.filter(category => category.categorytype === scheduledTransaction.category_type));
 
-                await formik.setFieldValue('value', moneyFormat(scheduledTransaction.data.value, true));
-                await formik.setFieldValue('description', scheduledTransaction.data.description);
-                await formik.setFieldValue('accountId', scheduledTransaction.data.account_id);
-                await formik.setFieldValue('categoryType', scheduledTransaction.data.category_type);
-                await formik.setFieldValue('categoryId', scheduledTransaction.data.category_id);
-                await formik.setFieldValue('date', moment(scheduledTransaction.data.next_date));
+                await formik.setFieldValue('value', moneyFormat(scheduledTransaction.value, true));
+                await formik.setFieldValue('description', scheduledTransaction.description);
+                await formik.setFieldValue('accountId', scheduledTransaction.account_id);
+                await formik.setFieldValue('categoryType', scheduledTransaction.category_type);
+                await formik.setFieldValue('categoryId', scheduledTransaction.category_id);
+                await formik.setFieldValue('date', moment(scheduledTransaction.next_date));
 
                 toggleLoadingModalOpen();
             } catch (e) {

@@ -33,11 +33,11 @@ const PayScheduledTransferForm = (props) => {
 
                 const scheduledTransfer = await scheduledTransferService.getScheduledTransferById(scheduledTransferId);
 
-                await formik.setFieldValue('originAccountId', scheduledTransfer.data.origin_account_id);
-                await formik.setFieldValue('destinationAccountId', scheduledTransfer.data.destination_account_id);
-                await formik.setFieldValue('value', moneyFormat(scheduledTransfer.data.value, true));
-                await formik.setFieldValue('description', scheduledTransfer.data.description);
-                await formik.setFieldValue('date', moment(scheduledTransfer.data.next_date));
+                await formik.setFieldValue('originAccountId', scheduledTransfer.origin_account_id);
+                await formik.setFieldValue('destinationAccountId', scheduledTransfer.destination_account_id);
+                await formik.setFieldValue('value', moneyFormat(scheduledTransfer.value, true));
+                await formik.setFieldValue('description', scheduledTransfer.description);
+                await formik.setFieldValue('date', moment(scheduledTransfer.next_date));
 
                 toggleLoadingModalOpen();
             } catch (e) {

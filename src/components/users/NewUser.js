@@ -55,6 +55,7 @@ const NewUser = (props) => {
                 const initialData = await authenticationService.newUser(userName, password);
                 dispatch({type: 'setAccounts', payload: initialData.accounts});
                 dispatch({type: 'setCategories', payload: initialData.categories});
+                dispatch({type: 'setScheduledTransactions', payload: initialData.scheduled_transactions});
                 toggleLoadingModalOpen();
                 props.history.push('/accounts');
             } catch (e) {

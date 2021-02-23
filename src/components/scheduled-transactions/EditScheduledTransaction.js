@@ -14,6 +14,7 @@ import {
 } from "./ScheduledTransactionFormParams";
 import {scheduledTransactionService} from "../../api/scheduled.transactions.service";
 import moment from "moment";
+import {useDispatch} from "react-redux";
 
 const useStyles = makeStyles(theme => ({
     appBarTitle: {
@@ -31,6 +32,7 @@ const EditScheduledTransaction = (props) => {
     const {showMessageModal} = useContext(MessageModalContext);
 
     const classes = useStyles();
+    const dispatch = useDispatch();
 
     const formikScheduledTransaction = useFormik({
         initialValues: scheduledTransactionInitialValues,
@@ -52,7 +54,7 @@ const EditScheduledTransaction = (props) => {
             try {
                 toggleLoadingModalOpen();
 
-                await scheduledTransactionService.editScheduledTransactionById(
+                const scheduledTransaction = await scheduledTransactionService.editScheduledTransactionById(
                     scheduledTransactionId,
                     parseInt(accountId),
                     parseInt(value.replaceAll('.', '').replaceAll(',', '')),
@@ -65,6 +67,8 @@ const EditScheduledTransaction = (props) => {
                     infiniteRepeat,
                     parseInt(endAfterRepeats)
                 );
+
+                dispatch({type: 'editScheduledTransaction', payload: scheduledTransaction});
 
                 toggleLoadingModalOpen();
                 props.history.push(`/scheduled-transactions`);

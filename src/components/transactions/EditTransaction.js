@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useContext} from 'react';
 
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
@@ -7,13 +7,13 @@ import SaveIcon from '@material-ui/icons/Save';
 import {Container, IconButton, makeStyles} from '@material-ui/core';
 import moment from 'moment';
 import {transactionService} from "../../api/transaction.service";
-import MessageModal from "../MessageModal";
-import LoadingModal from "../LoadingModal";
 import {useFormik} from "formik";
 import * as yup from "yup";
 import TransactionForm from "./TransactionForm";
 import {accountService} from "../../api/account.service";
 import {useDispatch} from "react-redux";
+import LoadingModalContext from "../../context/LoadingModalContext";
+import MessageModalContext from "../../context/MessageModalContext";
 
 const useStyles = makeStyles(theme => ({
     container: {
@@ -25,12 +25,10 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const EditTransaction = (props) => {
-    const {transactionId} = props.match.params;
+    const transactionId = parseInt(props.match.params.transactionId);
 
-    const [loadingModalOpen, setLoadingModalOpen] = React.useState(false);
-    const [messageModalOpen, setMessageModalOpen] = React.useState(false);
-    const [messageModalTitle, setMessageModalTitle] = React.useState('');
-    const [messageModalMessage, setMessageModalMessage] = React.useState('');
+    const toggleLoadingModalOpen = useContext(LoadingModalContext);
+    const {showMessageModal} = useContext(MessageModalContext);
 
     const classes = useStyles();
     const dispatch = useDispatch();
@@ -60,7 +58,7 @@ const EditTransaction = (props) => {
             const {value, description, accountId, categoryId, date} = values;
 
             try {
-                setLoadingModalOpen(true);
+                toggleLoadingModalOpen();
 
                 await transactionService.editTransactionById(
                     transactionId,
@@ -74,31 +72,21 @@ const EditTransaction = (props) => {
                 const accounts = await accountService.getAllAccounts();
                 dispatch({type: 'setAccounts', payload: accounts});
 
-                setLoadingModalOpen(false);
+                toggleLoadingModalOpen();
                 props.history.push(`/transactions/account/${accountId}`);
             } catch (e) {
                 if (e.response && e.response.status === 401) {
                     props.history.push('/');
                 }
 
-                setLoadingModalOpen(false);
-
-                setMessageModalTitle('Error');
-                setMessageModalMessage('An error occurred while processing your request, please try again.');
-                setMessageModalOpen(true);
+                toggleLoadingModalOpen();
+                showMessageModal('Error', 'An error occurred while processing your request, please try again.');
             }
         },
     });
 
     return (
         <>
-            <MessageModal
-                open={messageModalOpen}
-                title={messageModalTitle}
-                message={messageModalMessage}
-                handleClose={() => setMessageModalOpen(false)}
-            />
-            <LoadingModal open={loadingModalOpen}/>
             <AppBar position='sticky'>
                 <Toolbar>
                     <Typography variant='h6' className={classes.appBarTitle}>Edit Transaction</Typography>

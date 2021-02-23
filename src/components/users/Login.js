@@ -58,6 +58,7 @@ const Login = (props) => {
                 const login = await authenticationService.login(userName, password);
                 dispatch({type: 'setAccounts', payload: login.accounts});
                 dispatch({type: 'setCategories', payload: login.categories});
+                dispatch({type: 'setScheduledTransactions', payload: login.scheduled_transactions});
                 toggleLoadingModalOpen();
                 props.history.push('/accounts');
             } catch (e) {
@@ -89,6 +90,7 @@ const Login = (props) => {
             if (token && token.data) {
                 dispatch({type: 'setAccounts', payload: token.data.accounts});
                 dispatch({type: 'setCategories', payload: token.data.categories});
+                dispatch({type: 'setScheduledTransactions', payload: token.data.scheduled_transactions});
                 props.history.push('/accounts');
             }
 

@@ -4,12 +4,10 @@ import Typography from "@material-ui/core/Typography";
 import {Container, IconButton, makeStyles} from "@material-ui/core";
 import {Link} from "react-router-dom";
 import {Add} from "@material-ui/icons";
-import React, {useContext, useEffect} from "react";
-import {scheduledTransactionService} from "../../api/scheduled.transactions.service";
+import React from "react";
 import ScheduledTransactionCard from "./ScheduledTransactionCard";
-import LoadingModalContext from "../../context/LoadingModalContext";
-import MessageModalContext from "../../context/MessageModalContext";
 import moment from "moment";
+import {useSelector} from "react-redux";
 
 const useStyles = makeStyles(theme => ({
     appBarTitle: {
@@ -25,16 +23,11 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const ScheduledTransactionsList = (props) => {
-    const toggleLoadingModalOpen = useContext(LoadingModalContext);
-    const {showMessageModal} = useContext(MessageModalContext);
+const ScheduledTransactionsList = () => {
+    const scheduledTransactions = useSelector(state => {
+        let grouped = {};
 
-    const [grouped, setGrouped] = React.useState({});
-
-    const classes = useStyles();
-
-    const groupScheduledTransactionsByDate = (scheduledTransactions) => {
-        for (let t of scheduledTransactions) {
+        for (let t of state.scheduledTransactions) {
             let nextDate = moment(t.next_date).format("DD/MM/yyyy");
 
             if (!grouped[nextDate]) {
@@ -44,27 +37,10 @@ const ScheduledTransactionsList = (props) => {
             grouped[nextDate].push(t);
         }
 
-        setGrouped(grouped);
-    };
+        return grouped;
+    });
 
-    useEffect(() => {
-        (async function loadScheduledTransactions() {
-            try {
-                toggleLoadingModalOpen();
-                const scheduledTransactions = await scheduledTransactionService.getAllScheduledTransactions();
-                groupScheduledTransactionsByDate(scheduledTransactions.data);
-                toggleLoadingModalOpen();
-            } catch (e) {
-                if (e.response && e.response.status === 401) {
-                    props.history.push('/')
-                }
-
-                toggleLoadingModalOpen();
-                showMessageModal('Error', 'An error occurred while processing your request, please try again.');
-            }
-        })();
-        // eslint-disable-next-line
-    }, []);
+    const classes = useStyles();
 
     return (
         <>
@@ -78,14 +54,14 @@ const ScheduledTransactionsList = (props) => {
             </AppBar>
             <Container maxWidth='sm' className={classes.container}>
                 {
-                    Object.keys(grouped).sort().map(g =>
+                    Object.keys(scheduledTransactions).sort().map(date =>
                         <>
-                            <Typography key={g} variant='h6' className={classes.date}>{g}</Typography>
+                            <Typography key={date} variant='h6' className={classes.date}>{date}</Typography>
                             {
-                                grouped[g].map(t =>
+                                scheduledTransactions[date].map(scheduledTransaction =>
                                     <ScheduledTransactionCard
-                                        key={t.id}
-                                        scheduledTransaction={t}
+                                        key={scheduledTransaction.id}
+                                        scheduledTransaction={scheduledTransaction}
                                     />
                                 )
                             }

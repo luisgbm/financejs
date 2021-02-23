@@ -19,6 +19,7 @@ import AttachMoneyIcon from "@material-ui/icons/AttachMoney";
 import AutorenewIcon from "@material-ui/icons/Autorenew";
 import ScheduledTransferForm from "./ScheduledTransferForm";
 import moment from "moment";
+import {useDispatch} from "react-redux";
 
 const useStyles = makeStyles(theme => ({
     appBarTitle: {
@@ -58,6 +59,7 @@ const NewScheduledTransaction = (props) => {
     const {showMessageModal} = useContext(MessageModalContext);
 
     const classes = useStyles();
+    const dispatch = useDispatch();
 
     const formikScheduledTransfer = useFormik({
         initialValues: scheduledTransferInitialValues,
@@ -79,7 +81,7 @@ const NewScheduledTransaction = (props) => {
             try {
                 toggleLoadingModalOpen();
 
-                await scheduledTransferService.newScheduledTransfer(
+                let scheduledTransaction = await scheduledTransferService.newScheduledTransfer(
                     parseInt(originAccountId),
                     parseInt(destinationAccountId),
                     parseInt(value.replaceAll('.', '').replaceAll(',', '')),
@@ -91,6 +93,8 @@ const NewScheduledTransaction = (props) => {
                     infiniteRepeat,
                     parseInt(endAfterRepeats)
                 );
+
+                dispatch({type: 'addScheduledTransaction', payload: scheduledTransaction});
 
                 toggleLoadingModalOpen();
                 props.history.push(`/scheduled-transactions`);

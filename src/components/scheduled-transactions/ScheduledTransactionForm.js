@@ -22,7 +22,7 @@ import {scheduledTransactionService} from "../../api/scheduled.transactions.serv
 import {moneyFormat} from "../../utils/utils";
 import moment from "moment";
 import DeleteIcon from "@material-ui/icons/Delete";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 
 const useStyles = makeStyles(theme => ({
     formField: {
@@ -42,6 +42,7 @@ const ScheduledTransactionForm = (props) => {
     const [categories, setCategories] = React.useState([]);
 
     const classes = useStyles();
+    const dispatch = useDispatch();
 
     const updateCategories = async (categoryType) => {
         await formik.setFieldValue('categoryType', categoryType, true);
@@ -57,6 +58,7 @@ const ScheduledTransactionForm = (props) => {
         try {
             toggleLoadingModalOpen();
             await scheduledTransactionService.deleteScheduledTransactionById(scheduledTransactionId);
+            dispatch({type: 'deleteScheduledTransaction', payload: parseInt(scheduledTransactionId)});
             toggleLoadingModalOpen();
             history.push(`/scheduled-transactions`);
         } catch (e) {
@@ -77,21 +79,23 @@ const ScheduledTransactionForm = (props) => {
                 if (mode === 'edit') {
                     const scheduledTransaction = await scheduledTransactionService.getScheduledTransactionById(scheduledTransactionId);
 
-                    await formik.setFieldValue('value', moneyFormat(scheduledTransaction.data.value, true));
-                    await formik.setFieldValue('description', scheduledTransaction.data.description);
-                    await formik.setFieldValue('accountId', scheduledTransaction.data.account_id);
-                    await formik.setFieldValue('categoryType', scheduledTransaction.data.category_type);
-                    await formik.setFieldValue('categoryId', scheduledTransaction.data.category_id);
-                    await formik.setFieldValue('createdDate', moment(scheduledTransaction.data.created_date));
-                    await formik.setFieldValue('repeat', scheduledTransaction.data.repeat);
+                    setCategories(allCategories.filter(category => category.categorytype === scheduledTransaction.category_type));
 
-                    if (scheduledTransaction.data.repeat === true) {
-                        await formik.setFieldValue('repeatFreq', scheduledTransaction.data.repeat_freq);
-                        await formik.setFieldValue('repeatInterval', scheduledTransaction.data.repeat_interval);
-                        await formik.setFieldValue('infiniteRepeat', scheduledTransaction.data.infinite_repeat);
+                    await formik.setFieldValue('value', moneyFormat(scheduledTransaction.value, true));
+                    await formik.setFieldValue('description', scheduledTransaction.description);
+                    await formik.setFieldValue('accountId', scheduledTransaction.account_id);
+                    await formik.setFieldValue('categoryType', scheduledTransaction.category_type);
+                    await formik.setFieldValue('categoryId', scheduledTransaction.category_id);
+                    await formik.setFieldValue('createdDate', moment(scheduledTransaction.created_date));
+                    await formik.setFieldValue('repeat', scheduledTransaction.repeat);
 
-                        if (scheduledTransaction.data.infinite_repeat === false) {
-                            await formik.setFieldValue('endAfterRepeats', scheduledTransaction.data.end_after_repeats);
+                    if (scheduledTransaction.repeat === true) {
+                        await formik.setFieldValue('repeatFreq', scheduledTransaction.repeat_freq);
+                        await formik.setFieldValue('repeatInterval', scheduledTransaction.repeat_interval);
+                        await formik.setFieldValue('infiniteRepeat', scheduledTransaction.infinite_repeat);
+
+                        if (scheduledTransaction.infinite_repeat === false) {
+                            await formik.setFieldValue('endAfterRepeats', scheduledTransaction.end_after_repeats);
                         }
                     }
                 }
