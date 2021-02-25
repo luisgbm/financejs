@@ -71,8 +71,6 @@ const Login = (props) => {
                 } else {
                     showMessageModal('Error', 'An error occurred while processing your request, please try again.');
                 }
-
-                toggleLoadingModalOpen();
             }
         },
     });
