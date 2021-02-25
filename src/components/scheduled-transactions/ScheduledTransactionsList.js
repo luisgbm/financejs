@@ -40,6 +40,12 @@ const ScheduledTransactionsList = () => {
         return grouped;
     });
 
+    const dateIsToday = (date) => {
+        let today = moment().format("DD/MM/yyyy");
+
+        return today === date;
+    };
+
     const classes = useStyles();
 
     return (
@@ -56,7 +62,8 @@ const ScheduledTransactionsList = () => {
                 {
                     Object.keys(scheduledTransactions).sort().map(date =>
                         <div key={date}>
-                            <Typography key={date} variant='h6' className={classes.date}>{date}</Typography>
+                            <Typography key={date} variant='h6'
+                                        className={classes.date}>{dateIsToday(date) ? 'Today' : date}</Typography>
                             {
                                 scheduledTransactions[date].map(scheduledTransaction =>
                                     <ScheduledTransactionCard

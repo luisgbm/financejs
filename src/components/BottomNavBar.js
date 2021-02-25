@@ -7,6 +7,9 @@ import ImportExportIcon from "@material-ui/icons/ImportExport";
 import SettingsIcon from "@material-ui/icons/Settings";
 import EventIcon from "@material-ui/icons/Event";
 import {makeStyles} from "@material-ui/core/styles";
+import {Badge} from "@material-ui/core";
+import {dueScheduledTransactions} from "./scheduled-transactions/due.scheduled.transactions";
+import {useSelector} from "react-redux";
 
 const useStyles = makeStyles(theme => ({
     bottomNav: {
@@ -21,9 +24,12 @@ const BottomNavBar = () => {
     const [value, setValue] = React.useState('home');
     const [hide, setHide] = React.useState(false);
 
+    const allScheduledTransactions = useSelector(state => state.scheduledTransactions);
+
     let location = useLocation();
 
     const classes = useStyles();
+    const dueBadgeCount = dueScheduledTransactions(allScheduledTransactions);
 
     React.useEffect(() => {
         const hideForPaths = ['/', '/users/new'];
@@ -68,7 +74,11 @@ const BottomNavBar = () => {
                 />
                 <BottomNavigationAction
                     label='Schedule'
-                    icon={<EventIcon/>}
+                    icon={
+                        <Badge badgeContent={dueBadgeCount} color="secondary" invisible={dueBadgeCount === 0}>
+                            <EventIcon/>
+                        </Badge>
+                    }
                     component={Link}
                     to={'/scheduled-transactions'}
                     value={'scheduled-transactions'}
