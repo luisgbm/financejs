@@ -9,7 +9,6 @@ import DoneIcon from "@material-ui/icons/Done";
 import ScheduledTransactionForm from "./ScheduledTransactionForm";
 import {useFormik} from "formik";
 import {scheduledTransactionService} from "../../api/scheduled.transactions.service";
-import {scheduledTransferService} from "../../api/scheduled.transfers.service";
 import {
     scheduledTransactionInitialValues,
     scheduledTransactionValidationSchema
@@ -81,11 +80,14 @@ const NewScheduledTransaction = (props) => {
             try {
                 toggleLoadingModalOpen();
 
-                let scheduledTransaction = await scheduledTransferService.newScheduledTransfer(
-                    parseInt(originAccountId),
-                    parseInt(destinationAccountId),
+                let scheduledTransaction = await scheduledTransactionService.newScheduledTransaction(
+                    'Transfer',
+                    null,
                     parseInt(value.replaceAll('.', '').replaceAll(',', '')),
                     description,
+                    null,
+                    parseInt(originAccountId),
+                    parseInt(destinationAccountId),
                     moment(createdDate).format('yyyy-MM-DDTHH:mm:ss'),
                     repeat,
                     repeatFreq,
@@ -129,11 +131,14 @@ const NewScheduledTransaction = (props) => {
             try {
                 toggleLoadingModalOpen();
 
-                await scheduledTransactionService.newScheduledTransaction(
+                let scheduledTransaction = await scheduledTransactionService.newScheduledTransaction(
+                    'Transaction',
                     parseInt(accountId),
                     parseInt(value.replaceAll('.', '').replaceAll(',', '')),
                     description,
                     parseInt(categoryId),
+                    null,
+                    null,
                     moment(createdDate).format('yyyy-MM-DDTHH:mm:ss'),
                     repeat,
                     repeatFreq,
@@ -141,6 +146,8 @@ const NewScheduledTransaction = (props) => {
                     infiniteRepeat,
                     parseInt(endAfterRepeats)
                 );
+
+                dispatch({type: 'addScheduledTransaction', payload: scheduledTransaction});
 
                 toggleLoadingModalOpen();
                 props.history.push(`/scheduled-transactions`);

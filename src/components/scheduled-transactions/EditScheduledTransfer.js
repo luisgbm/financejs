@@ -9,7 +9,7 @@ import DoneIcon from "@material-ui/icons/Done";
 import ScheduledTransferForm from "./ScheduledTransferForm";
 import {useFormik} from "formik";
 import {scheduledTransferInitialValues, scheduledTransferValidationSchema} from "./ScheduledTransferFormParams";
-import {scheduledTransferService} from "../../api/scheduled.transfers.service";
+import {scheduledTransactionService} from "../../api/scheduled.transactions.service";
 import moment from "moment";
 import {useDispatch} from "react-redux";
 
@@ -51,12 +51,15 @@ const EditScheduledTransfer = (props) => {
             try {
                 toggleLoadingModalOpen();
 
-                const scheduledTransfer = await scheduledTransferService.editScheduledTransferById(
+                const scheduledTransaction = await scheduledTransactionService.editScheduledTransactionById(
                     scheduledTransferId,
-                    parseInt(originAccountId),
-                    parseInt(destinationAccountId),
+                    'Transfer',
+                    null,
                     parseInt(value.replaceAll('.', '').replaceAll(',', '')),
                     description,
+                    null,
+                    parseInt(originAccountId),
+                    parseInt(destinationAccountId),
                     moment(createdDate).format('yyyy-MM-DDTHH:mm:ss'),
                     repeat,
                     repeatFreq,
@@ -65,7 +68,7 @@ const EditScheduledTransfer = (props) => {
                     parseInt(endAfterRepeats)
                 );
 
-                dispatch({type: 'editScheduledTransaction', payload: scheduledTransfer});
+                dispatch({type: 'editScheduledTransaction', payload: scheduledTransaction});
 
                 toggleLoadingModalOpen();
                 props.history.push(`/scheduled-transactions`);

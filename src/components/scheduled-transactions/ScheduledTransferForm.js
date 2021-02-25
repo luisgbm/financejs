@@ -20,7 +20,7 @@ import RepeatFrequencies from "./RepeatFrequencies";
 import {moneyFormat} from "../../utils/utils";
 import moment from "moment";
 import DeleteIcon from "@material-ui/icons/Delete";
-import {scheduledTransferService} from "../../api/scheduled.transfers.service";
+import {scheduledTransactionService} from "../../api/scheduled.transactions.service";
 import {useDispatch, useSelector} from "react-redux";
 
 const useStyles = makeStyles(theme => ({
@@ -30,7 +30,8 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const ScheduledTransferForm = (props) => {
-    const {formik, history, mode, scheduledTransferId} = props;
+    const {formik, history, mode} = props;
+    const scheduledTransferId = parseInt(props.scheduledTransferId);
 
     const toggleLoadingModalOpen = useContext(LoadingModalContext);
     const {showMessageModal} = useContext(MessageModalContext);
@@ -43,8 +44,8 @@ const ScheduledTransferForm = (props) => {
     const onDeleteScheduledTransfer = async () => {
         try {
             toggleLoadingModalOpen();
-            await scheduledTransferService.deleteScheduledTransferById(scheduledTransferId);
-            dispatch({type: 'deleteScheduledTransaction', payload: parseInt(scheduledTransferId)});
+            await scheduledTransactionService.deleteScheduledTransactionById(scheduledTransferId);
+            dispatch({type: 'deleteScheduledTransaction', payload: scheduledTransferId});
             toggleLoadingModalOpen();
             history.push(`/scheduled-transactions`);
         } catch (e) {
@@ -63,7 +64,7 @@ const ScheduledTransferForm = (props) => {
                 toggleLoadingModalOpen();
 
                 if (mode === 'edit') {
-                    const scheduledTransfer = await scheduledTransferService.getScheduledTransferById(scheduledTransferId);
+                    const scheduledTransfer = await scheduledTransactionService.getScheduledTransactionById(scheduledTransferId);
 
                     await formik.setFieldValue('originAccountId', scheduledTransfer.origin_account_id);
                     await formik.setFieldValue('destinationAccountId', scheduledTransfer.destination_account_id);

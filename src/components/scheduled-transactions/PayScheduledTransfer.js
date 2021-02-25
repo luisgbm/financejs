@@ -5,7 +5,7 @@ import * as yup from "yup";
 import React, {useContext} from "react";
 import LoadingModalContext from "../../context/LoadingModalContext";
 import MessageModalContext from "../../context/MessageModalContext";
-import {scheduledTransferService} from "../../api/scheduled.transfers.service";
+import {scheduledTransactionService} from "../../api/scheduled.transactions.service";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import SaveIcon from "@material-ui/icons/Save";
@@ -24,7 +24,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const PayScheduledTransfer = (props) => {
-    const {scheduledTransferId} = props.match.params;
+    const scheduledTransferId = parseInt(props.match.params.scheduledTransferId);
 
     const toggleLoadingModalOpen = useContext(LoadingModalContext);
     const {showMessageModal} = useContext(MessageModalContext);
@@ -61,17 +61,22 @@ const PayScheduledTransfer = (props) => {
             try {
                 toggleLoadingModalOpen();
 
-                await scheduledTransferService.payScheduledTransfer(
+                await scheduledTransactionService.payScheduledTransaction(
                     scheduledTransferId,
-                    originAccountId,
-                    destinationAccountId,
                     parseInt(value.replaceAll('.', '').replaceAll(',', '')),
                     description,
-                    moment(date).format('YYYY-MM-DDTHH:mm:ss')
+                    moment(date).format('YYYY-MM-DDTHH:mm:ss'),
+                    null,
+                    null,
+                    originAccountId,
+                    destinationAccountId
                 );
 
                 const accounts = await accountService.getAllAccounts();
                 dispatch({type: 'setAccounts', payload: accounts});
+
+                const scheduledTransactions = await scheduledTransactionService.getAllScheduledTransactions();
+                dispatch({type: 'setScheduledTransactions', payload: scheduledTransactions});
 
                 toggleLoadingModalOpen();
                 props.history.push(`/transactions/account/${destinationAccountId}`);

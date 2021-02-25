@@ -24,7 +24,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const PayScheduledTransaction = (props) => {
-    const {scheduledTransactionId} = props.match.params;
+    const scheduledTransactionId = parseInt(props.match.params.scheduledTransactionId);
 
     const toggleLoadingModalOpen = useContext(LoadingModalContext);
     const {showMessageModal} = useContext(MessageModalContext);
@@ -65,11 +65,16 @@ const PayScheduledTransaction = (props) => {
                     description,
                     moment(date).format('YYYY-MM-DDTHH:mm:ss'),
                     parseInt(categoryId),
-                    parseInt(accountId)
+                    parseInt(accountId),
+                    null,
+                    null
                 );
 
                 const accounts = await accountService.getAllAccounts();
                 dispatch({type: 'setAccounts', payload: accounts});
+
+                const scheduledTransactions = await scheduledTransactionService.getAllScheduledTransactions();
+                dispatch({type: 'setScheduledTransactions', payload: scheduledTransactions});
 
                 toggleLoadingModalOpen();
                 props.history.push(`/transactions/account/${accountId}`);

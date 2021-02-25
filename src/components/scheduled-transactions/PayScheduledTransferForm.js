@@ -7,7 +7,6 @@ import CurrencyTextField from "../CurrencyTextField";
 import {moneyFormat} from "../../utils/utils";
 import LoadingModalContext from "../../context/LoadingModalContext";
 import MessageModalContext from "../../context/MessageModalContext";
-import {scheduledTransferService} from "../../api/scheduled.transfers.service";
 import {useSelector} from "react-redux";
 
 const useStyles = makeStyles(theme => ({
@@ -17,7 +16,9 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const PayScheduledTransferForm = (props) => {
-    const {formik, history, scheduledTransferId} = props;
+    const {formik, history} = props;
+    const scheduledTransferId = parseInt(props.scheduledTransferId);
+    const allscheduledTransactions = useSelector(state => state.scheduledTransactions);
 
     const toggleLoadingModalOpen = useContext(LoadingModalContext);
     const {showMessageModal} = useContext(MessageModalContext);
@@ -31,13 +32,13 @@ const PayScheduledTransferForm = (props) => {
             try {
                 toggleLoadingModalOpen();
 
-                const scheduledTransfer = await scheduledTransferService.getScheduledTransferById(scheduledTransferId);
+                const scheduledTransaction = allscheduledTransactions.find(scheduledTransaction => scheduledTransaction.id === scheduledTransferId);
 
-                await formik.setFieldValue('originAccountId', scheduledTransfer.origin_account_id);
-                await formik.setFieldValue('destinationAccountId', scheduledTransfer.destination_account_id);
-                await formik.setFieldValue('value', moneyFormat(scheduledTransfer.value, true));
-                await formik.setFieldValue('description', scheduledTransfer.description);
-                await formik.setFieldValue('date', moment(scheduledTransfer.next_date));
+                await formik.setFieldValue('originAccountId', scheduledTransaction.origin_account_id);
+                await formik.setFieldValue('destinationAccountId', scheduledTransaction.destination_account_id);
+                await formik.setFieldValue('value', moneyFormat(scheduledTransaction.value, true));
+                await formik.setFieldValue('description', scheduledTransaction.description);
+                await formik.setFieldValue('date', moment(scheduledTransaction.next_date));
 
                 toggleLoadingModalOpen();
             } catch (e) {

@@ -60,14 +60,14 @@ const ScheduledTransactionCard = (props) => {
                             onClose={handleClose}
                         >
                             <MenuItem component={Link}
-                                      to={scheduledTransaction.scheduled_type === 'Transaction' ? `/scheduled-transactions/edit/${scheduledTransaction.id}` : `/scheduled-transfers/edit/${scheduledTransaction.id}`}>
+                                      to={scheduledTransaction.kind === 'Transaction' ? `/scheduled-transactions/edit/${scheduledTransaction.id}` : `/scheduled-transfers/edit/${scheduledTransaction.id}`}>
                                 <ListItemIcon>
                                     <CreateIcon/>
                                 </ListItemIcon>
                                 Edit
                             </MenuItem>
                             <MenuItem component={Link}
-                                      to={scheduledTransaction.scheduled_type === 'Transaction' ? `/scheduled-transactions/pay/${scheduledTransaction.id}` : `/scheduled-transfers/pay/${scheduledTransaction.id}`}>
+                                      to={scheduledTransaction.kind === 'Transaction' ? `/scheduled-transactions/pay/${scheduledTransaction.id}` : `/scheduled-transfers/pay/${scheduledTransaction.id}`}>
                                 <ListItemIcon>
                                     <AttachMoneyIcon/>
                                 </ListItemIcon>
@@ -91,19 +91,19 @@ const ScheduledTransactionCard = (props) => {
                                 <b>Description:</b> {scheduledTransaction.description}<br/></> : <></>
                         }
                         {
-                            scheduledTransaction.scheduled_type === 'Transaction' ? <>
+                            scheduledTransaction.kind === 'Transaction' ? <>
                                 <b>Account:</b> {scheduledTransaction.account_name}<br/></> : <></>
                         }
                         {
-                            scheduledTransaction.scheduled_type === 'Transaction' ? <>
+                            scheduledTransaction.kind === 'Transaction' ? <>
                                 <b>Category:</b> {scheduledTransaction.category_name} ({scheduledTransaction.category_type})<br/></> : <></>
                         }
                         {
-                            scheduledTransaction.scheduled_type === 'Transfer' ? <>
+                            scheduledTransaction.kind === 'Transfer' ? <>
                                 <b>To:</b> {scheduledTransaction.destination_account_name}<br/></> : <></>
                         }
                         {
-                            scheduledTransaction.scheduled_type === 'Transfer' ? <>
+                            scheduledTransaction.kind === 'Transfer' ? <>
                                 <b>From:</b> {scheduledTransaction.origin_account_name}<br/></> : <></>
                         }
                     </>

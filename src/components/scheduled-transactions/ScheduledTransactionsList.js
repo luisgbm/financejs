@@ -55,7 +55,7 @@ const ScheduledTransactionsList = () => {
             <Container maxWidth='sm' className={classes.container}>
                 {
                     Object.keys(scheduledTransactions).sort().map(date =>
-                        <>
+                        <div key={date}>
                             <Typography key={date} variant='h6' className={classes.date}>{date}</Typography>
                             {
                                 scheduledTransactions[date].map(scheduledTransaction =>
@@ -65,7 +65,7 @@ const ScheduledTransactionsList = () => {
                                     />
                                 )
                             }
-                        </>
+                        </div>
                     )
                 }
             </Container>

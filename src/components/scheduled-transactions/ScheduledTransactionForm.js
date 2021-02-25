@@ -31,7 +31,9 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const ScheduledTransactionForm = (props) => {
-    const {formik, history, mode, scheduledTransactionId} = props;
+    const {formik, history, mode} = props;
+    const scheduledTransactionId = parseInt(props.scheduledTransactionId);
+    const allscheduledTransactions = useSelector(state => state.scheduledTransactions);
 
     const toggleLoadingModalOpen = useContext(LoadingModalContext);
     const {showMessageModal} = useContext(MessageModalContext);
@@ -58,7 +60,7 @@ const ScheduledTransactionForm = (props) => {
         try {
             toggleLoadingModalOpen();
             await scheduledTransactionService.deleteScheduledTransactionById(scheduledTransactionId);
-            dispatch({type: 'deleteScheduledTransaction', payload: parseInt(scheduledTransactionId)});
+            dispatch({type: 'deleteScheduledTransaction', payload: scheduledTransactionId});
             toggleLoadingModalOpen();
             history.push(`/scheduled-transactions`);
         } catch (e) {
@@ -77,7 +79,7 @@ const ScheduledTransactionForm = (props) => {
                 toggleLoadingModalOpen();
 
                 if (mode === 'edit') {
-                    const scheduledTransaction = await scheduledTransactionService.getScheduledTransactionById(scheduledTransactionId);
+                    const scheduledTransaction = allscheduledTransactions.find(scheduledTransaction => scheduledTransaction.id === scheduledTransactionId);
 
                     setCategories(allCategories.filter(category => category.categorytype === scheduledTransaction.category_type));
 

@@ -26,7 +26,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const EditScheduledTransaction = (props) => {
-    const {scheduledTransactionId} = props.match.params;
+    const scheduledTransactionId = parseInt(props.match.params.scheduledTransactionId);
 
     const toggleLoadingModalOpen = useContext(LoadingModalContext);
     const {showMessageModal} = useContext(MessageModalContext);
@@ -56,10 +56,13 @@ const EditScheduledTransaction = (props) => {
 
                 const scheduledTransaction = await scheduledTransactionService.editScheduledTransactionById(
                     scheduledTransactionId,
+                    'Transaction',
                     parseInt(accountId),
                     parseInt(value.replaceAll('.', '').replaceAll(',', '')),
                     description,
                     parseInt(categoryId),
+                    null,
+                    null,
                     moment(createdDate).format('yyyy-MM-DDTHH:mm:ss'),
                     repeat,
                     repeatFreq,

@@ -10,12 +10,15 @@ const getScheduledTransactionById = async (scheduledTransactionId) => {
     return scheduledTransaction.data;
 };
 
-const newScheduledTransaction = async (accountId, value, description, categoryId, createdDate, repeat, repeatFreq, repeatInterval, infiniteRepeat, endAfterRepeats) => {
+const newScheduledTransaction = async (kind, accountId, value, description, categoryId, originAccountId, destinationAccountId, createdDate, repeat, repeatFreq, repeatInterval, infiniteRepeat, endAfterRepeats) => {
     const scheduledTransaction = await authenticationService.postWithAuth(`/scheduled-transactions`, {
+        kind,
         account_id: accountId,
         value,
         description,
         category_id: categoryId,
+        origin_account_id: originAccountId,
+        destination_account_id: destinationAccountId,
         created_date: createdDate,
         repeat,
         repeat_freq: repeat ? repeatFreq : null,
@@ -27,24 +30,29 @@ const newScheduledTransaction = async (accountId, value, description, categoryId
     return scheduledTransaction.data;
 };
 
-const payScheduledTransaction = async (scheduledTransactionId, value, description, date, category, account) => {
+const payScheduledTransaction = async (scheduledTransactionId, value, description, date, categoryId, accountId, originAccountId, destinationAccountId) => {
     const transaction = await authenticationService.postWithAuth(`/scheduled-transactions/${scheduledTransactionId}/pay`, {
         value,
         description,
         date,
-        category,
-        account
+        category_id: categoryId,
+        account_id: accountId,
+        origin_account_id: originAccountId,
+        destination_account_id: destinationAccountId
     });
 
     return transaction.data;
 };
 
-const editScheduledTransactionById = async (scheduledTransactionId, accountId, value, description, categoryId, createdDate, repeat, repeatFreq, repeatInterval, infiniteRepeat, endAfterRepeats) => {
+const editScheduledTransactionById = async (scheduledTransactionId, kind, accountId, value, description, categoryId, originAccountId, destinationAccountId, createdDate, repeat, repeatFreq, repeatInterval, infiniteRepeat, endAfterRepeats) => {
     const scheduledTransaction = await authenticationService.patchWithAuth(`/scheduled-transactions/${scheduledTransactionId}`, {
+        kind,
         account_id: accountId,
         value,
         description,
         category_id: categoryId,
+        origin_account_id: originAccountId,
+        destination_account_id: destinationAccountId,
         created_date: createdDate,
         repeat,
         repeat_freq: repeat ? repeatFreq : null,

@@ -8,7 +8,6 @@ import CurrencyTextField from "../CurrencyTextField";
 import {moneyFormat} from "../../utils/utils";
 import LoadingModalContext from "../../context/LoadingModalContext";
 import MessageModalContext from "../../context/MessageModalContext";
-import {scheduledTransactionService} from "../../api/scheduled.transactions.service";
 import {useSelector} from "react-redux";
 
 const useStyles = makeStyles(theme => ({
@@ -18,7 +17,9 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const PayScheduledTransactionForm = (props) => {
-    const {formik, history, scheduledTransactionId} = props;
+    const {formik, history} = props;
+    const scheduledTransactionId = parseInt(props.scheduledTransactionId);
+    const allscheduledTransactions = useSelector(state => state.scheduledTransactions);
 
     const toggleLoadingModalOpen = useContext(LoadingModalContext);
     const {showMessageModal} = useContext(MessageModalContext);
@@ -45,7 +46,7 @@ const PayScheduledTransactionForm = (props) => {
             try {
                 toggleLoadingModalOpen();
 
-                const scheduledTransaction = await scheduledTransactionService.getScheduledTransactionById(scheduledTransactionId);
+                const scheduledTransaction = allscheduledTransactions.find(scheduledTransaction => scheduledTransaction.id === scheduledTransactionId);
 
                 setCategories(allCategories.filter(category => category.categorytype === scheduledTransaction.category_type));
 
