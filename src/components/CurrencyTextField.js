@@ -49,7 +49,7 @@ const CurrencyTextField = props => {
         e => {
             let {key, keyCode} = e;
             if (keyCode === 0 || keyCode === 229) { //for android chrome keycode fix
-                keyCode = getKeyCode(this.value);
+                keyCode = getKeyCode(key);
             }
             if (
                 (valueInCents === 0 && !VALID_FIRST.test(key)) ||
