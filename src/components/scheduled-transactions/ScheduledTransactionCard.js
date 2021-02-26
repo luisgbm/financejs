@@ -106,6 +106,10 @@ const ScheduledTransactionCard = (props) => {
                             scheduledTransaction.kind === 'Transfer' ? <>
                                 <b>From:</b> {scheduledTransaction.origin_account_name}<br/></> : <></>
                         }
+                        {
+                            scheduledTransaction.repeat === true ? <>
+                                <em>Payment {scheduledTransaction.current_repeat_count + 1} of {scheduledTransaction.infinite_repeat ? '(infinite)' : scheduledTransaction.end_after_repeats}</em></> : <></>
+                        }
                     </>
                 }
             />
