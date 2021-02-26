@@ -32,6 +32,10 @@ const CurrencyTextField = props => {
         }
     };
 
+    const getKeyCode = (str) => {
+        return str.charCodeAt(str.length - 1);
+    };
+
     const valueInCents = currency(value).intValue;
     const valueAbsTrunc = Math.trunc(Math.abs(valueInCents));
     if (
@@ -43,7 +47,10 @@ const CurrencyTextField = props => {
     }
     const handleKeyDown = useCallback(
         e => {
-            const {key, keyCode} = e;
+            let {key, keyCode} = e;
+            if (keyCode === 0 || keyCode === 229) { //for android chrome keycode fix
+                keyCode = getKeyCode(this.value);
+            }
             if (
                 (valueInCents === 0 && !VALID_FIRST.test(key)) ||
                 (valueInCents !== 0 &&
