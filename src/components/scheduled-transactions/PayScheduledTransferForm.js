@@ -3,7 +3,6 @@ import {DateTimePicker, MuiPickersUtilsProvider} from "@material-ui/pickers";
 import MomentUtils from "@date-io/moment";
 import React, {useContext, useEffect} from "react";
 import moment from "moment";
-import CurrencyTextField from "../CurrencyTextField";
 import LoadingModalContext from "../../context/LoadingModalContext";
 import MessageModalContext from "../../context/MessageModalContext";
 import {useSelector} from "react-redux";
@@ -54,26 +53,20 @@ const PayScheduledTransferForm = (props) => {
 
     return (
         <>
-            <FormControl
+            <TextField
                 fullWidth
+                id='value'
+                name='value'
+                label='Value'
+                variant='outlined'
+                autoComplete='off'
                 className={classes.formField}
-            >
-                <CurrencyTextField
-                    id='value'
-                    name='value'
-                    textAlign='left'
-                    label='Value'
-                    variant='outlined'
-                    currencySymbol="$"
-                    outputFormat='number'
-                    decimalCharacter=','
-                    digitGroupSeparator='.'
-                    value={formik.values.value}
-                    onChange={(event, value) => formik.setFieldValue('value', value, true)}
-                    helperText={formik.touched.value && formik.errors.value}
-                    error={formik.touched.value && Boolean(formik.errors.value)}
-                />
-            </FormControl>
+                type='number'
+                value={formik.values.value}
+                onChange={formik.handleChange}
+                error={formik.touched.value && Boolean(formik.errors.value)}
+                helperText={formik.touched.value && formik.errors.value}
+            />
             <FormControl
                 fullWidth
                 variant='outlined'

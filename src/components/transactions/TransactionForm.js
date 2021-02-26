@@ -46,9 +46,9 @@ const TransactionForm = (props) => {
 
         if (categoryType !== '') {
             setCategories(allCategories.filter(category => category.categorytype === categoryType));
-        } else {
-            await formik.setFieldValue('categoryId', '', true);
         }
+
+        await formik.setFieldValue('categoryId', '', true);
     };
 
     const onDeleteTransaction = async () => {
@@ -105,25 +105,20 @@ const TransactionForm = (props) => {
 
     return (
         <>
-            <FormControl
+            <TextField
                 fullWidth
+                id='value'
+                name='value'
+                label='Value'
+                variant='outlined'
+                autoComplete='off'
                 className={classes.formField}
-            >
-                <TextField
-                    fullWidth
-                    id='value'
-                    name='value'
-                    label='Value'
-                    variant='outlined'
-                    autoComplete='off'
-                    className={classes.formField}
-                    type='number'
-                    value={formik.values.value}
-                    onChange={formik.handleChange}
-                    error={formik.touched.value && Boolean(formik.errors.value)}
-                    helperText={formik.touched.value && formik.errors.value}
-                />
-            </FormControl>
+                type='number'
+                value={formik.values.value}
+                onChange={formik.handleChange}
+                error={formik.touched.value && Boolean(formik.errors.value)}
+                helperText={formik.touched.value && formik.errors.value}
+            />
             <FormControl
                 fullWidth
                 variant='outlined'
