@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useContext} from 'react';
 
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
@@ -7,14 +7,14 @@ import SaveIcon from '@material-ui/icons/Save';
 import {Container, IconButton, makeStyles} from '@material-ui/core';
 import moment from 'moment';
 import {transferService} from "../../api/transfer.service";
-import MessageModal from "../MessageModal";
-import LoadingModal from "../LoadingModal";
 import {useFormik} from "formik";
 import * as yup from "yup";
 import TransferForm from "./TransferForm";
 import {accountService} from "../../api/account.service";
 import {useDispatch} from "react-redux";
 import currency from "currency.js";
+import LoadingModalContext from "../../context/LoadingModalContext";
+import MessageModalContext from "../../context/MessageModalContext";
 
 const useStyles = makeStyles(theme => ({
     container: {
@@ -28,10 +28,8 @@ const useStyles = makeStyles(theme => ({
 const EditTransfer = (props) => {
     const {transferId, fromAccountId} = props.match.params;
 
-    const [loadingModalOpen, setLoadingModalOpen] = React.useState(false);
-    const [messageModalOpen, setMessageModalOpen] = React.useState(false);
-    const [messageModalTitle, setMessageModalTitle] = React.useState('');
-    const [messageModalMessage, setMessageModalMessage] = React.useState('');
+    const toggleLoadingModalOpen = useContext(LoadingModalContext);
+    const {showMessageModal} = useContext(MessageModalContext);
 
     const classes = useStyles();
     const dispatch = useDispatch();
@@ -63,13 +61,11 @@ const EditTransfer = (props) => {
             const {value, fromAccountId, toAccountId, description, date} = values;
 
             try {
-                setLoadingModalOpen(true);
-
-                const valueInCents = currency(value).intValue;
+                toggleLoadingModalOpen();
 
                 await transferService.editTransferById(
                     transferId,
-                    valueInCents,
+                    currency(value).intValue,
                     description,
                     moment(date).format('YYYY-MM-DDTHH:mm:ss'),
                     fromAccountId,
@@ -79,31 +75,21 @@ const EditTransfer = (props) => {
                 const accounts = await accountService.getAllAccounts();
                 dispatch({type: 'setAccounts', payload: accounts});
 
-                setLoadingModalOpen(false);
+                toggleLoadingModalOpen();
                 props.history.push(`/transactions/account/${fromAccountId}`);
             } catch (e) {
                 if (e.response && e.response.status === 401) {
                     props.history.push('/');
                 }
 
-                setLoadingModalOpen(false);
-
-                setMessageModalTitle('Error');
-                setMessageModalMessage('An error occurred while processing your request, please try again.');
-                setMessageModalOpen(true);
+                toggleLoadingModalOpen();
+                showMessageModal('Error', 'An error occurred while processing your request, please try again.');
             }
         },
     });
 
     return (
         <>
-            <MessageModal
-                open={messageModalOpen}
-                title={messageModalTitle}
-                message={messageModalMessage}
-                handleClose={() => setMessageModalOpen(false)}
-            />
-            <LoadingModal open={loadingModalOpen}/>
             <AppBar position='sticky'>
                 <Toolbar>
                     <Typography variant='h6' className={classes.appBarTitle}>Edit Transfer</Typography>

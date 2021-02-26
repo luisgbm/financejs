@@ -17,11 +17,11 @@ import MessageModalContext from "../../context/MessageModalContext";
 import {DateTimePicker, MuiPickersUtilsProvider} from "@material-ui/pickers";
 import MomentUtils from "@date-io/moment";
 import RepeatFrequencies from "./RepeatFrequencies";
-import {moneyFormat} from "../../utils/utils";
 import moment from "moment";
 import DeleteIcon from "@material-ui/icons/Delete";
 import {scheduledTransactionService} from "../../api/scheduled.transactions.service";
 import {useDispatch, useSelector} from "react-redux";
+import currency from "currency.js";
 
 const useStyles = makeStyles(theme => ({
     formField: {
@@ -68,7 +68,7 @@ const ScheduledTransferForm = (props) => {
 
                     await formik.setFieldValue('originAccountId', scheduledTransfer.origin_account_id);
                     await formik.setFieldValue('destinationAccountId', scheduledTransfer.destination_account_id);
-                    await formik.setFieldValue('value', moneyFormat(scheduledTransfer.value, true));
+                    await formik.setFieldValue('value', currency(scheduledTransfer.value, {fromCents: true}));
                     await formik.setFieldValue('description', scheduledTransfer.description);
                     await formik.setFieldValue('createdDate', moment(scheduledTransfer.created_date));
                     await formik.setFieldValue('repeat', scheduledTransfer.repeat);
@@ -105,12 +105,15 @@ const ScheduledTransferForm = (props) => {
                 <CurrencyTextField
                     id='value'
                     name='value'
+                    textAlign='left'
                     label='Value'
                     variant='outlined'
-                    autoComplete='off'
-                    customInput={TextField}
+                    currencySymbol="$"
+                    outputFormat='number'
+                    decimalCharacter=','
+                    digitGroupSeparator='.'
                     value={formik.values.value}
-                    onChange={formik.handleChange}
+                    onChange={(event, value) => formik.setFieldValue('value', value, true)}
                     helperText={formik.touched.value && formik.errors.value}
                     error={formik.touched.value && Boolean(formik.errors.value)}
                 />

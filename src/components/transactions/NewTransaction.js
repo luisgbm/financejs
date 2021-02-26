@@ -84,11 +84,9 @@ const NewTransaction = (props) => {
             try {
                 toggleLoadingModalOpen();
 
-                const valueInCents = currency(value).intValue;
-
                 await transactionService.newTransaction(
                     accountId,
-                    valueInCents,
+                    currency(value).intValue,
                     description,
                     date.format('yyyy-MM-DDTHH:mm:ss'),
                     parseInt(categoryId)
@@ -139,10 +137,8 @@ const NewTransaction = (props) => {
             try {
                 toggleLoadingModalOpen();
 
-                const valueInCents = currency(value).intValue;
-
                 await transferService.newTransfer(
-                    valueInCents,
+                    currency(value).intValue,
                     description,
                     fromAccountId,
                     toAccountId,

@@ -19,10 +19,10 @@ import {DateTimePicker, MuiPickersUtilsProvider} from "@material-ui/pickers";
 import MomentUtils from "@date-io/moment";
 import RepeatFrequencies from "./RepeatFrequencies";
 import {scheduledTransactionService} from "../../api/scheduled.transactions.service";
-import {moneyFormat} from "../../utils/utils";
 import moment from "moment";
 import DeleteIcon from "@material-ui/icons/Delete";
 import {useDispatch, useSelector} from "react-redux";
+import currency from "currency.js";
 
 const useStyles = makeStyles(theme => ({
     formField: {
@@ -83,7 +83,7 @@ const ScheduledTransactionForm = (props) => {
 
                     setCategories(allCategories.filter(category => category.categorytype === scheduledTransaction.category_type));
 
-                    await formik.setFieldValue('value', moneyFormat(scheduledTransaction.value, true));
+                    await formik.setFieldValue('value', currency(scheduledTransaction.value, {fromCents: true}));
                     await formik.setFieldValue('description', scheduledTransaction.description);
                     await formik.setFieldValue('accountId', scheduledTransaction.account_id);
                     await formik.setFieldValue('categoryType', scheduledTransaction.category_type);
@@ -123,12 +123,15 @@ const ScheduledTransactionForm = (props) => {
                 <CurrencyTextField
                     id='value'
                     name='value'
+                    textAlign='left'
                     label='Value'
                     variant='outlined'
-                    autoComplete='off'
-                    customInput={TextField}
+                    currencySymbol="$"
+                    outputFormat='number'
+                    decimalCharacter=','
+                    digitGroupSeparator='.'
                     value={formik.values.value}
-                    onChange={formik.handleChange}
+                    onChange={(event, value) => formik.setFieldValue('value', value, true)}
                     helperText={formik.touched.value && formik.errors.value}
                     error={formik.touched.value && Boolean(formik.errors.value)}
                 />

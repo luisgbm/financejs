@@ -14,12 +14,12 @@ import React, {useContext, useEffect} from "react";
 import DeleteIcon from "@material-ui/icons/Delete";
 import {transferService} from "../../api/transfer.service";
 import moment from "moment";
-import {moneyFormat} from "../../utils/utils";
 import CurrencyTextField from "../CurrencyTextField";
 import LoadingModalContext from "../../context/LoadingModalContext";
 import MessageModalContext from "../../context/MessageModalContext";
 import {useDispatch, useSelector} from "react-redux";
 import {accountService} from "../../api/account.service";
+import currency from 'currency.js';
 
 const useStyles = makeStyles(theme => ({
     formField: {
@@ -46,7 +46,7 @@ const TransferForm = (props) => {
                 if (mode === 'edit') {
                     const transfer = await transferService.getTransferById(transferId);
 
-                    formik.setFieldValue('value', moneyFormat(transfer.data.value, true));
+                    formik.setFieldValue('value', currency(transfer.data.value, {fromCents: true}));
                     formik.setFieldValue('description', transfer.data.description);
                     formik.setFieldValue('date', moment(transfer.data.date));
                     formik.setFieldValue('fromAccountId', transfer.data.origin_account);
@@ -96,12 +96,15 @@ const TransferForm = (props) => {
                 <CurrencyTextField
                     id='value'
                     name='value'
+                    textAlign='left'
                     label='Value'
                     variant='outlined'
-                    autoComplete='off'
-                    customInput={TextField}
+                    currencySymbol="$"
+                    outputFormat='number'
+                    decimalCharacter=','
+                    digitGroupSeparator='.'
                     value={formik.values.value}
-                    onChange={formik.handleChange}
+                    onChange={(event, value) => formik.setFieldValue('value', value, true)}
                     helperText={formik.touched.value && formik.errors.value}
                     error={formik.touched.value && Boolean(formik.errors.value)}
                 />

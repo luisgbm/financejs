@@ -55,13 +55,11 @@ const EditScheduledTransaction = (props) => {
             try {
                 toggleLoadingModalOpen();
 
-                const valueInCents = currency(value).intValue;
-
                 const scheduledTransaction = await scheduledTransactionService.editScheduledTransactionById(
                     scheduledTransactionId,
                     'Transaction',
                     parseInt(accountId),
-                    valueInCents,
+                    currency(value).intValue,
                     description,
                     parseInt(categoryId),
                     null,

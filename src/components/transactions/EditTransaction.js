@@ -61,11 +61,9 @@ const EditTransaction = (props) => {
             try {
                 toggleLoadingModalOpen();
 
-                const valueInCents = currency(value).intValue;
-
                 await transactionService.editTransactionById(
                     transactionId,
-                    valueInCents,
+                    currency(value).intValue,
                     description,
                     moment(date).format('YYYY-MM-DDTHH:mm:ss'),
                     parseInt(accountId),
