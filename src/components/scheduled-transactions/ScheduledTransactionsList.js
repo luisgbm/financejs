@@ -27,7 +27,9 @@ const ScheduledTransactionsList = () => {
     const scheduledTransactions = useSelector(state => {
         let grouped = {};
 
-        for (let t of state.scheduledTransactions) {
+        let orderedByDate = state.scheduledTransactions.sort((a, b) => moment(a.next_date).diff(moment(b.next_date)));
+
+        for (let t of orderedByDate) {
             let nextDate = moment(t.next_date).format("DD/MM/yyyy");
 
             if (!grouped[nextDate]) {
@@ -60,7 +62,7 @@ const ScheduledTransactionsList = () => {
             </AppBar>
             <Container maxWidth='sm' className={classes.container}>
                 {
-                    Object.keys(scheduledTransactions).sort().map(date =>
+                    Object.keys(scheduledTransactions).map(date =>
                         <div key={date}>
                             <Typography key={date} variant='h6'
                                         className={classes.date}>{dateIsToday(date) ? 'Today' : date}</Typography>
