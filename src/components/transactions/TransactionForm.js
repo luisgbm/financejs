@@ -118,8 +118,6 @@ const TransactionForm = (props) => {
                     variant='outlined'
                     currencySymbol="$"
                     outputFormat='number'
-                    decimalCharacter=','
-                    digitGroupSeparator='.'
                     value={formik.values.value}
                     onChange={(event, value) => formik.setFieldValue('value', value, true)}
                     helperText={formik.touched.value && formik.errors.value}
