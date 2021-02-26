@@ -15,6 +15,7 @@ import {
 import {scheduledTransactionService} from "../../api/scheduled.transactions.service";
 import moment from "moment";
 import {useDispatch} from "react-redux";
+import currency from "currency.js";
 
 const useStyles = makeStyles(theme => ({
     appBarTitle: {
@@ -54,11 +55,13 @@ const EditScheduledTransaction = (props) => {
             try {
                 toggleLoadingModalOpen();
 
+                const valueInCents = currency(value).intValue;
+
                 const scheduledTransaction = await scheduledTransactionService.editScheduledTransactionById(
                     scheduledTransactionId,
                     'Transaction',
                     parseInt(accountId),
-                    parseInt(value.replaceAll('.', '').replaceAll(',', '')),
+                    valueInCents,
                     description,
                     parseInt(categoryId),
                     null,

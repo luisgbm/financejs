@@ -14,6 +14,7 @@ import * as yup from "yup";
 import TransferForm from "./TransferForm";
 import {accountService} from "../../api/account.service";
 import {useDispatch} from "react-redux";
+import currency from "currency.js";
 
 const useStyles = makeStyles(theme => ({
     container: {
@@ -64,9 +65,11 @@ const EditTransfer = (props) => {
             try {
                 setLoadingModalOpen(true);
 
+                const valueInCents = currency(value).intValue;
+
                 await transferService.editTransferById(
                     transferId,
-                    parseInt(value.replaceAll('.', '').replaceAll(',', '')),
+                    valueInCents,
                     description,
                     moment(date).format('YYYY-MM-DDTHH:mm:ss'),
                     fromAccountId,

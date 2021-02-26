@@ -105,12 +105,10 @@ const ScheduledTransferForm = (props) => {
                 <CurrencyTextField
                     id='value'
                     name='value'
-                    textAlign='left'
                     label='Value'
                     variant='outlined'
-                    currencySymbol="$"
-                    outputFormat='number'
                     autoComplete='off'
+                    customInput={TextField}
                     value={formik.values.value}
                     onChange={formik.handleChange}
                     helperText={formik.touched.value && formik.errors.value}

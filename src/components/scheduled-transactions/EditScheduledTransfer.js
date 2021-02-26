@@ -12,6 +12,7 @@ import {scheduledTransferInitialValues, scheduledTransferValidationSchema} from 
 import {scheduledTransactionService} from "../../api/scheduled.transactions.service";
 import moment from "moment";
 import {useDispatch} from "react-redux";
+import currency from "currency.js";
 
 const useStyles = makeStyles(theme => ({
     appBarTitle: {
@@ -55,7 +56,7 @@ const EditScheduledTransfer = (props) => {
                     scheduledTransferId,
                     'Transfer',
                     null,
-                    parseInt(value.replaceAll('.', '').replaceAll(',', '')),
+                    currency(value).intValue,
                     description,
                     null,
                     parseInt(originAccountId),

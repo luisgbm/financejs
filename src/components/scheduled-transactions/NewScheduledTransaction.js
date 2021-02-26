@@ -19,6 +19,7 @@ import AutorenewIcon from "@material-ui/icons/Autorenew";
 import ScheduledTransferForm from "./ScheduledTransferForm";
 import moment from "moment";
 import {useDispatch} from "react-redux";
+import currency from "currency.js";
 
 const useStyles = makeStyles(theme => ({
     appBarTitle: {
@@ -83,7 +84,7 @@ const NewScheduledTransaction = (props) => {
                 let scheduledTransaction = await scheduledTransactionService.newScheduledTransaction(
                     'Transfer',
                     null,
-                    parseInt(value.replaceAll('.', '').replaceAll(',', '')),
+                    currency(value).intValue,
                     description,
                     null,
                     parseInt(originAccountId),
@@ -134,7 +135,7 @@ const NewScheduledTransaction = (props) => {
                 let scheduledTransaction = await scheduledTransactionService.newScheduledTransaction(
                     'Transaction',
                     parseInt(accountId),
-                    parseInt(value.replaceAll('.', '').replaceAll(',', '')),
+                    currency(value).intValue,
                     description,
                     parseInt(categoryId),
                     null,

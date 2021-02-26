@@ -18,6 +18,7 @@ import LoadingModalContext from "../../context/LoadingModalContext";
 import MessageModalContext from "../../context/MessageModalContext";
 import {useDispatch} from "react-redux";
 import {accountService} from "../../api/account.service";
+import currency from "currency.js";
 
 const useStyles = makeStyles(theme => ({
     container: {
@@ -83,9 +84,11 @@ const NewTransaction = (props) => {
             try {
                 toggleLoadingModalOpen();
 
+                const valueInCents = currency(value).intValue;
+
                 await transactionService.newTransaction(
                     accountId,
-                    parseInt(value.replaceAll('.', '').replaceAll(',', '')),
+                    valueInCents,
                     description,
                     date.format('yyyy-MM-DDTHH:mm:ss'),
                     parseInt(categoryId)
@@ -136,8 +139,10 @@ const NewTransaction = (props) => {
             try {
                 toggleLoadingModalOpen();
 
+                const valueInCents = currency(value).intValue;
+
                 await transferService.newTransfer(
-                    parseInt(value.replaceAll('.', '').replaceAll(',', '')),
+                    valueInCents,
                     description,
                     fromAccountId,
                     toAccountId,

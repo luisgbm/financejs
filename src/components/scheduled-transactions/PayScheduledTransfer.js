@@ -13,6 +13,7 @@ import AppBar from "@material-ui/core/AppBar";
 import PayScheduledTransferForm from "./PayScheduledTransferForm";
 import {useDispatch} from "react-redux";
 import {accountService} from "../../api/account.service";
+import currency from "currency.js";
 
 const useStyles = makeStyles(theme => ({
     container: {
@@ -63,7 +64,7 @@ const PayScheduledTransfer = (props) => {
 
                 await scheduledTransactionService.payScheduledTransaction(
                     scheduledTransferId,
-                    parseInt(value.replaceAll('.', '').replaceAll(',', '')),
+                    currency(value).intValue,
                     description,
                     moment(date).format('YYYY-MM-DDTHH:mm:ss'),
                     null,
