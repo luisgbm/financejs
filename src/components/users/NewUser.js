@@ -61,15 +61,12 @@ const NewUser = (props) => {
             } catch (e) {
                 toggleLoadingModalOpen();
 
-
                 if (e.response && e.response.status === 409) {
                     showMessageModal('User already exists',
                         `A user with the name "${userName}" already exists, please choose a different user name.`);
                 } else {
                     showMessageModal('Error', 'An error occurred while processing your request, please try again.');
                 }
-
-                toggleLoadingModalOpen();
             }
         },
     });
