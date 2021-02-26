@@ -15,7 +15,6 @@ import React, {useContext, useEffect} from "react";
 import {transactionService} from "../../api/transaction.service";
 import moment from "moment";
 import DeleteIcon from "@material-ui/icons/Delete";
-import CurrencyTextField from "../CurrencyTextField";
 import {useDispatch, useSelector} from "react-redux";
 import LoadingModalContext from "../../context/LoadingModalContext";
 import MessageModalContext from "../../context/MessageModalContext";
@@ -110,18 +109,19 @@ const TransactionForm = (props) => {
                 fullWidth
                 className={classes.formField}
             >
-                <CurrencyTextField
+                <TextField
+                    fullWidth
                     id='value'
                     name='value'
-                    textAlign='left'
                     label='Value'
                     variant='outlined'
-                    currencySymbol="$"
-                    outputFormat='number'
+                    autoComplete='off'
+                    className={classes.formField}
+                    type='number'
                     value={formik.values.value}
-                    onChange={(event, value) => formik.setFieldValue('value', value, true)}
-                    helperText={formik.touched.value && formik.errors.value}
+                    onChange={formik.handleChange}
                     error={formik.touched.value && Boolean(formik.errors.value)}
+                    helperText={formik.touched.value && formik.errors.value}
                 />
             </FormControl>
             <FormControl
