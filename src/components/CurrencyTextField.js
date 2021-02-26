@@ -32,10 +32,6 @@ const CurrencyTextField = props => {
         }
     };
 
-    const getKeyCode = (str) => {
-        return str.charCodeAt(str.length - 1);
-    };
-
     const valueInCents = currency(value).intValue;
     const valueAbsTrunc = Math.trunc(Math.abs(valueInCents));
     if (
@@ -47,21 +43,18 @@ const CurrencyTextField = props => {
     }
     const handleKeyDown = useCallback(
         e => {
-            let {key, keyCode} = e;
-            if (keyCode === 0 || keyCode === 229) { //for android chrome keycode fix
-                keyCode = getKeyCode(key);
-            }
+            let {key, which} = e;
             if (
                 (valueInCents === 0 && !VALID_FIRST.test(key)) ||
                 (valueInCents !== 0 &&
                     !VALID_NEXT.test(key) &&
-                    keyCode !== DELETE_KEY_CODE)
+                    which !== DELETE_KEY_CODE)
             ) {
                 return;
             }
             const valueString = valueInCents.toString();
             let nextValue;
-            if (keyCode !== DELETE_KEY_CODE) {
+            if (which !== DELETE_KEY_CODE) {
                 const nextValueString =
                     valueInCents === 0 ? key : `${valueString}${key}`;
                 nextValue = Number.parseInt(nextValueString, 10);
