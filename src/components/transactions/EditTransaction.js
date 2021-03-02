@@ -46,13 +46,14 @@ const EditTransaction = (props) => {
         },
         validationSchema: yup.object({
             value: yup
-                .string('Enter the value')
+                .number('Enter the value')
+                .moreThan(0, 'Value must be greater than 0')
                 .required('Value is required'),
             categoryType: yup
                 .string('Select the category type')
                 .required('Type is required'),
             categoryId: yup
-                .string('Select the category')
+                .number('Select the category')
                 .required('Category is required')
         }),
         onSubmit: async (values) => {

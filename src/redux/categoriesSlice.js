@@ -6,10 +6,10 @@ const categoriesReducer = (state = initialState, action) => {
             return [
                 ...state,
                 action.payload
-            ];
+            ].sort((a, b) => a.name.localeCompare(b.name));
         }
         case 'setCategories': {
-            return action.payload;
+            return action.payload.sort((a, b) => a.name.localeCompare(b.name));
         }
         case 'editCategory': {
             return state.map(category => {
@@ -18,10 +18,10 @@ const categoriesReducer = (state = initialState, action) => {
                 }
 
                 return category;
-            });
+            }).sort((a, b) => a.name.localeCompare(b.name));
         }
         case 'deleteCategory': {
-            return state.filter(category => category.id !== action.payload);
+            return state.filter(category => category.id !== action.payload).sort((a, b) => a.name.localeCompare(b.name));
         }
         default:
             return state;

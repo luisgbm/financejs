@@ -45,13 +45,14 @@ const EditTransfer = (props) => {
         },
         validationSchema: yup.object({
             value: yup
-                .string('Enter the value')
+                .number('Enter the value')
+                .moreThan(0, 'Value must be greater than 0')
                 .required('Value is required'),
             fromAccountId: yup
-                .string('Select the From account')
+                .number('Select the From account')
                 .required('From account is required'),
             toAccountId: yup
-                .string('Select the To account')
+                .number('Select the To account')
                 .test('differentFromAccountId', 'To and From must be different', function (value) {
                     return value !== this.options.parent.fromAccountId;
                 })

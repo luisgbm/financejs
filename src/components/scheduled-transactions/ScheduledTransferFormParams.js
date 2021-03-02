@@ -12,7 +12,8 @@ const scheduledTransferValidationSchema = yup.object({
         })
         .required('To Account is required'),
     value: yup
-        .string('Enter the value')
+        .number('Enter the value')
+        .moreThan(0, 'Value must be greater than 0')
         .required('Value is required'),
     repeat: yup
         .boolean(),
@@ -23,15 +24,17 @@ const scheduledTransferValidationSchema = yup.object({
             then: yup.string().required('Frequency is required')
         }),
     repeatInterval: yup
-        .string()
+        .number()
+        .moreThan(0, 'Interval must be greater than 0')
         .when('repeat', {
             is: true,
-            then: yup.string().required('Interval is required')
+            then: yup.number().required('Interval is required')
         }),
     infiniteRepeat: yup
         .boolean(),
     endAfterRepeats: yup
-        .string()
+        .number()
+        .moreThan(0, 'End After Repetitions must be greater than 0')
         .when('repeat', {
             is: true,
             then: yup.string().when('infiniteRepeat', {
