@@ -1,4 +1,4 @@
-import {Card, CardHeader, IconButton, ListItemIcon, makeStyles} from "@material-ui/core";
+import {Badge, Card, CardHeader, IconButton, ListItemIcon, makeStyles} from "@material-ui/core";
 import CreateIcon from "@material-ui/icons/Create";
 import Typography from "@material-ui/core/Typography";
 import {moneyFormat} from "../../utils/utils";
@@ -8,6 +8,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import AttachMoneyIcon from '@material-ui/icons/AttachMoney';
 import {Link} from "react-router-dom";
+import moment from "moment";
 
 const useStyles = makeStyles(theme => ({
     card: {
@@ -45,6 +46,13 @@ const ScheduledTransactionCard = (props) => {
         }
     };
 
+    const transactionIsDue = (date) => {
+        let dateMoment = moment(date);
+        let today = moment();
+
+        return today.isSameOrBefore(dateMoment);
+    };
+
     return (
         <Card key={scheduledTransaction.id} variant='outlined' className={classes.card}>
             <CardHeader
@@ -77,12 +85,14 @@ const ScheduledTransactionCard = (props) => {
                     </>
                 }
                 title={
-                    <Typography
-                        variant='h6'
-                        className={getValueClass(scheduledTransaction.category_type)}
-                    >
-                        {moneyFormat(scheduledTransaction.value)}
-                    </Typography>
+                    <Badge variant="dot" color="secondary" invisible={transactionIsDue(scheduledTransaction.next_date)}>
+                        <Typography
+                            variant='h6'
+                            className={getValueClass(scheduledTransaction.category_type)}
+                        >
+                            {moneyFormat(scheduledTransaction.value)}
+                        </Typography>
+                    </Badge>
                 }
                 subheader={
                     <>
