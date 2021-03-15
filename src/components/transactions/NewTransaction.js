@@ -89,7 +89,7 @@ const NewTransaction = (props) => {
                     accountId,
                     currency(value).intValue,
                     description,
-                    date.format('yyyy-MM-DDTHH:mm:ss'),
+                    moment(date).format('yyyy-MM-DDTHH:mm:ss'),
                     parseInt(categoryId)
                 );
 
@@ -144,7 +144,7 @@ const NewTransaction = (props) => {
                     description,
                     fromAccountId,
                     toAccountId,
-                    date.format('yyyy-MM-DDTHH:mm:ss'),
+                    moment(date).format('yyyy-MM-DDTHH:mm:ss'),
                 );
 
                 const accounts = await accountService.getAllAccounts();
